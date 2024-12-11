@@ -49,13 +49,13 @@ public class AccelerationIntegrator {
         lastTimestamp = currentTime;
     }
 
-    public ITwist2d update(double[] accel) {
+    public ITwist2d update(double[] update) {
 
-        lowPassFilter(accel);
+        lowPassFilter(update);
 
-        prevAccel = accel;
+        prevAccel = update;
 
-        integrateAccel(accel[0], accel[1], accel[2]);
+        integrateAccel(update[0], update[1], update[2]);
 
         if(s_Swerve.getAbsoluteWheelVelocity() < 0.001){ //tune this threshold as needed
             xVelocity = 0;
@@ -65,17 +65,17 @@ public class AccelerationIntegrator {
         return new ITwist2d(xVelocity, yVelocity);
     }
 
-    public ITwist2d update(double[] accel, double[] wheelVelocity) {
+    public ITwist2d update(double[] update, double[] wheelVelocity) {
         
-        lowPassFilter(accel);
+        lowPassFilter(update);
 
-        prevAccel = accel;
+        prevAccel = update;
 
-        integrateAccel(accel[0], accel[1], accel[2]);
+        integrateAccel(update[0], update[1], update[2]);
 
-        complimentaryFilter(accel, wheelVelocity);
+        complimentaryFilter(update, wheelVelocity);
 
-        if(Math.abs(s_Swerve.getAbsoluteWheelVelocity()) < 0.00001){ //tune this threshold as needed
+        if(Math.abs(s_Swerve.getAbsoluteWheelVelocity()) == 0){ //tune this threshold as needed
             xVelocity = 0;
             yVelocity = 0;
         } 

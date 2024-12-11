@@ -83,7 +83,7 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 	private InterpolatingTreeMap<InterpolatingDouble, ITranslation2d> filteredPoses;
     private InterpolatingTreeMap<InterpolatingDouble, ITwist2d> robotVelocities;
 
-    private ExtendedKalmanFilter<N4, N2, N2> EKF;
+    private ExtendedKalmanFilter<N2, N2, N2> EKF;
 
     private static final double dt = 0.020;
     private static final int observationSize = 50; //how many poses we keep our tree
@@ -127,21 +127,21 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
             updateAccel();
 
-            ITwist2d robotVelocity = getInterpolatedValue(robotVelocities, timestamp, ITwist2d.identity());
+            // ITwist2d robotVelocity = getInterpolatedValue(robotVelocities, timestamp, ITwist2d.identity());
 
-            // EKF.predict(VecBuilder.fill(robotVelocity.getX(), robotVelocity.getY()), timestamp);
-
-            // //calculate std of vision estimate for EKF
-            // Vector<N2> stdevs = VecBuilder.fill(Math.pow(updatePose.getStandardDeviation(), 1), Math.pow(updatePose.getStandardDeviation(), 1));
-			// 		EKF.correct(
-			// 				VecBuilder.fill(robotVelocity.getX(), robotVelocity.getY()),
-			// 				VecBuilder.fill(
-			// 						updatePose.estimatedPose.getX(),
-			// 						updatePose.estimatedPose.getY()),
-			// 				StateSpaceUtil.makeCovarianceMatrix(Nat.N2(), stdevs));
-			// 		filteredPoses.put(
-			// 				new InterpolatingDouble(timestamp),
-			// 				new ITranslation2d(EKF.getXhat(0), EKF.getXhat(1)));
+            //calculate std of vision estimate for EKF
+            double std = updatePose.getStandardDeviation();
+            Vector<N2> stdevs = VecBuilder.fill(Math.pow(std, 1), Math.pow(std, 1));
+					EKF.correct(
+							VecBuilder.fill(0, 0),
+							VecBuilder.fill(
+									updatePose.estimatedPose.getX(),
+									updatePose.estimatedPose.getY()),
+							StateSpaceUtil.makeCovarianceMatrix(Nat.N2(), stdevs));
+                            
+					filteredPoses.put(
+							new InterpolatingDouble(timestamp),
+							new ITranslation2d(EKF.getXhat(0), EKF.getXhat(1)));
         }
     }
 
@@ -153,67 +153,40 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
         ITwist2d robotVelocity = getLatestRobotVelocity();
 
-        SmartDashboard.putNumber("robotVelocitie X", robotVelocity.getX());
-        SmartDashboard.putNumber("robotVelocitie Y", robotVelocity.getY());
-        SmartDashboard.putNumber("robotVelocitie MAG", Math.hypot(robotVelocity.getY(), robotVelocity.getX()));
-        //predict next state with our velocity measurement
-        EKF.predict(VecBuilder.fill(robotVelocity.getX(), robotVelocity.getY()), timestamp);
+        SmartDashboard.putNumber("robotVelocity X", robotVelocity.getX());
+        SmartDashboard.putNumber("robotVelocity Y", robotVelocity.getY());
+        SmartDashboard.putNumber("robotVelocity magnitude", getRobotVelocityMagnitude());
+            
+        EKF.predict(VecBuilder.fill(0,0), dt);
 
         //correct our prediction with the odometry update
         EKF.correct(
-            VecBuilder.fill(robotVelocity.getX(), robotVelocity.getY()),
-            VecBuilder.fill(
+                VecBuilder.fill(0,0),
+                VecBuilder.fill(
                 pose.getX(),
                 pose.getY()));
 
         filteredPoses.put(
             new InterpolatingDouble(timestamp),
             new ITranslation2d(EKF.getXhat(0), EKF.getXhat(1)));
-    }
+        }
 
 
     public void initKalman() {
         double dt = 0.020;
 
-        BiFunction<Matrix<N4, N1>, Matrix<N2, N1>, Matrix<N4, N1>> f = (state, input) -> {
-            double x = state.get(0, 0);
-            double y = state.get(1, 0);
-            double velx = input.get(0, 0);
-            double vely = input.get(1, 0);
-
-            return VecBuilder.fill(
-                x + (velx * dt),                // New x position
-                y + (vely * dt),                // New y position
-                velx,
-                vely 
-                );
-        };
-
-
-        BiFunction<Matrix<N4, N1>, Matrix<N2, N1>, Matrix<N2, N1>> h = (state, input) -> {
-            double x = state.get(0, 0);
-            double y = state.get(1, 0);
-
-            return VecBuilder.fill(
-                x,                // New x position
-                y                // New y position
-                );
-        }; //same thing as (x,u) -> u
-
-        // TODO these need to be not guessed
-        Matrix<N4, N1> stateStdDevs = VecBuilder.fill(
+        // TODO tune
+        Matrix<N2, N1> stateStdDevs = VecBuilder.fill(
             Math.pow(0.1, 2), //variance in position x
-            Math.pow(0.1, 2), //variance in position y
-            Math.pow(0.05, 2), //variance in velocity x
-            Math.pow(0.05, 2)); //variance in velocity y
+            Math.pow(0.1, 2)); //variance in position y
         
         Matrix<N2, N1> measurementStdDevs = VecBuilder.fill(    
             Math.pow(0.05, 2), //variance in measurement x
             Math.pow(0.05, 2)); //variance in measurement y
 
-        EKF = new ExtendedKalmanFilter<>(Nat.N4(), Nat.N2(), Nat.N2(),
-        f,
-        h,
+        EKF = new ExtendedKalmanFilter<>(Nat.N2(), Nat.N2(), Nat.N2(),
+        (x,u) -> u,
+        (x,u) -> x,
         stateStdDevs,
         measurementStdDevs,
         dt);
@@ -337,7 +310,7 @@ public class RobotState { //will estimate pose with odometry and correct drift w
          *
          * @return double VelocityMagnitude
          */
-        public synchronized double robotVelocityMagnitude() {
+        public synchronized double getRobotVelocityMagnitude() {
             ITwist2d robotVelocity = getLatestRobotVelocity();
             return Math.signum(Math.atan2(robotVelocity.getX(), robotVelocity.getY()))
              * Math.hypot(robotVelocity.getX(), robotVelocity.getY());
