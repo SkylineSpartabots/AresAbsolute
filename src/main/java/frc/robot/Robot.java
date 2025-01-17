@@ -22,9 +22,11 @@ import frc.lib.AccelerationIntegrator;
 import frc.robot.RobotState.RobotState;
 // import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.Drivetrain;
+import frc.robot.Subsystems.LEDs.LEDs;
 import frc.robot.Subsystems.Vision.Vision;
 // import frc.robot.commands.AutoCommand;
 // import frc.robot.commands.Autos;
+
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -46,8 +48,10 @@ public class Robot extends TimedRobot {
 
   private Drivetrain drivetrain;
   private RobotState robotState;
+  private LEDs leds;
  
     public Robot() { 
+
       // oops just realized logging needs to be in the constructor lol
       // metadata
       // Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -104,6 +108,10 @@ public class Robot extends TimedRobot {
       drivetrain = Drivetrain.getInstance();
       robotState = RobotState.getInstance();
       vision = Vision.getInstance();
+      leds = LEDs.getInstance();
+      leds.initLEDs();
+      leds.updateAlliance();
+      
     }
 
   @Override
