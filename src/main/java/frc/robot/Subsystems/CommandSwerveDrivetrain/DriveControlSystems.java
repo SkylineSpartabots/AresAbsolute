@@ -9,7 +9,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.interpolation.Interpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -29,6 +32,18 @@ public class DriveControlSystems {
     private boolean aligning = false;
     private double lastHeading = 0;
 
+
+    private double goalHeading = 0.0;
+
+    //need tune this 
+    private double filterThreshold = 0.1;
+
+    //MODIFIED implementation to convert rotations to heading by integration
+
+    private static Timer timer = new Timer();
+    private double prevTimestamp = 0.0;
+
+
     // Can tune
     private double deadbandFactor = 0.8; // higher is more linear joystick controls
 
@@ -38,9 +53,14 @@ public class DriveControlSystems {
 
     PIDController pidHeading = new PIDController(0, 0, 0);
 
+    // arbitrary number havent tested yet
+    SlewRateLimiter limit = new SlewRateLimiter(0.2);
+
     public DriveControlSystems() {  
         // robotState = RobotState.getInstance();
         drivetrain = CommandSwerveDrivetrain.getInstance();
+
+        timer.start();
     }
 
     //interface with modules
@@ -62,7 +82,15 @@ public class DriveControlSystems {
         ChassisSpeeds speeds = new ChassisSpeeds(driverLY, driverLX, driverRX);
 
         double[][] wheelFeedFwX = calculateFeedforward();
-        
+
+        driverRX = limit.calculate(driverRX);         //slew rate limit for smoother inputs
+
+        //ignore changes that are too small (number subject to change this is just a test value)
+        if(Math.abs(driverRX) > 0.05) { headingIntegrator(driverRX); SmartDashboard.putNumber("Goal heading", goalHeading); }
+    
+        driverRX = calculateGoalHeading(goalHeading, drivetrain.getHeading());         //if it's not needed it's not applied
+
+
         return new SwerveRequest.FieldCentric().withVelocityX(driverLX).withVelocityY(driverLY).withRotationalRate(driverRX);
         // .withSpeeds(speeds)
         // .withWheelForceFeedforwardsX(wheelFeedFwX[0])
@@ -104,7 +132,6 @@ public class DriveControlSystems {
             wheelFeedFwX[1][i] = Y;
         }
 
-
         return wheelFeedFwX;
     }
 
@@ -114,6 +141,47 @@ public class DriveControlSystems {
         else
             return (deadbandFactor * Math.pow(input, 3)) + (1 - deadbandFactor) * input;
     }
+
+    public double calculateGoalHeading(double goalHeading, double driverRx) {
+        double headingDifference = Math.IEEEremainder(drivetrain.getHeading() - goalHeading, 2 * Math.PI);
+
+        if (Math.abs(headingDifference) >= updateFilterThreshold(drivetrain.getAbsoluteWheelVelocity(), driverRx)) {
+            return headingControl(drivetrain.getHeading());
+        } else {
+            SmartDashboard.putBoolean("Heading control active", false);
+        }
+
+        return driverRx; //passes correction value back to drive()
+    }
+
+    public double headingControl(double currHeading) {
+        updateGains(drivetrain.getAbsoluteWheelVelocity());       //same pid as original heading control
+
+        currHeading = pidHeading.calculate(currHeading, goalHeading);         //heading -> rotational rate
+
+        SmartDashboard.putBoolean("Heading control active", true);
+
+        return currHeading;
+    }
+
+
+    // (EXPERIMENTAL) numerical definite integration i foudn this online
+    public void headingIntegrator(double driverRX) {
+        //change in heading, change in time 
+        double time = timer.get();
+        double dt = time - prevTimestamp;
+        prevTimestamp = time;
+
+        goalHeading = Math.IEEEremainder(goalHeading + driverRX * dt, 2*Math.PI);
+    }
+
+    //kind of similar approach to updateGains - based on robot speed optimal values could be different
+    public double updateFilterThreshold(double velocity, double turnRate) {
+        return filterThreshold * (1 + Math.log1p(velocity/Constants.MaxSpeed) + Math.log1p(turnRate/Constants.MaxAngularRate));     //**MORE CONSERVATIVE** 
+        //return filterThreshold * (1 + velocity/Constants.MaxSpeed + turnRate/Constants.MaxAngularRate);        **MORE AGGRESSIVE**
+    }
+
+
 
     // =======---===[ ⚙ Heading control ]===---========
     // public double headingControl(double driverRX){ //TODO tune high and low PID values
