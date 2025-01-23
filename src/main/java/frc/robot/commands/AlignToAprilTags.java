@@ -20,6 +20,7 @@ public class AlignToAprilTags extends Command{
     private int apriltagID;
     DriveControlSystems controlSystems;
     RobotContainer container;
+    PIDController pid;
 
     public double[] getTargetValues() {
         double[] values = new double[2];
@@ -56,6 +57,9 @@ public class AlignToAprilTags extends Command{
         driver = container.getDriverController();
         centerCamera = new PhotonCamera(Constants.VisionConstants.cameraName);
         controlSystems = new DriveControlSystems();
+        pid = new PIDController(Constants.robotPIDs.AprilTagAlignmentPID.kP, 
+            Constants.robotPIDs.AprilTagAlignmentPID.kI, 
+            Constants.robotPIDs.AprilTagAlignmentPID.kD);
     }
 
     @Override
@@ -77,12 +81,16 @@ public class AlignToAprilTags extends Command{
         double dYawError = (yawError - prevYawError) / deltaTime;
         double dRangeError = (rangeError - prevRangeError) / deltaTime;
 
+        pid.setPID(Constants.robotPIDs.AprilTagAlignmentPID.kP, 
+            0, 
+            Constants.robotPIDs.AprilTagAlignmentPID.kD);
+
         double turn = (yawError * Constants.robotPIDs.AprilTagAlignmentPID.kP * Constants.MaxAngularRate) + 
                     (dYawError * Constants.robotPIDs.AprilTagAlignmentPID.kD * Constants.MaxAngularRate);
         
         double forward = (rangeError * Constants.robotPIDs.AprilTagAlignmentPID.kP * Constants.MaxSpeed) + 
                     (dRangeError * Constants.robotPIDs.AprilTagAlignmentPID.kD * Constants.MaxSpeed);
-        
+
         s_swerve.applyRequest(() -> controlSystems.drive(forward, driver.getLeftX(), turn));
     }
 
