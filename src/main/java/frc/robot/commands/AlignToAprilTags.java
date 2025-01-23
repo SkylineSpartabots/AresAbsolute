@@ -19,6 +19,7 @@ public class AlignToAprilTags extends Command{
     CommandXboxController driver;
     private int apriltagID;
     DriveControlSystems controlSystems;
+    RobotContainer container;
 
     public double[] getTargetValues() {
         double[] values = new double[2];
@@ -52,7 +53,7 @@ public class AlignToAprilTags extends Command{
     public AlignToAprilTags(int apriltagID) {
         this.apriltagID = apriltagID;
         s_swerve = CommandSwerveDrivetrain.getInstance();
-        driver = new CommandXboxController(0);
+        driver = container.getDriverController();
         centerCamera = new PhotonCamera(Constants.VisionConstants.cameraName);
         controlSystems = new DriveControlSystems();
     }
