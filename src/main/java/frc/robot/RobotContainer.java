@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.commands.AlignToAprilTags;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CANCoders;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
@@ -82,6 +83,7 @@ public class RobotContainer {
         driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
     driverBack.onTrue(new InstantCommand(() -> drivetrain.resetOdo()));
+    driverRightBumper.onTrue(new AlignToAprilTags(7));
   }
 
   public Command getAutonomousCommand() {

@@ -84,4 +84,23 @@ public class AlignToAprilTags extends Command{
         
         s_swerve.applyRequest(() -> controlSystems.drive(forward, driver.getLeftX(), turn));
     }
+
+    @Override
+    public void execute(){
+        double[] values = getTargetValues();
+        SmartDashboard.putNumber("Yaw Error: ", values[0] - s_swerve.getHeading());
+        SmartDashboard.putNumber("Range Error: ", 1 - values[1]);
+    }
+
+    @Override
+    public boolean isFinished() {
+        double[] values = getTargetValues();
+        return (((values[0] - s_swerve.getHeading()) == 0) && ((1 - values[1]) == 0));
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        s_swerve.applyRequest(() -> controlSystems.drive(
+            -driver.getLeftY(), driver.getLeftX(), -driver.getRightX()));
+    }
 }
