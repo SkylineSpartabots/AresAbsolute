@@ -1,10 +1,15 @@
 package frc.robot.Subsystems.LEDs;
 
+import edu.wpi.first.wpilibj.util.Color;
+
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.Optional;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -47,5 +52,21 @@ public class LEDs extends SubsystemBase {
         leds.setData(ledBuffer);
         leds.start();
         leds.close();
-    } 
+    }
+
+    public void error(){
+        /* LEDPattern base = LEDPattern.solid(Color.kOrange);
+        LEDPattern pattern = base.blink(Seconds.of(1));
+
+        pattern.applyTo(ledBuffer);
+        leds.setData(ledBuffer); */
+
+        for(int i=0; i<ledBuffer.getLength(); i++){
+            ledBuffer.setHSV(i, 5, 255, 255);
+        }
+
+        leds.setData(ledBuffer);
+        leds.start();
+    }
+
 }
