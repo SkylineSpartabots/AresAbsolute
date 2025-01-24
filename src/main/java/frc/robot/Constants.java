@@ -98,6 +98,8 @@ public final class Constants {
 
     public static final class HardwarePorts {
         // motor id
+        public static final int slapdownPivot = 0; // TODO: Figure this out later (placeholder)
+        public static final int slapdownIntake = 1; // TODO: Figure this out later (placeholder)
     }
 
     //change for next game
