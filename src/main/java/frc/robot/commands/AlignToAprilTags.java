@@ -36,7 +36,7 @@ public class AlignToAprilTags extends Command{
                         targetYaw = target.getYaw();
                         targetRange = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
                             Constants.VisionConstants.aprilTagHeight, 
-                            Units.degreesToRadians(1.0), 
+                            Constants.VisionConstants.cameraPitchOffset, 
                             Units.degreesToRadians(target.getPitch()));
                     }
                 }
@@ -57,9 +57,7 @@ public class AlignToAprilTags extends Command{
         driver = container.getDriverController();
         centerCamera = new PhotonCamera(Constants.VisionConstants.cameraName);
         controlSystems = new DriveControlSystems();
-        pid = new PIDController(Constants.robotPIDs.AprilTagAlignmentPID.kP, 
-            Constants.robotPIDs.AprilTagAlignmentPID.kI, 
-            Constants.robotPIDs.AprilTagAlignmentPID.kD);
+        pid = new PIDController(0, 0, 0);
     }
 
     @Override
@@ -98,13 +96,13 @@ public class AlignToAprilTags extends Command{
     public void execute(){
         double[] values = getTargetValues();
         SmartDashboard.putNumber("Yaw Error: ", values[0] - s_swerve.getHeading());
-        SmartDashboard.putNumber("Range Error: ", 1 - values[1]);
+        SmartDashboard.putNumber("Range Error: ", 1.0 - values[1]);
     }
 
     @Override
     public boolean isFinished() {
         double[] values = getTargetValues();
-        return (((values[0] - s_swerve.getHeading()) == 0) && ((1 - values[1]) == 0));
+        return (((values[0] - s_swerve.getHeading()) == 0) && ((1.0 - values[1]) == 0));
     }
 
     @Override
