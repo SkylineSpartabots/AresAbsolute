@@ -36,7 +36,7 @@ public class AlignToAprilTags extends Command{
                         targetYaw = target.getYaw();
                         targetRange = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
                             Constants.VisionConstants.aprilTagHeight, 
-                            Constants.VisionConstants.cameraPitchOffset, 
+                            Constants.VisionConstants.centerCameraPitch, 
                             Units.degreesToRadians(target.getPitch()));
                     }
                 }
