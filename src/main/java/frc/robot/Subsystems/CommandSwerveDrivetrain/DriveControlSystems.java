@@ -36,7 +36,7 @@ public class DriveControlSystems {
     private double goalHeading = 0.0;
 
     //need tune this 
-    private double filterThreshold = 0.1;
+    private double filterThreshold = 0.15;
 
     //MODIFIED implementation to convert rotations to heading by integration
 
@@ -86,7 +86,8 @@ public class DriveControlSystems {
         driverRX = limit.calculate(driverRX);         //slew rate limit for smoother inputs
 
         //ignore changes that are too small (number subject to change this is just a test value)
-        if(Math.abs(driverRX) > 0.05) { headingIntegrator(driverRX); SmartDashboard.putNumber("Goal heading", goalHeading); }
+        // CHANGE: clamping v1 for continuous straight driving
+        if(Math.abs(driverRX) > 0.05 || timer.get() - prevTimestamp > 0.05) { headingIntegrator(driverRX); SmartDashboard.putNumber("Goal heading", goalHeading); }
     
         driverRX = calculateGoalHeading(goalHeading, drivetrain.getHeading());         //if it's not needed it's not applied
 
