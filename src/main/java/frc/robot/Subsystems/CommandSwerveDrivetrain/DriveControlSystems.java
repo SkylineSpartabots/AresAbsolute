@@ -86,8 +86,18 @@ public class DriveControlSystems {
         driverRX = limit.calculate(driverRX);         //slew rate limit for smoother inputs
 
         //ignore changes that are too small (number subject to change this is just a test value)
-        // CHANGE: clamping v1 for continuous straight driving
-        if(Math.abs(driverRX) > 0.05 || timer.get() - prevTimestamp > 0.05) { headingIntegrator(driverRX); SmartDashboard.putNumber("Goal heading", goalHeading); }
+        
+        //moved some integrator code here so we can compare earlier
+
+        double time = timer.get();
+        double dt = time - prevTimestamp;
+
+        if(Math.abs(driverRX) > 0.04 || timer.get() - dt > 0.04) { 
+            dt = Math.min(dt, 0.04);
+            headingIntegrator(driverRX, dt); 
+            SmartDashboard.putNumber("Goal heading", goalHeading); 
+            prevTimestamp = time;
+        }
     
         driverRX = calculateGoalHeading(goalHeading, drivetrain.getHeading());         //if it's not needed it's not applied
 
@@ -167,12 +177,8 @@ public class DriveControlSystems {
 
 
     // (EXPERIMENTAL) numerical definite integration i foudn this online
-    public void headingIntegrator(double driverRX) {
-        //change in heading, change in time 
-        double time = timer.get();
-        double dt = time - prevTimestamp;
-        prevTimestamp = time;
-
+    public void headingIntegrator(double driverRX, double dt) {
+        //change in heading, change in time
         goalHeading = Math.IEEEremainder(goalHeading + driverRX * dt, 2*Math.PI);
     }
 
