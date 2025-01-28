@@ -1,16 +1,10 @@
 package frc.robot.Subsystems.LEDs;
 
-import edu.wpi.first.wpilibj.util.Color;
-
-import static edu.wpi.first.units.Units.Seconds;
-
-import java.util.Optional;
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.util.Color;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDs extends SubsystemBase {
@@ -28,45 +22,45 @@ public class LEDs extends SubsystemBase {
 
     public LEDs() {
          leds = new AddressableLED(0);
-         ledBuffer = new AddressableLEDBuffer(15); //long strip length is 1000
+         ledBuffer = new AddressableLEDBuffer(1000); //long strip length is 1000
     }
 
     public void initLEDs(){
         leds.setLength(ledBuffer.getLength());
     }
 
-    public void updateAlliance(){
+    public enum ledStates{
+        ORANGE(5, 255, 255),
+        BLUE(120, 255, 255),
+        RED(0, 255, 255);
 
-        Optional<Alliance> alliance = DriverStation.getAlliance();
-
-        if(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Blue){
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                ledBuffer.setHSV(i, 120,255,255);
-            }
-        } else if(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red){
-            for (int i = 0; i < ledBuffer.getLength(); i++) {
-                ledBuffer.setHSV(i, 0, 255, 255);
-            }
-        }
+        private int h;
+        private int s;
+        private int v;
         
-        leds.setData(ledBuffer);
-        leds.start();
-        leds.close();
+        private int getH(){
+            return h;
+        }
+        private int getS(){
+            return s;
+        }
+        private int getV(){
+            return v;
+        }
+
+        ledStates(int h, int s, int v){
+            this.h = h;
+            this.s = s;
+            this.v = v;
+        }
     }
 
-    public void error(){
-        /* LEDPattern base = LEDPattern.solid(Color.kOrange);
-        LEDPattern pattern = base.blink(Seconds.of(1));
-
-        pattern.applyTo(ledBuffer);
-        leds.setData(ledBuffer); */
-
+    public void setColor(ledStates state){
         for(int i=0; i<ledBuffer.getLength(); i++){
-            ledBuffer.setHSV(i, 5, 255, 255);
+            ledBuffer.setHSV(i, state.getH(), state.getS(), state.getV());
         }
 
         leds.setData(ledBuffer);
         leds.start();
     }
-
 }

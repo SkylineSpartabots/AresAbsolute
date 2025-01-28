@@ -23,6 +23,7 @@ import frc.robot.RobotState.RobotState;
 // import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.Drivetrain;
 import frc.robot.Subsystems.LEDs.LEDs;
+import frc.robot.Subsystems.LEDs.LEDs.ledStates;
 import frc.robot.Subsystems.Vision.Vision;
 // import frc.robot.commands.AutoCommand;
 // import frc.robot.commands.Autos;
@@ -108,9 +109,9 @@ public class Robot extends TimedRobot {
       drivetrain = Drivetrain.getInstance();
       robotState = RobotState.getInstance();
       vision = Vision.getInstance();
+
       leds = LEDs.getInstance();
       leds.initLEDs();
-      leds.updateAlliance();
       
     }
 
