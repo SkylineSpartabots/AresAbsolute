@@ -197,6 +197,11 @@ public final class Constants {
             public static final double lowI = 0;
             public static final double lowD = 1.5;
         }
+
+        public static final class AprilTagAlignmentPID {
+            public static final double kP = 0.01;
+            public static final double kD = 0;
+        }
     }
 
     public static final class HardwarePorts {

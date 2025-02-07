@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.commands.AlignToAprilTags;
 import frc.robot.commands.AltSetElevator;
 import frc.robot.commands.CancelableCommand;
 import frc.robot.commands.SetElevator;
@@ -132,6 +133,7 @@ public class RobotContainer {
 
     driver.rightBumper().onTrue(new InstantCommand( () -> reefPoleLevel = reefPoleLevel.raiseLevel()));
     driver.leftBumper().onTrue(new InstantCommand(() -> reefPoleLevel = reefPoleLevel.decreaseLevel()));
+    driverA.onTrue(new AlignToAprilTags());
 
     driverBack.onTrue(new InstantCommand(() -> drivetrain.resetOdo()));
 

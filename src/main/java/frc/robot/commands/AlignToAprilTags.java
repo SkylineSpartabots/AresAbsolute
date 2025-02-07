@@ -1,44 +1,47 @@
 package frc.robot.commands;
-
-import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
+import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
-import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.Subsystems.Vision.Vision;
 
 public class AlignToAprilTags extends Command{
-    private static PhotonCamera centerCamera;
-    CommandSwerveDrivetrain s_swerve;
-    CommandXboxController driver;
-    private int apriltagID;
-    DriveControlSystems controlSystems;
-    RobotContainer container;
-    PIDController pid;
+    private Vision vision;
+    private CommandSwerveDrivetrain s_swerve;
+    // private int apriltagID;
+    private RobotState robotState;
+    private PIDController pid = new PIDController(0, 0, 0);
+
+    public AlignToAprilTags() {
+        // this.apriltagID = apriltagID;
+        s_swerve = CommandSwerveDrivetrain.getInstance();
+        vision = Vision.getInstance();
+        robotState = RobotState.getInstance();
+    }
 
     public double[] getTargetValues() {
-        double[] values = new double[2];
+        double[] values = new double[3];
 
         double targetYaw = 0.0;
         double targetRange = 0.0;
-        var results = centerCamera.getAllUnreadResults();
-        if(!results.isEmpty()) {
-            var result = results.get(results.size() - 1);
+        double targetStrafe = 0.0;
+        var result = vision.getLatestAprilTagResult();
+        if(result != null) {
             if(result.hasTargets()) {
                 for(var target : result.getTargets()){
-                    if(target.getFiducialId() == apriltagID) {
-                        targetYaw = target.getYaw();
-                        targetRange = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
-                            Constants.VisionConstants.aprilTagHeight, 
-                            Constants.VisionConstants.centerCameraPitch, 
-                            Units.degreesToRadians(target.getPitch()));
-                    }
+                    targetYaw = target.getYaw();
+                    targetRange = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
+                        Constants.VisionConstants.aprilTagHeight, 
+                        Constants.VisionConstants.centerCameraPitch, 
+                        Units.degreesToRadians(target.getPitch()));
+                    targetStrafe = targetRange * Math.sin(Units.degreesToRadians(targetYaw));
                 }
             }
         } else {
@@ -47,23 +50,21 @@ public class AlignToAprilTags extends Command{
 
         values[0] = targetYaw;
         values[1] = targetRange;
+        values[2] = targetStrafe;
 
         return values;
     }
 
-    public AlignToAprilTags(int apriltagID) {
-        this.apriltagID = apriltagID;
-        s_swerve = CommandSwerveDrivetrain.getInstance();
-        driver = container.getDriverController();
-        centerCamera = new PhotonCamera(Constants.VisionConstants.cameraName);
-        controlSystems = new DriveControlSystems();
-        pid = new PIDController(0, 0, 0);
+    @Override
+    public void initialize() {
+        
     }
 
     @Override
-    public void initialize() {
+    public void execute(){
         double prevYawError = 0.0;
         double prevRangeError = 0.0;
+        double prevStrafeError = 0.0;
         double deltaTime = 0.02;
 
         double[] values = getTargetValues();
@@ -75,9 +76,11 @@ public class AlignToAprilTags extends Command{
         }
 
         double rangeError = 1.0 - values[1];
+        double strafeError = values[2];
 
         double dYawError = (yawError - prevYawError) / deltaTime;
         double dRangeError = (rangeError - prevRangeError) / deltaTime;
+        double dStrafeError = (strafeError - prevStrafeError) / deltaTime;
 
         pid.setPID(Constants.robotPIDs.AprilTagAlignmentPID.kP, 
             0, 
@@ -89,12 +92,18 @@ public class AlignToAprilTags extends Command{
         double forward = (rangeError * Constants.robotPIDs.AprilTagAlignmentPID.kP * Constants.MaxSpeed) + 
                     (dRangeError * Constants.robotPIDs.AprilTagAlignmentPID.kD * Constants.MaxSpeed);
 
-        s_swerve.applyRequest(() -> controlSystems.drive(forward, driver.getLeftX(), turn));
-    }
+        double strafe = (strafeError * Constants.robotPIDs.AprilTagAlignmentPID.kP * Constants.MaxSpeed) + 
+                    (dStrafeError * Constants.robotPIDs.AprilTagAlignmentPID.kD * Constants.MaxSpeed);
 
-    @Override
-    public void execute(){
-        double[] values = getTargetValues();
+        Pose2d currentPose = robotState.getCurrentPose2d();
+
+        s_swerve.applyFieldSpeeds((ChassisSpeeds.fromFieldRelativeSpeeds(
+                forward, strafe, turn, currentPose.getRotation())));
+
+        prevYawError = yawError;
+        prevRangeError = rangeError;
+        prevStrafeError = strafeError;
+        
         SmartDashboard.putNumber("Yaw Error: ", values[0] - s_swerve.getHeading());
         SmartDashboard.putNumber("Range Error: ", 1.0 - values[1]);
     }
@@ -107,7 +116,6 @@ public class AlignToAprilTags extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        s_swerve.applyRequest(() -> controlSystems.drive(
-            -driver.getLeftY(), driver.getLeftX(), -driver.getRightX()));
+        s_swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 }
