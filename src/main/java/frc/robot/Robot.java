@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -23,6 +24,7 @@ import frc.robot.RobotState.RobotState;
 // import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Vision.Vision;
+import frc.robot.Subsystems.LaserCAN;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CANCoders;
 // import frc.robot.commands.AutoCommand;
 // import frc.robot.commands.Autos;
@@ -48,6 +50,7 @@ public class Robot extends TimedRobot {
   private CommandSwerveDrivetrain drivetrain;
   private RobotState robotState;
   private CANCoders encoders;
+  private LaserCAN laser;
  
     public Robot() { 
       // oops just realized logging needs to be in the constructor lol
@@ -102,11 +105,12 @@ public class Robot extends TimedRobot {
       // }
 
       // Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
-      
+      CanBridge.runTCP();
       drivetrain = CommandSwerveDrivetrain.getInstance();
       robotState = RobotState.getInstance();
       vision = Vision.getInstance();
       encoders = CANCoders.getInstance();
+      laser = LaserCAN.getInstance();
     }
 
   @Override
