@@ -115,7 +115,6 @@ public class Vision extends SubsystemBase {
         }
 
         //in the future we would have a set of tags we would only want to mega tag
-
         // for (var fiducialID : multiTagResult.fiducialIDsUsed) {
         //     if (fiducialID =! idk) {
         //     }
@@ -136,11 +135,11 @@ public class Vision extends SubsystemBase {
             return;
         }
         
-        // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimitDPS) {
-        //     SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
-        //     return;
-        // } 
-        //ensure this works before putting back into the code
+        //ensure this works
+        if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimitDPS) {
+            SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
+            return;
+        } 
 
         if(!cameraResult.getMultiTagResult().isEmpty()) {
             if(hasValidTarget(cameraResult)) 

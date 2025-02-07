@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.generated.TunerConstants;
 
 import javax.xml.stream.events.DTD;
 
@@ -28,6 +29,9 @@ public class DriveControlSystems {
     private boolean shooterMode = false;
     private boolean aligning = false;
     private double lastHeading = 0;
+    private boolean homing = false;
+
+    private PIDController homingController = new PIDController(0, 0, 0);
 
     // Can tune
     private double deadbandFactor = 0.8; // higher is more linear joystick controls
@@ -38,10 +42,28 @@ public class DriveControlSystems {
 
     PIDController pidHeading = new PIDController(0, 0, 0);
 
+    private static DriveControlSystems controlSystems;
+
+    public static DriveControlSystems getInstance(){
+        if(controlSystems == null){
+            controlSystems = new DriveControlSystems();  
+        }
+        return controlSystems;
+    }
+
     public DriveControlSystems() {  
         // robotState = RobotState.getInstance();
         drivetrain = CommandSwerveDrivetrain.getInstance();
     }
+
+    private double homingL1(){
+        double homingSetpoint = 0; //TODO: finish calculation for homing angle setpoint
+        double RX = homingController.calculate(drivetrain.getHeading(), homingSetpoint);
+        return RX; 
+    }
+
+
+    
 
     //interface with modules
     public SwerveModule getModule(int index) {
@@ -54,20 +76,25 @@ public class DriveControlSystems {
         driverLY = scaledDeadBand(driverLY) * Constants.MaxSpeed;
         driverRX = scaledDeadBand(driverRX) * Constants.MaxAngularRate;
 
+
         SmartDashboard.putNumber("requested velocity x", driverLX);
         SmartDashboard.putNumber("requested velocity y", driverLY);
-        // Logger.recordOutput("JoystickProcessing/RequestedX", driverLX);
-        // Logger.recordOutput("JoystickProcessing/RequestedY", driverLY);
+
+        if(homing == true){
+            driverRX = homingL1();
+        }
 
         ChassisSpeeds speeds = new ChassisSpeeds(driverLY, driverLX, driverRX);
 
         double[][] wheelFeedFwX = calculateFeedforward();
         
-        return new SwerveRequest.FieldCentric().withVelocityX(driverLX).withVelocityY(driverLY).withRotationalRate(driverRX);
-        // .withSpeeds(speeds)
-        // .withWheelForceFeedforwardsX(wheelFeedFwX[0])
-        //  .withWheelForceFeedforwardsY(wheelFeedFwX[1])
-        //  .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.Velocity);
+        // return new SwerveRequest().FieldCentric().withVelocityX(driverLY).withVelocityY(driverLX).withRotationalRate(driverRX);
+
+        return new SwerveRequest.ApplyFieldSpeeds()
+        .withSpeeds(speeds)
+        .withWheelForceFeedforwardsX(wheelFeedFwX[0])
+        .withWheelForceFeedforwardsY(wheelFeedFwX[1])
+        .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.Velocity);
         // .withDesaturateWheelSpeeds(true);
     }
 
@@ -75,10 +102,10 @@ public class DriveControlSystems {
 
     public double[][] calculateFeedforward() {
         double[][] wheelFeedFwX = new double[2][4];
-        //TODO tune
-        double Kv = 0.01;  // velocity gain
-        double Ka = 0.01;  // acceleration gain
-        double Kf = 0;  // friction gain
+        //TODO tune (PLS)
+        double Kv = 0.009;  // velocity gain
+        double Ka = 0.0002;  // acceleration gain
+        double Kf = 0.003;  // friction gain
 
         for (int i = 0; i < 4; i++) {
             double currentVelocity = getModule(i).getCurrentState().speedMetersPerSecond;
@@ -115,26 +142,9 @@ public class DriveControlSystems {
             return (deadbandFactor * Math.pow(input, 3)) + (1 - deadbandFactor) * input;
     }
 
+
+
     // =======---===[ ⚙ Heading control ]===---========
-    // public double headingControl(double driverRX){ //TODO tune high and low PID values
-    //     if (!pidHeading.atSetpoint()) {
-    //         double velocity = drivetrain.robotWheelVelocity();
-    //         updateGains(velocity);
-            
-    //         // driverRX = pidHeading.calculate(robotState.robotYaw(), lastHeading);
-    //         SmartDashboard.putBoolean("headingON", true);
-//    Logger.recordOutput("HeadingControl/Active", true);
-
-    //     } else {
-    //         SmartDashboard.putBoolean("headingON", false);
-    //         SmartDashboard.putNumber("lastHeading", lastHeading);
-//    Logger.recordOutput("HeadingControl/Active", false);
-//    Logger.recordOutput("HeadingControl/LastHeading", lastHeading);
-    //     }
-
-    //     return driverRX;
-    // } 
-    // TODO fix this later bruh
 
     public void updateGains(double velocity) {
         double speedRatio = Math.abs(Constants.MaxSpeed/velocity); //velocity is from wheels so could be off
