@@ -1,5 +1,6 @@
 package frc.robot.commands;
 import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,21 +33,35 @@ public class AlignToAprilTags extends Command{
         double targetYaw = 0.0;
         double targetRange = 0.0;
         double targetStrafe = 0.0;
-        var result = vision.getLatestAprilTagResult();
-        if(result != null) {
-            if(result.hasTargets()) {
-                for(var target : result.getTargets()){
-                    targetYaw = target.getYaw();
-                    targetRange = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
-                        Constants.VisionConstants.aprilTagHeight, 
-                        Constants.VisionConstants.centerCameraPitch, 
-                        Units.degreesToRadians(target.getPitch()));
-                    targetStrafe = targetRange * Math.sin(Units.degreesToRadians(targetYaw));
+        double biggestTargetArea = 0.0;
+        double targetArea = 0.0;
+        PhotonTrackedTarget goodTarget = null;
+        var results = vision.getLatestAprilTagResult();
+        if(results != null) {
+            if(results.hasTargets()) {
+                for(var target : results.getTargets()){
+                    targetArea = target.getArea();
+                    if(targetArea > biggestTargetArea) {
+                        biggestTargetArea = targetArea;
+                        goodTarget = target;
+                    }
                 }
             }
         } else {
             System.out.println("No April Tag Found");
         }
+
+        targetYaw = goodTarget.getYaw();
+        targetRange = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
+            Constants.VisionConstants.aprilTagHeight, 
+            Constants.VisionConstants.centerCameraPitch, 
+            Units.degreesToRadians(goodTarget.getPitch()));
+        targetStrafe = targetRange * Math.sin(Units.degreesToRadians(targetYaw));
+
+        System.out.println("April Tag ID: " + goodTarget.getFiducialId());
+        System.out.println("Target Yaw: " + targetYaw);
+        System.out.println("Target Range: " + targetRange);
+        System.out.println("Target Strafe: " + targetStrafe);
 
         values[0] = targetYaw;
         values[1] = targetRange;
@@ -61,7 +76,7 @@ public class AlignToAprilTags extends Command{
     }
 
     @Override
-    public void execute(){
+    public void execute() {
         double prevYawError = 0.0;
         double prevRangeError = 0.0;
         double prevStrafeError = 0.0;
@@ -76,7 +91,7 @@ public class AlignToAprilTags extends Command{
         }
 
         double rangeError = 1.0 - values[1];
-        double strafeError = values[2];
+        double strafeError = 1.0 - values[2];
 
         double dYawError = (yawError - prevYawError) / deltaTime;
         double dRangeError = (rangeError - prevRangeError) / deltaTime;
