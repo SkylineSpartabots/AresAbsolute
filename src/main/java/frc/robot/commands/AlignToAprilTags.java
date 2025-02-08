@@ -91,7 +91,7 @@ public class AlignToAprilTags extends Command{
         }
 
         double rangeError = 1.0 - values[1];
-        double strafeError = 1.0 - values[2];
+        double strafeError = values[2];
 
         double dYawError = (yawError - prevYawError) / deltaTime;
         double dRangeError = (rangeError - prevRangeError) / deltaTime;
@@ -126,7 +126,7 @@ public class AlignToAprilTags extends Command{
     @Override
     public boolean isFinished() {
         double[] values = getTargetValues();
-        return (((values[0] - s_swerve.getHeading()) == 0) && ((1.0 - values[1]) == 0));
+        return (((values[0] - s_swerve.getHeading()) == 0) && ((1.0 - values[1]) == 0) && (values[2] == 0));
     }
 
     @Override
