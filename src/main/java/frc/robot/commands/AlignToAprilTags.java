@@ -19,6 +19,7 @@ public class AlignToAprilTags extends Command{
     // private int apriltagID;
     private RobotState robotState;
     private PIDController pid = new PIDController(0, 0, 0);
+    private PhotonTrackedTarget target;
 
     public AlignToAprilTags() {
         // this.apriltagID = apriltagID;
@@ -27,12 +28,7 @@ public class AlignToAprilTags extends Command{
         robotState = RobotState.getInstance();
     }
 
-    public double[] getTargetValues() {
-        double[] values = new double[3];
-
-        double targetYaw = 0.0;
-        double targetRange = 0.0;
-        double targetStrafe = 0.0;
+    public PhotonTrackedTarget getTarget() {
         double biggestTargetArea = 0.0;
         double targetArea = 0.0;
         PhotonTrackedTarget goodTarget = null;
@@ -51,76 +47,62 @@ public class AlignToAprilTags extends Command{
             System.out.println("No April Tag Found");
         }
 
-        targetYaw = goodTarget.getYaw();
-        targetRange = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
+        return goodTarget;
+    }
+
+
+    public double[] getTargetValues() {
+        double[] values = new double[3];
+
+        double targetYaw = 0.0;
+        double targetX = 0.0;
+        double targetY = 0.0;
+        if(target == null) {
+            target = getTarget();
+        }
+
+        targetYaw = target.getYaw();
+        targetX = PhotonUtils.calculateDistanceToTargetMeters(Constants.VisionConstants.centerCameraHeight, 
             Constants.VisionConstants.aprilTagHeight, 
             Constants.VisionConstants.centerCameraPitch, 
-            Units.degreesToRadians(goodTarget.getPitch()));
-        targetStrafe = targetRange * Math.sin(Units.degreesToRadians(targetYaw));
+            Units.degreesToRadians(target.getPitch()));
+        targetY = targetX * Math.sin(Units.degreesToRadians(targetYaw));
 
-        System.out.println("April Tag ID: " + goodTarget.getFiducialId());
+        System.out.println("April Tag ID: " + target.getFiducialId());
         System.out.println("Target Yaw: " + targetYaw);
-        System.out.println("Target Range: " + targetRange);
-        System.out.println("Target Strafe: " + targetStrafe);
+        System.out.println("Target Range: " + targetX);
+        System.out.println("Target Strafe: " + targetY);
 
         values[0] = targetYaw;
-        values[1] = targetRange;
-        values[2] = targetStrafe;
+        values[1] = targetX;
+        values[2] = targetY;
 
         return values;
     }
 
     @Override
     public void initialize() {
-        
+        pid.setPID(Constants.robotPIDs.AprilTagAlignmentPID.kP, 
+            0, 
+            Constants.robotPIDs.AprilTagAlignmentPID.kD);
     }
 
     @Override
     public void execute() {
-        double prevYawError = 0.0;
-        double prevRangeError = 0.0;
-        double prevStrafeError = 0.0;
-        double deltaTime = 0.02;
-
         double[] values = getTargetValues();
-        double yawError = values[0] - s_swerve.getHeading();
-        if(yawError > 180) {
-            yawError -= 360;
-        } else if(yawError < 180) {
-            yawError += 360;
-        }
 
-        double rangeError = 1.0 - values[1];
-        double strafeError = values[2];
-
-        double dYawError = (yawError - prevYawError) / deltaTime;
-        double dRangeError = (rangeError - prevRangeError) / deltaTime;
-        double dStrafeError = (strafeError - prevStrafeError) / deltaTime;
-
-        pid.setPID(Constants.robotPIDs.AprilTagAlignmentPID.kP, 
-            0, 
-            Constants.robotPIDs.AprilTagAlignmentPID.kD);
-
-        double turn = (yawError * Constants.robotPIDs.AprilTagAlignmentPID.kP * Constants.MaxAngularRate) + 
-                    (dYawError * Constants.robotPIDs.AprilTagAlignmentPID.kD * Constants.MaxAngularRate);
-        
-        double forward = (rangeError * Constants.robotPIDs.AprilTagAlignmentPID.kP * Constants.MaxSpeed) + 
-                    (dRangeError * Constants.robotPIDs.AprilTagAlignmentPID.kD * Constants.MaxSpeed);
-
-        double strafe = (strafeError * Constants.robotPIDs.AprilTagAlignmentPID.kP * Constants.MaxSpeed) + 
-                    (dStrafeError * Constants.robotPIDs.AprilTagAlignmentPID.kD * Constants.MaxSpeed);
+        double turn = pid.calculate(s_swerve.getHeading(), values[0]);
+        double forward = pid.calculate(1.0, values[1]);
+        double strafe = pid.calculate(0.0, values[2]);
 
         Pose2d currentPose = robotState.getCurrentPose2d();
 
         s_swerve.applyFieldSpeeds((ChassisSpeeds.fromFieldRelativeSpeeds(
                 forward, strafe, turn, currentPose.getRotation())));
-
-        prevYawError = yawError;
-        prevRangeError = rangeError;
-        prevStrafeError = strafeError;
         
         SmartDashboard.putNumber("Yaw Error: ", values[0] - s_swerve.getHeading());
         SmartDashboard.putNumber("Range Error: ", 1.0 - values[1]);
+        SmartDashboard.putNumber("Strafe Error: ", values[2]);
     }
 
     @Override
