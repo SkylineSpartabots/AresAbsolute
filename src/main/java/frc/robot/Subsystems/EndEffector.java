@@ -44,11 +44,11 @@ public class EndEffector extends SubsystemBase {
   }
 
   public EndEffector() {
-    coral = new TalonFX(Constants.HardwarePorts.outtakeID);
-    aligner = new LaserCan(Constants.HardwarePorts.laserID);
+    coral = new TalonFX(Constants.HardwarePorts.outtakeID, Constants.HardwarePorts.mechanismBus);
+    aligner = new LaserCan(Constants.HardwarePorts.laserID); // TODO laser can constructor does not support CANbus name. NEEDS TO BE WIRED TO DT
     configLaser();
     // config(roller, InvertedValue.Clockwise_Positive, NeutralModeValue.Brake);
-    algae = new TalonFX(Constants.HardwarePorts.algaeID);
+    algae = new TalonFX(Constants.HardwarePorts.algaeID, Constants.HardwarePorts.mechanismBus);
     config(coral, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
     config(algae, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
 

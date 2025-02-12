@@ -35,8 +35,8 @@ public class Intake extends SubsystemBase {
   }
 
   public Intake() {
-    pivot = new TalonFX(Constants.HardwarePorts.intakePivotID);
-    roller = new TalonFX(Constants.HardwarePorts.intakeRollerID);
+    pivot = new TalonFX(Constants.HardwarePorts.intakePivotID, Constants.HardwarePorts.mechanismBus);
+    roller = new TalonFX(Constants.HardwarePorts.intakeRollerID, Constants.HardwarePorts.mechanismBus);
 
     configPivot(pivot, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
     configRoller(roller, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);

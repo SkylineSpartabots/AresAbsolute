@@ -50,8 +50,8 @@ public class Elevator extends SubsystemBase {
 
 
   public Elevator() {
-    leader = new TalonFX(Constants.HardwarePorts.elevatorLeaderId);
-    follower = new TalonFX(Constants.HardwarePorts.elevatorFollowerId);
+    leader = new TalonFX(Constants.HardwarePorts.elevatorLeaderId, Constants.HardwarePorts.mechanismBus);
+    follower = new TalonFX(Constants.HardwarePorts.elevatorFollowerId, Constants.HardwarePorts.mechanismBus);
     leader.setNeutralMode(NeutralModeValue.Brake);
     follower.setNeutralMode(NeutralModeValue.Brake);
     configMotor(leader, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -218,6 +219,7 @@ public final class Constants {
     }
 
     public static final class HardwarePorts {
+        public static final CANBus mechanismBus = new CANBus("Mechanisms");
         // motor id
         public static final int beamPort = 0;
 

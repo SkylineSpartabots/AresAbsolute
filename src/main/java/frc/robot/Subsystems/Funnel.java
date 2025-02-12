@@ -41,7 +41,7 @@ public class Funnel extends SubsystemBase {
 
 
   public Funnel() {
-    roller = new TalonFX(Constants.HardwarePorts.funnelID);
+    roller = new TalonFX(Constants.HardwarePorts.funnelID, Constants.HardwarePorts.mechanismBus);
     configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
   }
 
