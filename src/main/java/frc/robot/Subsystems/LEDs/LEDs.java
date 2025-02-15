@@ -3,6 +3,7 @@ package frc.robot.Subsystems.LEDs;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -34,17 +35,17 @@ public class LEDs extends SubsystemBase {
         BLUE(120, 255, 255),
         RED(0, 255, 255);
 
-        private int h;
-        private int s;
-        private int v;
+        public  int h;
+        public int s;
+        public int v;
         
-        private int getH(){
+        public int getH(){
             return h;
         }
-        private int getS(){
+        public int getS(){
             return s;
         }
-        private int getV(){
+        public int getV(){
             return v;
         }
 
