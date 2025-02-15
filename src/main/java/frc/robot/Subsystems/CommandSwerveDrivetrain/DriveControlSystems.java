@@ -98,6 +98,31 @@ public class DriveControlSystems {
         // .withDesaturateWheelSpeeds(true);
     }
 
+    public SwerveRequest autoDrive(double driverLY, double driverLX, double driverRX){
+        
+
+
+        SmartDashboard.putNumber("requested velocity x", driverLX);
+        SmartDashboard.putNumber("requested velocity y", driverLY);
+
+        if(homing == true){
+            driverRX = homingL1();
+        }
+
+        ChassisSpeeds speeds = new ChassisSpeeds(driverLY, driverLX, driverRX);
+
+        double[][] wheelFeedFwX = calculateFeedforward();
+        
+        // return new SwerveRequest().FieldCentric().withVelocityX(driverLY).withVelocityY(driverLX).withRotationalRate(driverRX);
+
+        return new SwerveRequest.ApplyFieldSpeeds()
+        .withSpeeds(speeds)
+        .withWheelForceFeedforwardsX(wheelFeedFwX[0])
+        .withWheelForceFeedforwardsY(wheelFeedFwX[1])
+        .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.Velocity);
+        // .withDesaturateWheelSpeeds(true);
+    }
+
     private double[] previousVelocities = new double[4]; // To store previous velocity for each module
 
     public double[][] calculateFeedforward() {

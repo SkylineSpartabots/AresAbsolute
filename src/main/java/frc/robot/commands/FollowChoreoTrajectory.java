@@ -53,7 +53,7 @@ public class FollowChoreoTrajectory extends Command {
     timer.start();
     if (trajectory != null){
       startPose = trajectory.getInitialPose(alliance.get() == DriverStation.Alliance.Red);
-      s_Swerve.resetOdo(startPose.get());
+      s_Swerve.resetPose(startPose.get());
     }
     
     
@@ -99,7 +99,7 @@ public class FollowChoreoTrajectory extends Command {
     // );
 
        s_Swerve.setControl(
-        controlSystems.drive(
+        controlSystems.autoDrive(
           sample.vx + xController.calculate(currPose.getX(), sample.x),
           sample.vy + yController.calculate(currPose.getY(), sample.y),
           sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
