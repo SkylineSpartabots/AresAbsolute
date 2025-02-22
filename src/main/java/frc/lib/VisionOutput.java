@@ -1,64 +1,91 @@
 package frc.lib;
 
 import java.util.Collections;
+import java.util.List;
 
+import frc.robot.LimelightHelpers;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.Interpolating.Geometry.ITranslation2d;
 
+import frc.robot.LimelightHelpers.PoseEstimate;
+import frc.robot.LimelightHelpers.RawFiducial;
 /**
  * VisionOutput
  */
-public class VisionOutput extends EstimatedRobotPose {
+public class VisionOutput {
 
-    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, PhotonTrackedTarget target, PoseStrategy strategy)  {
-        super(estimatedPose, timestampSeconds, Collections.singletonList(target), strategy);
+    /** The estimated pose */
+    public final Pose3d estimatedPose;
+
+    /** The estimated time the frame used to derive the robot pose was taken */
+    public final double timestampSeconds;
+
+    /** A list of the targets used to compute this pose */
+    public final List<PhotonTrackedTarget> targetsUsed;
+
+    public final double standardDev;
+
+    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed)  {
+        this.estimatedPose = estimatedPose;
+        this.timestampSeconds = timestampSeconds;
+        this.targetsUsed = targetsUsed;
+        this.standardDev = getStandardDeviation(targetsUsed);
+    }
+
+    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, double standardDev)  {
+        this.estimatedPose = estimatedPose;
+        this.timestampSeconds = timestampSeconds;
+        this.targetsUsed = null;
+        this.standardDev = getStandardDeviation(targetsUsed);
+    }
+
+    public VisionOutput(Pose2d estimatedPose, double timestampSeconds, double standardDev)  {
+        this.estimatedPose = new Pose3d(estimatedPose);
+        this.timestampSeconds = timestampSeconds;
+        this.targetsUsed = null;
+        this.standardDev = standardDev;
+    }
+
+    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, PhotonTrackedTarget targetsUsed)  {
+        this.estimatedPose = estimatedPose;
+        this.timestampSeconds = timestampSeconds;
+        this.targetsUsed = Collections.singletonList(targetsUsed);
+        this.standardDev = getStandardDeviation(this.targetsUsed);
     }
 
     public VisionOutput(EstimatedRobotPose pose)  {
-        super(pose.estimatedPose, pose.timestampSeconds, pose.targetsUsed, pose.strategy);
+        this(pose.estimatedPose, pose.timestampSeconds, pose.targetsUsed);
+    }
+    
+    public VisionOutput(PoseEstimate poseEstimate){
+        this(new Pose3d(poseEstimate.pose), poseEstimate.timestampSeconds, getStandardDeviation(poseEstimate));
     }
 
-    static private double meanArea = 0.0;
-    static private double meanAmbiguity = 0.0; //TODO get a default value for these but we need like a field or smth
-    static private int count = 0;
-    static private double sumSquareDiffArea = 0.0;
-    static private double sumSquareDiffAmbiguity = 0.0;
+    private static double getStandardDeviation(PoseEstimate limelighEstimate) {
+        return -1; //If we are not using limelight im not going to do this one
+    }
 
-    public double getStandardDeviation() {
-        //TODO i want to do more here
-        for (PhotonTrackedTarget photonTrackedTarget : this.targetsUsed) {
-            count++;
+    private static double getStandardDeviation(List<PhotonTrackedTarget> targets) {
+        int count = 0;
 
-            // Update means with Welford algorithm 
-            double deltaArea = photonTrackedTarget.getArea() - meanArea;
-            meanArea += deltaArea / count;
-            sumSquareDiffArea += deltaArea * (photonTrackedTarget.getArea() - meanArea);
+        for (PhotonTrackedTarget photonTrackedTarget : targets) {
 
-            double deltaAmbiguity = photonTrackedTarget.getPoseAmbiguity() - meanAmbiguity;
-            meanAmbiguity += deltaAmbiguity / count;
-            sumSquareDiffAmbiguity += deltaAmbiguity * (photonTrackedTarget.getPoseAmbiguity() - meanAmbiguity);
+            // photonTrackedTarget.area;
+            // photonTrackedTarget.skew;
+            // photonTrackedTarget.poseAmbiguity;
         }
-        
-        //dont divide by 0
-        if(count <= 1) {
-            return 1e-4;
-        } 
-
-        double varianceArea = sumSquareDiffArea / (count - 1);
-        double varianceAmbiguity = sumSquareDiffAmbiguity / (count - 1);
-
-        // Return average of standard deviations
-        return (Math.sqrt(varianceArea) + Math.sqrt(varianceAmbiguity)) / 2;
+        return -1;
     }
 
     public ITranslation2d getInterpolatableTransform2d() {
         return new ITranslation2d(estimatedPose.getTranslation().toTranslation2d().getX(), estimatedPose.getTranslation().toTranslation2d().getY());
     }
-
-
-
 }

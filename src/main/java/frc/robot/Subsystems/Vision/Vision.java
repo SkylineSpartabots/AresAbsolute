@@ -1,6 +1,11 @@
 package frc.robot.Subsystems.Vision;    
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
 
 // import org.littletonrobotics.junction.Logger;
 import org.opencv.photo.Photo;
@@ -14,6 +19,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -21,34 +28,39 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.MultiTagOutput;
 import frc.lib.VisionOutput;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants.VisionLimits;
+import frc.robot.LimelightHelpers;
 import frc.robot.RobotState.RobotState;
-import frc.robot.Subsystems.CommandSwerveDrivetrain.Drivetrain;
+import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 
 public class Vision extends SubsystemBase {
     private static Vision instance;
-    private static PhotonCamera centerCamera;
+    private static PhotonCamera FLCamera;
+    private static PhotonCamera FRCamera;
+    private static PhotonCamera elevatorCamera;
 
-    private static PhotonPipelineResult cameraResult;
+    private static List<PhotonPipelineResult> cameraResult;
 
     private double lastProcessedTimestamp = -1;
 
-    Drivetrain s_Swerve;
+    CommandSwerveDrivetrain s_Swerve;
+    LimelightSubsystem s_Lime;
     RobotState robotState;
     
     public double floorDistance;
 
     private Transform3d cameraToRobotTransform = new Transform3d(
         //center cam
-        new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-5.67162), Units.inchesToMeters(-10.172538)),
-        new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(40),Units.degreesToRadians(0)));
+        new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-13.5), Units.inchesToMeters(-1.5)),
+        new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0),Units.degreesToRadians(0)));
 
-    public static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+        public static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // This is the field type that will be in PNW events
 
-    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraToRobotTransform);
-    
+        PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraToRobotTransform);
+        
     public static Vision getInstance() {
         if (instance == null) {
             instance = new Vision();
@@ -57,41 +69,53 @@ public class Vision extends SubsystemBase {
     }
     
     public Vision() {
-        s_Swerve = Drivetrain.getInstance();
+        s_Swerve = CommandSwerveDrivetrain.getInstance();
         robotState = RobotState.getInstance();
 
-        centerCamera = new PhotonCamera(Constants.VisionConstants.cameraName);
-        photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_LAST_POSE);
+        FLCamera = new PhotonCamera(Constants.VisionConstants.FLCamera);
+        FRCamera = new PhotonCamera(Constants.VisionConstants.FRCamera);
+        elevatorCamera = new PhotonCamera(Constants.VisionConstants.elevatorCamera);
+
+        photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
         updateAprilTagResults();
     }
 
     public void updateAprilTagResults() {
-        cameraResult = centerCamera.getLatestResult();
-
+        List<PhotonPipelineResult> unreadResults = FLCamera.getAllUnreadResults();
+        unreadResults.addAll(FRCamera.getAllUnreadResults());
+        unreadResults.addAll(elevatorCamera.getAllUnreadResults());
+        
+        if (!unreadResults.isEmpty()){
+            cameraResult = unreadResults; // assuming first index is the latest result
+        }
+        // Zero yaw is robot facing red alliance wall - our code should be doing this.
     }
 
-    public PhotonPipelineResult getLatestAprilTagResult(){
-        updateAprilTagResults();
-        return cameraResult;
+    public boolean validateTarget(PhotonPipelineResult camera) {
+        PhotonTrackedTarget target = camera.getBestTarget();
+        
+        if(camera.hasTargets()
+        && target.getFiducialId() >= 1
+        && target.getFiducialId() <= Constants.VisionConstants.aprilTagMax
+        && target.getPoseAmbiguity() < 0.2 && target.getPoseAmbiguity() > -1)
+            return true;
+
+        return false;
     }
 
-    public List<PhotonTrackedTarget> getTargets(){
-        return cameraResult.getTargets();
+    private List<MultiTagOutput> updateMultiTag() {
+        List<MultiTagOutput> multitags = new ArrayList<>();
+
+        for (PhotonPipelineResult photonPipelineResult : cameraResult) {
+            if(photonPipelineResult.getMultiTagResult().isPresent() && multitagChecks(photonPipelineResult.getMultiTagResult().get())) {
+                multitags.add(new MultiTagOutput(photonPipelineResult.getMultiTagResult().get(), photonPipelineResult.getTimestampSeconds(), photonPipelineResult.getBestTarget()));
+            }
+        }
+
+        return multitags;
     }
 
-    public Boolean hasValidTarget(PhotonPipelineResult camera) {
-        if(camera.hasTargets()) {
-            PhotonTrackedTarget target = camera.getBestTarget();
-
-            return
-            target.getFiducialId() >= 1 &&
-            target.getFiducialId() <= Constants.VisionConstants.aprilTagMax &&
-            target.getPoseAmbiguity() < 0.2 && target.getPoseAmbiguity() > -1;
-        } else {return false;}
-    }
-
-    private Boolean shouldUseMultiTag() {
-        MultiTargetPNPResult multiTagResult = cameraResult.getMultiTagResult().get();
+    private Boolean multitagChecks(MultiTargetPNPResult multiTagResult) {
 
         if(multiTagResult.estimatedPose.bestReprojErr > VisionLimits.k_reprojectionLimit) {
             SmartDashboard.putString("Multitag updates", "high error");
@@ -115,7 +139,6 @@ public class Vision extends SubsystemBase {
         }
 
         //in the future we would have a set of tags we would only want to mega tag
-
         // for (var fiducialID : multiTagResult.fiducialIDsUsed) {
         //     if (fiducialID =! idk) {
         //     }
@@ -124,50 +147,49 @@ public class Vision extends SubsystemBase {
         return true;
     }
 
-
     /**
      * calculates field-relative robot pose from vision reading, feed to pose estimator (Kalman filter)
      */
-    public void updateVision() throws Exception{
+    private void updateVision() throws Exception {
 
-        if(cameraResult.getTimestampSeconds() == lastProcessedTimestamp) {
-            SmartDashboard.putString("Vision accepter", "Vision failed: old");
-            // Logger.recordOutput("Vision/Vision accepter", "Vision failed: old");
-            return;
-        }
-        
-        // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimitDPS) {
+        // something is wrong with this... (we still need it tho)
+        // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
         //     SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
         //     return;
-        // } 
-        //ensure this works before putting back into the code
+        // }
+        
+        //get data from camera
+        List<MultiTagOutput> multiTagResult = updateMultiTag();
 
-        if(!cameraResult.getMultiTagResult().isEmpty()) {
-            if(hasValidTarget(cameraResult)) 
-            { //using fallback tag
-                VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(cameraResult).get());
-                robotState.visionUpdate(newPose); 
+        if(!multiTagResult.isEmpty()) { //Use multitag if available
+            for (MultiTagOutput multiTagOutput : multiTagResult) {
+                Pose3d tagPose = aprilTagFieldLayout.getTagPose(multiTagOutput.getBestTarget().getFiducialId()).get();
+
+                Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(multiTagOutput.estimatedPose.best, tagPose, cameraToRobotTransform);
+    
+                VisionOutput newPose = new VisionOutput(robotPose, multiTagOutput.getTimestamp(),  multiTagOutput.getBestTarget());
+                
+                System.out.println(newPose.toString());
+    
+                robotState.visionUpdate(newPose);    
             }
-        } else if (shouldUseMultiTag()) { //using multitag
-            VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(cameraResult).get());
-            robotState.visionUpdate(newPose); 
-        } else if (hasValidTarget(cameraResult)){ // manually making the pose
-            Pose3d targetPose = aprilTagFieldLayout.getTagPose(cameraResult.getBestTarget().getFiducialId()).orElse(null);
-            Pose3d newPose = PhotonUtils.estimateFieldToRobotAprilTag(
-            cameraResult.getBestTarget().getBestCameraToTarget(), targetPose, cameraToRobotTransform);
-            robotState.visionUpdate(new VisionOutput(newPose, cameraResult.getTimestampSeconds(),
-            cameraResult.getBestTarget(), PoseStrategy.CLOSEST_TO_LAST_POSE));
-        } else { SmartDashboard.putString("Vision accepter", "Vision failed: no targets");} 
-        // lastProcessedTimestamp = cameraResult.getTimestampSeconds();
+        } else { // if no multitags, use other tag data
+            for (PhotonPipelineResult photonPipelineResult : cameraResult) {
+                if(validateTarget(photonPipelineResult)) {
+                    VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get());
+                    robotState.visionUpdate(newPose); 
+                }
+            } 
+        }
     }
 
     @Override
     public void periodic() {
-        updateAprilTagResults();
-        if(!cameraResult.targets.isEmpty()) {
-            try {
-                updateVision();
-            } catch (Exception e){}
-        }
+        // updateAprilTagResults();
+        // if(!cameraResult.isEmpty()) {
+        //     try {
+        //         updateVision();
+        //     } catch (Exception e){}
+        // } 
     }
 }

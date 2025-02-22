@@ -165,6 +165,9 @@ bin/
 .idea/
 out/
 
+# IntelliJ Build and Deploy Scripts
+.run
+
 # Fleet
 .fleet
 
@@ -185,3 +188,4 @@ compile_commands.json
 
 # Eclipse generated file for annotation processors
 .factorypath
+
