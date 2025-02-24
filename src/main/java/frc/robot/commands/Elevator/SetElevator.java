@@ -60,7 +60,7 @@ public class SetElevator extends Command {
 
     setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
     pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
-    
+
     // setpoint = profile.calculate(timer.get(), initialState, goal);
     s_Elevator.setVoltage(pidoutput); // used to tune feedforward
     // System.out.println("current draw: " + s_Elevator.getCurrent());
@@ -81,14 +81,12 @@ public class SetElevator extends Command {
   public void end(boolean interrupted) {
     System.out.println("final time: " + timer.get());
     System.out.println("expected time: " + profile.totalTime());
-    timer.stop();
-    s_Elevator.stop();
     System.out.println("final error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.1;
+    return false;
   }
 }

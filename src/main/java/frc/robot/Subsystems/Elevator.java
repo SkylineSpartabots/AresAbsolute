@@ -7,9 +7,11 @@ package frc.robot.Subsystems;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -29,6 +31,7 @@ public class Elevator extends SubsystemBase {
   private TorqueCurrentFOC torqueOutput;
 
   private DigitalInput beam;
+  private boolean holdPosition = false;
 
   public static Elevator getInstance(){
     if(instance == null){
@@ -38,12 +41,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public enum ElevatorState {
-    GROUND(0.11),
     L1(15),
     L2(30),
     L3(45),
     L4(60),
-    SOURCE(10);
+    GROUND(0.11),
+    SOURCE(4.75);
     //48.1 should be max
     private double encoderPosition;
     private ElevatorState(double encoderPosition){
@@ -101,6 +104,9 @@ public class Elevator extends SubsystemBase {
     currentLimitsConfigs.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits = currentLimitsConfigs;
+    config.HardwareLimitSwitch.ForwardLimitEnable = false;
+
+    config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
     motor.getConfigurator().apply(config);
     motor.getPosition().setUpdateFrequency(50);
     motor.getStatorCurrent().setUpdateFrequency(50);
@@ -122,14 +128,26 @@ public class Elevator extends SubsystemBase {
   }
 
   public void stop(){
-    leader.set(0);
+    leader.setControl(voltOutput.withOutput(0));
+  }
+
+  public void holdPosition(){ //need to resist gravity and break mode is not cutting it
+    leader.setControl(new PositionTorqueCurrentFOC(getPosition())
+    .withLimitReverseMotion(true)
+    .withLimitForwardMotion(true)
+    .withSlot(0));
+    System.out.println(getPosition());
   }
 
   public void setSpeed(double speed){
+    holdPosition = false;
     leader.set(speed);
   }
-  
 
+  public void setVoltage(double voltage){
+    holdPosition = false;
+    leader.setControl(voltOutput.withOutput(voltage));
+  }
 
   public double getVelocity(){
     return leader.getVelocity().getValueAsDouble();
@@ -147,16 +165,13 @@ public class Elevator extends SubsystemBase {
     leader.setPosition(0);
   }
 
-  public void setVoltage(double voltage){
-    leader.setControl(voltOutput.withOutput(voltage));
-  }
-
   public boolean getBeamResult(){
     return beam.get();
   }
 
   @Override
   public void periodic() {
+
     SmartDashboard.putNumber("elevator position", getPosition());
     SmartDashboard.putBoolean("beam break result", getBeamResult());
     SmartDashboard.putNumber("elevator stator current", getCurrent());
