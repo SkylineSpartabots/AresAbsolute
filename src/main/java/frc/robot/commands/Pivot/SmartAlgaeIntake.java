@@ -13,13 +13,13 @@ import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class SmartIntake extends Command {
+public class SmartAlgaeIntake extends Command {
   private Slapdown s_Slapdown;
   Timer timer = new Timer();
 
   double previousSupplyCurrent = 0;
   
-  public SmartIntake() {
+  public SmartAlgaeIntake() {
     s_Slapdown = Slapdown.getInstance();
     addRequirements(s_Slapdown);
   }
@@ -28,7 +28,6 @@ public class SmartIntake extends Command {
   @Override
   public void initialize() 
   { 
-    System.out.println("init");
     timer.restart();
     s_Slapdown.setRollerSpeed(RollerState.INTAKE.getRollerSpeed());
   }
@@ -42,7 +41,6 @@ public class SmartIntake extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("End Smart Intake- break roller");
     s_Slapdown.brakeRoller();
   }
 

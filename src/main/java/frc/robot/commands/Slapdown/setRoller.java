@@ -13,11 +13,12 @@ import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class setRoller extends Command {
+public class SetRoller extends Command {
   private Slapdown s_Slapdown;
   private RollerState state;
+  Timer timer = new Timer();
   
-  public setRoller(RollerState state) {
+  public SetRoller(RollerState state) {
     s_Slapdown = Slapdown.getInstance();
     this.state = state;
   }
@@ -40,6 +41,12 @@ public class setRoller extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    if(state == RollerState.OUTTAKE) {
+      if(timer.hasElapsed(0.75)) {
+        return true;
+      } else return false;
+    } else {
+        return true;
+    }
   }
 }

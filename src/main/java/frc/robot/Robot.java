@@ -34,10 +34,10 @@ import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Vision.Vision;
+import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Autos.AutoCommand;
 import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
-import frc.robot.commands.CommandFactory.CommandFactory;
 
 public class Robot extends LoggedRobot {
   private SequentialCommandGroup m_autonomousCommand;
