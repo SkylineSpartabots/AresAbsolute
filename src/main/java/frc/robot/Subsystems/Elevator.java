@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
 
 public class Elevator extends SubsystemBase {
   
@@ -37,7 +38,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public enum ElevatorState {
-    GROUND(0.1),
+    GROUND(0.11),
     L1(15),
     L2(30),
     L3(45),
@@ -48,6 +49,26 @@ public class Elevator extends SubsystemBase {
     private ElevatorState(double encoderPosition){
       this.encoderPosition = encoderPosition;
     }
+
+  public ElevatorState raiseLevel() {
+        if(this.ordinal() == 3)
+            return this;
+        else {
+            SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[this.ordinal() + 1].name());
+            return ElevatorState.values()[this.ordinal() + 1];
+        }
+    }
+
+    public ElevatorState decreaseLevel() {
+        if(this.ordinal() == 0)
+            return this;
+        else {
+            SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[this.ordinal() - 1].name());
+            return ElevatorState.values()[this.ordinal() - 1];
+        }
+    }
+
+
     public double getEncoderPosition(){
       return encoderPosition;
     }

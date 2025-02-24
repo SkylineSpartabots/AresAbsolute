@@ -6,6 +6,7 @@ package frc.robot.commands.Elevator;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -13,54 +14,64 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SetElevator extends Command {
   private Elevator s_Elevator;
-  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.17, 0.112, 0);
-  private PIDController controller = new PIDController(0.0000000001, 0, 0.2);
+  // private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.17, 0.112, 0);
+  // private PIDController controller = new PIDController(0.0000000001, 0, 0.2);
   private double goalPosition;
-  private TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration));
-  private Timer timer;
+  private TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration);
+  // private Timer timer;
+  // private State initialState;
+  // private State setpoint;
+  // private State goal;
+  private double error;
+  private double pidoutput;
   private State initialState;
   private State setpoint;
-  private State goal;
-  private double error;
-
+  private Timer timer;
+  private TrapezoidProfile profile = new TrapezoidProfile(constraints);
+  private PIDController controller = new PIDController(1.5, 0.5, 0.04);
   public SetElevator(ElevatorState state) {
     this(state.getEncoderPosition());
   }
 
-  public SetElevator(ReefPoleLevel state) {
-    this(ElevatorState.values()[state.ordinal() + 1].getEncoderPosition()); //ReefPoleLevel is doesint include ground
-  }
-
   public SetElevator(double goalPosition){
     this.goalPosition = goalPosition;
-    timer = new Timer();
-    goal = new State(goalPosition, 0.0);
     s_Elevator = Elevator.getInstance();
     addRequirements(s_Elevator);
+    timer = new Timer();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     timer.restart();
+    controller.disableContinuousInput();
     initialState = new State(s_Elevator.getPosition(), s_Elevator.getVelocity());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    setpoint = profile.calculate(timer.get(), initialState, goal);
-    s_Elevator.setVoltage(feedforward.calculate(setpoint.velocity)); // used to tune feedforward
+
+    setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
+    pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
+    
+    // setpoint = profile.calculate(timer.get(), initialState, goal);
+    s_Elevator.setVoltage(pidoutput); // used to tune feedforward
+    // System.out.println("current draw: " + s_Elevator.getCurrent());
+    System.out.println("current: " + s_Elevator.getCurrent());
+    // System.out.println("desired position: " + controller.getSetpoint());
+    // System.out.println("desired position: " + controller.getSetpoint().position);
+    // System.out.println("pid output: " + pidoutput);
     // s_Elevator.setVoltage(controller.calculate(s_Elevator.getPosition(), setpoint.position) + feedforward.calculate(setpoint.velocity));
-    SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
-    error = Math.abs(s_Elevator.getPosition() - setpoint.position);
+    // SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
+    error = s_Elevator.getPosition() - setpoint.position;
+    SmartDashboard.putNumber("current error", error);
     // System.out.println(s_Elevator.getFollowerVoltage());
     System.out.println("current setpoint error " + error);
   }
@@ -68,14 +79,16 @@ public class SetElevator extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    System.out.println("final time: " + timer.get());
+    System.out.println("expected time: " + profile.totalTime());
+    timer.stop();
     s_Elevator.stop();
-    System.out.println("eta: " +  profile.totalTime());
-    System.out.println("actual time " + timer.get());
+    System.out.println("final error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return profile.isFinished(timer.get()) || Math.abs(s_Elevator.getPosition() - goalPosition) < 0.5;
+    return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.1;
   }
 }

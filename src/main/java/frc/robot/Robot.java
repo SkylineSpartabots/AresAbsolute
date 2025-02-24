@@ -30,6 +30,7 @@ import frc.lib.SensorUtils;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Vision.Vision;
@@ -150,6 +151,7 @@ public class Robot extends LoggedRobot {
 
     //start the logger here
     m_robotContainer = new RobotContainer();
+    SmartDashboard.putString("Selected Pole Level", ElevatorState.L3.name());
   }
 
   @Override

@@ -56,9 +56,9 @@ public class EndEffector extends SubsystemBase {
 
   public enum OuttakeState{
     HOLD(0),
-    INTAKE(0.3),
-    MIDOUTTAKE(0.6),
-    L4SCORE(0.7, 0.4);
+    INDEX(-0.2),
+    SCOREMID(-0.6),
+    SCOREL4(0.7, 0.4);
     private double topSpeed;
     private double botSpeed;
     private OuttakeState(double topSpeed, double botSpeed){
@@ -68,6 +68,9 @@ public class EndEffector extends SubsystemBase {
     private OuttakeState(double speed){
       this.topSpeed = speed;
       this.botSpeed = speed;
+    }
+    private double getSpeed() {
+      return topSpeed;
     }
   }
 
@@ -104,6 +107,10 @@ public class EndEffector extends SubsystemBase {
 
   public void setOuttakeSpeed(double speed){
     coral.set(speed);
+  }
+
+  public void setOuttakeSpeed(OuttakeState state){
+    coral.set(state.getSpeed());
   }
 
   public void setAlgaeSpeed(double speed){

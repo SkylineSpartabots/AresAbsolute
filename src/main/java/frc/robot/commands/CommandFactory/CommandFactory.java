@@ -18,7 +18,7 @@ import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.CancelableCommand;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
-import frc.robot.commands.Elevator.AltSetElevator;
+import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Pivot.SetSlapdownPivot;
 import frc.robot.commands.Pivot.SmartIntake;
 import frc.robot.commands.SwerveCommands.DriveToPose;
@@ -73,7 +73,7 @@ public class CommandFactory {
 
     public static Command AutoScoreCoral(ElevatorState level, ReefPoleSide side, CommandXboxController controller){
         return new ParallelCommandGroup(
-            new AltSetElevator(level),
+            new SetElevator(level),
             new DriveToPose(side)
         ).raceWith(new CancelableCommand(controller));
     }

@@ -1,25 +1,27 @@
-package frc.robot.commands;
+package frc.robot.commands.EndEffector;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
 
-public class indexCoral extends Command {
+public class setOuttake extends Command {
   EndEffector s_EndEffector;
   Timer timer = new Timer();
   boolean finished = false;
+  OuttakeState state;
 
-  public indexCoral() {
+  public setOuttake(OuttakeState state) {
     s_EndEffector = EndEffector.getInstance();
     addRequirements(s_EndEffector);
+    this.state = state;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     timer.restart();
-    s_EndEffector.setOuttakeSpeed(-0.2);
+    s_EndEffector.setOuttakeSpeed(state);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,6 +38,7 @@ public class indexCoral extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(0.1);
+    return (state == OuttakeState.INDEX && timer.hasElapsed(0.09)
+     || (state == OuttakeState.SCOREMID && timer.hasElapsed(0.5)));
   }
 }
