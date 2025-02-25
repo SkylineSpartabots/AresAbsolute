@@ -60,11 +60,15 @@ public class Robot extends LoggedRobot {
   private CommandSwerveDrivetrain drivetrain;
   private Elevator elevator;
   private RobotState robotState;
+
+  private LEDs leds;
+
   private Slapdown intake;
   private DriveControlSystems controlSystems;
 
  
     public Robot() { 
+
       // oops just realized logging needs to be in the constructor lol
       // facebookdata
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -122,9 +126,15 @@ public class Robot extends LoggedRobot {
       drivetrain = CommandSwerveDrivetrain.getInstance();
       robotState = RobotState.getInstance();
       vision = Vision.getInstance();
+
+
+      leds = LEDs.getInstance();
+      leds.initLEDs();
+      
       intake = Slapdown.getInstance();
       controlSystems = DriveControlSystems.getInstance();
       // CanBridge.runTCP();
+
     }
 
   @Override
