@@ -30,7 +30,10 @@ import frc.lib.SensorUtils;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.EndEffector;
+import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Vision.Vision;
@@ -38,6 +41,9 @@ import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Autos.AutoCommand;
 import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
+import frc.robot.commands.Elevator.SetElevator;
+import frc.robot.commands.Elevator.ZeroElevator;
+import frc.robot.commands.Slapdown.SetPivot;
 
 public class Robot extends LoggedRobot {
   private SequentialCommandGroup m_autonomousCommand;
@@ -52,18 +58,8 @@ public class Robot extends LoggedRobot {
   private AutoCommand thirdSavedChoice;
   private AutoCommand fourthSavedChoice;
   private AutoCommand fifthSavedChoice;
+
   
-
-  private RobotContainer m_robotContainer;
-
-  private final Vision vision;
-
-  private CommandSwerveDrivetrain drivetrain;
-  private Elevator elevator;
-  private RobotState robotState;
-  private Slapdown intake;
-  private DriveControlSystems controlSystems;
-
  
     public Robot() { 
       // oops just realized logging needs to be in the constructor lol
@@ -119,12 +115,17 @@ public class Robot extends LoggedRobot {
 
       // Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
       
-      elevator = Elevator.getInstance();
-      drivetrain = CommandSwerveDrivetrain.getInstance();
-      robotState = RobotState.getInstance();
-      vision = Vision.getInstance();
-      intake = Slapdown.getInstance();
-      controlSystems = DriveControlSystems.getInstance();
+      //Init all subsystems
+      Vision.getInstance();
+      Elevator.getInstance();
+      CommandSwerveDrivetrain.getInstance();
+      RobotState.getInstance();
+      Slapdown.getInstance();
+      DriveControlSystems.getInstance();
+      Funnel.getInstance();
+      Slapdown.getInstance();
+      EndEffector.getInstance();
+
       // CanBridge.runTCP();
     }
 
@@ -150,7 +151,10 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     //start the logger here
-    m_robotContainer = new RobotContainer();
+
+     //might need to move these depending on when command Scheduler is inited
+    new SetPivot(PivotState.UP);
+    new ZeroElevator();
     SmartDashboard.putString("Selected Pole Level", ElevatorState.L3.name());
   }
 

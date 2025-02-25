@@ -32,7 +32,7 @@ public class SetElevator extends Command {
   private double pidoutput;
   private State initialState;
   private State setpoint;
-  private Timer timer;
+  private Timer timer = new Timer();
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
   private PIDController controller = new PIDController(1.5, 0.5, 0.04);
   public SetElevator(ElevatorState state) {
@@ -42,11 +42,10 @@ public class SetElevator extends Command {
   public SetElevator(double goalPosition){
     this.goalPosition = goalPosition;
     s_Elevator = Elevator.getInstance();
+    
     addRequirements(s_Elevator);
-    timer = new Timer();
   }
 
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     timer.restart();
@@ -54,39 +53,40 @@ public class SetElevator extends Command {
     initialState = new State(s_Elevator.getPosition(), s_Elevator.getVelocity());
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
     setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
     pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
 
-    // setpoint = profile.calculate(timer.get(), initialState, goal);
     s_Elevator.setVoltage(pidoutput); // used to tune feedforward
+
+    error = s_Elevator.getPosition() - setpoint.position;
+
     // System.out.println("current draw: " + s_Elevator.getCurrent());
-    System.out.println("current: " + s_Elevator.getCurrent());
+    // System.out.println("current: " + s_Elevator.getCurrent());
+    // setpoint = profile.calculate(timer.get(), initialState, goal);
     // System.out.println("desired position: " + controller.getSetpoint());
     // System.out.println("desired position: " + controller.getSetpoint().position);
     // System.out.println("pid output: " + pidoutput);
     // s_Elevator.setVoltage(controller.calculate(s_Elevator.getPosition(), setpoint.position) + feedforward.calculate(setpoint.velocity));
     // SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
-    error = s_Elevator.getPosition() - setpoint.position;
-    SmartDashboard.putNumber("current error", error);
+    // SmartDashboard.putNumber("current error", error);
     // System.out.println(s_Elevator.getFollowerVoltage());
-    System.out.println("current setpoint error " + error);
+    // System.out.println("current setpoint error " + error);
   }
 
-  // Called once the command ends or is interrupted.
+  
   @Override
   public void end(boolean interrupted) {
-    System.out.println("final time: " + timer.get());
-    System.out.println("expected time: " + profile.totalTime());
-    System.out.println("final error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));
+    // System.out.println("final time: " + timer.get());
+    // System.out.println("expected time: " + profile.totalTime());
+    // System.out.println("final error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    //Dont end the command or the elevator will drop; Break mode is not strong enough to hold up carriage
     return false;
   }
 }

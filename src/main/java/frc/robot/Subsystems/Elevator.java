@@ -131,14 +131,6 @@ public class Elevator extends SubsystemBase {
     leader.setControl(voltOutput.withOutput(0));
   }
 
-  public void holdPosition(){ //need to resist gravity and break mode is not cutting it
-    leader.setControl(new PositionTorqueCurrentFOC(getPosition())
-    .withLimitReverseMotion(true)
-    .withLimitForwardMotion(true)
-    .withSlot(0));
-    System.out.println(getPosition());
-  }
-
   public void setSpeed(double speed){
     holdPosition = false;
     leader.set(speed);

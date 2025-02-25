@@ -23,9 +23,9 @@ import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.EndEffector.SetOuttake;
 import frc.robot.commands.EndEffector.SmartCoralIndex;
 import frc.robot.commands.Funnel.SetFunnel;
-import frc.robot.commands.Pivot.SetSlapdownPivot;
-import frc.robot.commands.Pivot.SmartAlgaeIntake;
 import frc.robot.commands.Slapdown.SetRoller;
+import frc.robot.commands.Slapdown.SetPivot;
+import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.SwerveCommands.DriveToPose;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -41,7 +41,7 @@ public class CommandFactory {
     //add all mechanism off functions as they are tested; currently only pivot
     public static Command OffEverything() {
         return new ParallelCommandGroup(
-            new SetSlapdownPivot(PivotState.UP),
+            new SetPivot(PivotState.UP),
             new InstantCommand(()-> Slapdown.getInstance().setRollerSpeed(0))
         );
     }
@@ -54,7 +54,7 @@ public class CommandFactory {
 
     public static Command Lift() {
        return new ParallelCommandGroup(
-                new SetSlapdownPivot(PivotState.UP),
+                new SetPivot(PivotState.UP),
                 new InstantCommand(()-> Slapdown.getInstance().brakeRoller())
             );
     }
@@ -62,10 +62,17 @@ public class CommandFactory {
     public static Command SmartAlgeaIntake() {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                new SetSlapdownPivot(PivotState.DOWN),
+                new SetPivot(PivotState.DOWN),
                 new SmartAlgaeIntake()
             ),
-            new SetSlapdownPivot(PivotState.HOLD)
+            new SetPivot(PivotState.HOLD)
+        );
+    }
+
+    public static Command AlgeaOuttake() {
+        return new SequentialCommandGroup(
+            new SetRoller(RollerState.OUTTAKE),
+            new SetRoller(RollerState.OFF)
         );
     }
 
@@ -77,16 +84,7 @@ public class CommandFactory {
             ),
             new SetFunnel(FunnelState.OFF)
         );
-    }
-
-    public static Command AlgeaOuttake() {
-        return new SequentialCommandGroup(
-            new SetRoller(RollerState.OUTTAKE),
-            new SetRoller(RollerState.OFF)
-        );
-    }
-
-    
+    }    
 
     public static Command AutoScoreCoral(ElevatorState level, ReefPoleSide side, CommandXboxController controller){
         return new ParallelCommandGroup(
@@ -98,7 +96,6 @@ public class CommandFactory {
     public static Command Outtake() {
         return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
-
 
     public static Command AutoScorefromSource(ReefPoleLevel level, SourceNumber source, ReefNumber reef){
         return new ParallelCommandGroup(

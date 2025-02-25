@@ -3,7 +3,6 @@ package frc.lib;
 import java.util.Collections;
 import java.util.List;
 
-import frc.robot.LimelightHelpers;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.MultiTargetPNPResult;
@@ -14,9 +13,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.Interpolating.Geometry.ITranslation2d;
-
-import frc.robot.LimelightHelpers.PoseEstimate;
-import frc.robot.LimelightHelpers.RawFiducial;
+import frc.lib.LimelightHelpers.PoseEstimate;
+import frc.lib.LimelightHelpers.RawFiducial;
 /**
  * VisionOutput
  */
