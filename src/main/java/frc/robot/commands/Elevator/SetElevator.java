@@ -35,8 +35,8 @@ public class SetElevator extends Command {
   private Timer timer = new Timer();
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
   private PIDController controller = new PIDController(1.5, 0.5, 0.04);
-  public SetElevator(ElevatorState state) {
-    this(state.getEncoderPosition());
+  public SetElevator(ElevatorState newState) {
+    this(newState.getEncoderPosition());
   }
 
   public SetElevator(double goalPosition){

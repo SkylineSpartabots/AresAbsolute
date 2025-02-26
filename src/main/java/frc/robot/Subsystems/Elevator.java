@@ -58,28 +58,7 @@ public class Elevator extends SubsystemBase {
     public double getEncoderPosition(){
       return encoderPosition;
     }
-
-  public ElevatorState raiseLevel() {
-    System.out.println(this.ordinal());
-        if(this.ordinal() == 3)
-            return this;
-        else {
-            SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[this.ordinal() + 1].name());
-            return ElevatorState.values()[this.ordinal() + 1];
-        }
-    }
-
-    public ElevatorState decreaseLevel() {
-      System.out.println(this.ordinal());
-        if(this.ordinal() == 0)
-            return this;
-        else {
-            SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[this.ordinal() - 1].name());
-            return ElevatorState.values()[this.ordinal() - 1];
-        }
-    }
   }
-
 
   public Elevator() {
     leader = new TalonFX(Constants.HardwarePorts.elevatorLeaderId, "mechbus");

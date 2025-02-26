@@ -186,8 +186,8 @@ public class RobotContainer {
     driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo()));
 
     // Elevator
-    driver.rightBumper().onTrue(new InstantCommand(() -> reefPoleLevel = reefPoleLevel.raiseLevel()));
-    driver.leftBumper().onTrue(new InstantCommand(() -> reefPoleLevel = reefPoleLevel.decreaseLevel()));
+    driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
+    driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
     driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
 
     driver.povDown().onTrue(new ZeroElevator());
@@ -207,6 +207,20 @@ public class RobotContainer {
     // Funnel
     driver.y().onTrue(new SetFunnel(FunnelState.INTAKING));
     driver.a().onTrue(new SetFunnel(FunnelState.OFF));
+  }
+
+  private void raisePoleLevel() {
+    if(!(reefPoleLevel.ordinal() == 3)) {
+      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() + 1].name());
+      reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() + 1];
+    }
+  }
+
+  private void lowerPoleLevel() {
+    if(!(reefPoleLevel.ordinal() == 0)) {
+      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() - 1].name());
+      reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() - 1];
+    }
   }
 
   public Command getAutonomousCommand() {
