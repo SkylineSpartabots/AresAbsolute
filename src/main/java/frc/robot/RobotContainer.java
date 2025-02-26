@@ -186,17 +186,18 @@ public class RobotContainer {
     driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo()));
 
     // Elevator
-    driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
-    driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
-    driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
-
+    // driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
+    // driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
+    // driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
+driver.rightTrigger().onTrue(new InstantCommand(()->elevator.setSpeed(-0.1)));
     driver.start().onTrue(new ZeroElevator());
     driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
     driver.povLeft().onTrue(new SetElevator(ElevatorState.L3));
     driver.povRight().onTrue(new SetElevator(ElevatorState.L2));
     driver.povDown().onTrue(new SetElevator(ElevatorState.L1));
+    driver.a().onTrue(new SetElevator(ElevatorState.SOURCE));
     // driver.povRight().onTrue(new SetElevator(ElevatorState.L4));
-    // driver.povLeft().onTrue(new SetElevator(ElevatorState.SOURCE));
+    // driver.povLeft().onTrue(new SetElevator(ElevatorState.sSOURCE));
 
     // Slapdown
     // driver.povLeft().onTrue(CommandFactory.SmartAlgeaIntake());
@@ -209,7 +210,7 @@ public class RobotContainer {
 
     // Funnel
     driver.y().onTrue(new SetFunnel(FunnelState.INTAKING));
-    driver.a().onTrue(new SetFunnel(FunnelState.OFF));
+    // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
   }
 
   private void raisePoleLevel() {

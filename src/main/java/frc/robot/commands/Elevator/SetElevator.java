@@ -23,7 +23,7 @@ public class SetElevator extends Command {
   // private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.17, 0.112, 0);
   // private PIDController controller = new PIDController(0.0000000001, 0, 0.2);
   private double goalPosition;
-  private ElevatorFeedforward ff = new ElevatorFeedforward(0, 0, 0.1);
+  private ElevatorFeedforward ff = new ElevatorFeedforward(0, 0, 0.15);
   private TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration);
   // private Timer timer;
   // private State initialState;
@@ -35,7 +35,7 @@ public class SetElevator extends Command {
   private State setpoint;
   private Timer timer = new Timer();
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
-  private PIDController controller = new PIDController(1.5, 0.5, 0.04);
+  private PIDController controller = new PIDController(1.5, 0.5, 0.12);
   public SetElevator(ElevatorState newState) {
     this(newState.getEncoderPosition());
   }
@@ -60,7 +60,7 @@ public class SetElevator extends Command {
     setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
     pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
 
-    s_Elevator.setVoltage(pidoutput); // used to tune feedforward
+    s_Elevator.setVoltage(pidoutput + ff.calculate(setpoint.velocity)); // used to tune feedforward
 
     error = s_Elevator.getPosition() - setpoint.position;
 
@@ -82,14 +82,16 @@ public class SetElevator extends Command {
   @Override
   public void end(boolean interrupted) {
     // s_Elevator.setSpeed(0);
-    // System.out.println("final time: " + timer.get());
-    // System.out.println("expected time: " + profile.totalTime());
+    s_Elevator.setPosition(s_Elevator.getPosition());
+    System.out.println(s_Elevator.getPosition());
+    System.out.println("final time: " + timer.get());
+    System.out.println("expected time: " + profile.totalTime());
     // System.out.println("final error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));
   }
 
   @Override
   public boolean isFinished() {
     //Dont end the command or the elevator will drop; Break mode is not strong enough to hold up carriage
-    return false;
+    return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.1;
   }
 }

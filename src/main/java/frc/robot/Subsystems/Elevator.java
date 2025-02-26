@@ -96,12 +96,12 @@ public class Elevator extends SubsystemBase {
     Slot0Configs configuration = new Slot0Configs();
     configuration.kG = 0.4;
     configuration.kP = 0.1;
-  
+  motor.getConfigurator().apply(configuration);
      // motor.optimizeBusUtilization();
   }
 
   public void setPosition(double position){
-    leader.setControl(new PositionVoltage(position).withSlot(0));
+    leader.setControl(new PositionVoltage(position).withSlot(0).withUpdateFreqHz(50));
   }
 
   public double getPosition(){
