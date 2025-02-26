@@ -30,7 +30,6 @@ public class Elevator extends SubsystemBase {
   private VoltageOut voltOutput;
   private TorqueCurrentFOC torqueOutput;
 
-  private DigitalInput beam;
   private boolean holdPosition = false;
 
   public static Elevator getInstance(){
@@ -88,7 +87,6 @@ public class Elevator extends SubsystemBase {
 
     follower.setControl(new Follower(Constants.HardwarePorts.elevatorLeaderId, false));
 
-    beam = new DigitalInput(Constants.HardwarePorts.beamPort);
     voltOutput = new VoltageOut(0).withEnableFOC(true);
     torqueOutput = new TorqueCurrentFOC(0);
   }
@@ -157,15 +155,10 @@ public class Elevator extends SubsystemBase {
     leader.setPosition(0);
   }
 
-  public boolean getBeamResult(){
-    return beam.get();
-  }
-
   @Override
   public void periodic() {
 
     SmartDashboard.putNumber("elevator position", getPosition());
-    SmartDashboard.putBoolean("beam break result", getBeamResult());
     SmartDashboard.putNumber("elevator stator current", getCurrent());
   }
 }

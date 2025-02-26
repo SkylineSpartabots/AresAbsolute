@@ -36,6 +36,7 @@ import frc.robot.commands.CommandFactory.*;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.EndEffector.SetOuttake;
+import frc.robot.commands.EndEffector.SmartCoralIndex;
 import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
@@ -193,6 +194,7 @@ public class RobotContainer {
     driver.povUp().onTrue(new SetElevator(reefPoleLevel));
 
     driver.leftTrigger().onTrue(new SetElevator(ElevatorState.SOURCE));
+    driver.rightTrigger().onTrue(CommandFactory.SmartCoralIntake());
 
     // Slapdown
     driver.povLeft().onTrue(CommandFactory.SmartAlgeaIntake());

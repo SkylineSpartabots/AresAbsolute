@@ -28,6 +28,6 @@ public class SmartCoralIndex extends Command {
 
   @Override
   public boolean isFinished() {
-    return s_EndEffector.getLaserMeasurement().distance_mm < 3;
+    return s_EndEffector.getBeamResult();
   }
 }

@@ -22,7 +22,7 @@ import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
 
 import com.revrobotics.spark.config.SparkFlexConfig;
 
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.OuttakeProfiler;
@@ -34,6 +34,7 @@ public class EndEffector extends SubsystemBase {
 
   // private OuttakeProfiler outtakeProfiler;
 
+  private DigitalInput beam;
   private TalonFX coral;
   private TalonFX algae;
   private LaserCan aligner;
@@ -44,6 +45,7 @@ public class EndEffector extends SubsystemBase {
   }
 
   public EndEffector() {
+    beam = new DigitalInput(Constants.HardwarePorts.endEffectorBeamPort);
     coral = new TalonFX(Constants.HardwarePorts.outtakeID, "mechbus");
     aligner = new LaserCan(Constants.HardwarePorts.laserID);
     configLaser();
@@ -103,6 +105,10 @@ public class EndEffector extends SubsystemBase {
     motor.optimizeBusUtilization();
     // config.CurrentLimits = currentLimitsConfigs;
     // // motor.optimizeBusUtilization();
+  }
+  
+  public boolean getBeamResult(){
+    return beam.get();
   }
 
   public void setOuttakeSpeed(double speed){

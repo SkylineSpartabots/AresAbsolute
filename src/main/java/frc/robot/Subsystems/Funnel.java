@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -17,6 +18,7 @@ public class Funnel extends SubsystemBase {
   private static Funnel instance;
   
   private TalonFX roller;
+  private DigitalInput beam;
   
   private FunnelState state;
 
@@ -41,6 +43,7 @@ public class Funnel extends SubsystemBase {
 
 
   public Funnel() {
+    beam = new DigitalInput(Constants.HardwarePorts.funnelBeamPort);
     roller = new TalonFX(Constants.HardwarePorts.funnelID, "mechbus");
     configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
   }
@@ -57,6 +60,10 @@ public class Funnel extends SubsystemBase {
 
   public void setSpeed(double speed){
     roller.set(speed);
+  }
+
+  public boolean getBeamResult(){
+    return beam.get();
   }
 
   public void setState(FunnelState desiredState){
