@@ -76,7 +76,6 @@ public class RobotContainer {
 
   private ElevatorState reefPoleLevel = ElevatorState.L3; //default reef pole level
 
-  private ElevatorState operatorPoleLevel = ElevatorState.L2;
 
   //instances
   private final CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance(); // Drivetrain
@@ -127,7 +126,7 @@ public class RobotContainer {
     ));
     //bindings
     
-    driver.leftTrigger().onTrue(CommandFactory.OffEverything());
+    // driver.leftTrigger().onTrue(CommandFactory.OffEverything());
     // driver.a().onTrue(new InstantCommand(()->intake.testUnbrake()));
     // driver.b().onTrue(new InstantCommand(()->intake.testBrake()));
 
@@ -189,17 +188,18 @@ public class RobotContainer {
     // Elevator
     driver.rightBumper().onTrue(new InstantCommand(() -> reefPoleLevel = reefPoleLevel.raiseLevel()));
     driver.leftBumper().onTrue(new InstantCommand(() -> reefPoleLevel = reefPoleLevel.decreaseLevel()));
+    driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
 
     driver.povDown().onTrue(new ZeroElevator());
     driver.povUp().onTrue(new SetElevator(reefPoleLevel));
-
-    driver.leftTrigger().onTrue(new SetElevator(ElevatorState.SOURCE));
-    driver.rightTrigger().onTrue(CommandFactory.SmartCoralIntake());
+    // driver.povRight().onTrue(new SetElevator(ElevatorState.L4));
+    // driver.povLeft().onTrue(new SetElevator(ElevatorState.SOURCE));
 
     // Slapdown
     driver.povLeft().onTrue(CommandFactory.SmartAlgeaIntake());
     driver.povRight().onTrue(CommandFactory.AlgeaOuttake());
 
+    // driver.rightTrigger().onTrue(new InstantCommand(() -> endEffector.setAlgaeSpeed(0.5)));
     // EndEffector
     driver.x().onTrue(new SetOuttake(OuttakeState.INDEX));
     driver.b().onTrue(new SetOuttake(OuttakeState.SCOREMID));

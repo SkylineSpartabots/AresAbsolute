@@ -5,6 +5,7 @@
 package frc.robot.Subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
@@ -14,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -41,18 +43,24 @@ public class Elevator extends SubsystemBase {
 
   public enum ElevatorState {
     L1(15),
-    L2(30),
-    L3(45),
+    L2(25),
+    L3(39),
     L4(60),
     GROUND(0.11),
     SOURCE(4.75);
     //48.1 should be max
     private double encoderPosition;
+
     private ElevatorState(double encoderPosition){
       this.encoderPosition = encoderPosition;
     }
 
+    public double getEncoderPosition(){
+      return encoderPosition;
+    }
+
   public ElevatorState raiseLevel() {
+    System.out.println(this.ordinal());
         if(this.ordinal() == 3)
             return this;
         else {
@@ -62,17 +70,13 @@ public class Elevator extends SubsystemBase {
     }
 
     public ElevatorState decreaseLevel() {
+      System.out.println(this.ordinal());
         if(this.ordinal() == 0)
             return this;
         else {
             SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[this.ordinal() - 1].name());
             return ElevatorState.values()[this.ordinal() - 1];
         }
-    }
-
-
-    public double getEncoderPosition(){
-      return encoderPosition;
     }
   }
 
@@ -109,8 +113,16 @@ public class Elevator extends SubsystemBase {
     motor.getPosition().setUpdateFrequency(50);
     motor.getStatorCurrent().setUpdateFrequency(50);
     motor.optimizeBusUtilization();
+
+    Slot0Configs configuration = new Slot0Configs();
+    configuration.kG = 0.4;
+    configuration.kP = 0.1;
   
      // motor.optimizeBusUtilization();
+  }
+
+  public void setPosition(double position){
+    leader.setControl(new PositionVoltage(position).withSlot(0));
   }
 
   public double getPosition(){

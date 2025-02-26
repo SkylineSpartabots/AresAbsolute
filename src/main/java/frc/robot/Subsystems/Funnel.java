@@ -30,7 +30,7 @@ public class Funnel extends SubsystemBase {
   }
 
   public enum FunnelState{
-    INTAKING(0.2254),
+    INTAKING(0.254),
     OFF(0);
     private double rollerSpeed;
     private FunnelState(double rollerSpeed){
@@ -43,7 +43,7 @@ public class Funnel extends SubsystemBase {
 
 
   public Funnel() {
-    beam = new DigitalInput(Constants.HardwarePorts.funnelBeamPort);
+    // beam = new DigitalInput(Constants.HardwarePorts.funnelBeamPort);
     roller = new TalonFX(Constants.HardwarePorts.funnelID, "mechbus");
     configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
   }

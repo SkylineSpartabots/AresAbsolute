@@ -79,6 +79,7 @@ public class SetElevator extends Command {
   
   @Override
   public void end(boolean interrupted) {
+    // s_Elevator.setSpeed(0);
     // System.out.println("final time: " + timer.get());
     // System.out.println("expected time: " + profile.totalTime());
     // System.out.println("final error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));

@@ -102,8 +102,9 @@ public class Slapdown extends SubsystemBase {
     config.CurrentLimits = currentLimitsConfigs;
 
     Slot1Configs position = new Slot1Configs();
-    position.kP = 2.4;
+    position.kP = 2;
     position.kG = 1;
+    position.kD = 0.5;
     motor.getSupplyCurrent().setUpdateFrequency(50);
     motor.getStatorCurrent().setUpdateFrequency(50);
     motor.getVelocity().setUpdateFrequency(50);

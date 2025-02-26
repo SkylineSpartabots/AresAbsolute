@@ -45,7 +45,7 @@ public class EndEffector extends SubsystemBase {
   }
 
   public EndEffector() {
-    beam = new DigitalInput(Constants.HardwarePorts.endEffectorBeamPort);
+    // beam = new DigitalInput(Constants.HardwarePorts.endEffectorBeamPort);
     coral = new TalonFX(Constants.HardwarePorts.outtakeID, "mechbus");
     aligner = new LaserCan(Constants.HardwarePorts.laserID);
     configLaser();
@@ -58,8 +58,8 @@ public class EndEffector extends SubsystemBase {
 
   public enum OuttakeState{
     HOLD(0),
-    INDEX(-0.2),
-    SCOREMID(-0.6),
+    INDEX(-0.4),
+    SCOREMID(-0.75),
     SCOREL4(0.7, 0.4);
     private double topSpeed;
     private double botSpeed;
