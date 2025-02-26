@@ -23,6 +23,7 @@ public class SetElevator extends Command {
   // private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.17, 0.112, 0);
   // private PIDController controller = new PIDController(0.0000000001, 0, 0.2);
   private double goalPosition;
+  private ElevatorFeedforward ff = new ElevatorFeedforward(0, 0, 0.1);
   private TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration);
   // private Timer timer;
   // private State initialState;
@@ -71,7 +72,8 @@ public class SetElevator extends Command {
     // System.out.println("pid output: " + pidoutput);
     // s_Elevator.setVoltage(controller.calculate(s_Elevator.getPosition(), setpoint.position) + feedforward.calculate(setpoint.velocity));
     // SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
-    // SmartDashboard.putNumber("current error", error);
+    SmartDashboard.putNumber("current error", error);
+    System.out.println("current error: " + error);
     // System.out.println(s_Elevator.getFollowerVoltage());
     // System.out.println("current setpoint error " + error);
   }

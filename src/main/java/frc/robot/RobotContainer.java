@@ -190,14 +190,17 @@ public class RobotContainer {
     driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
     driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
 
-    driver.povDown().onTrue(new ZeroElevator());
-    driver.povUp().onTrue(new SetElevator(reefPoleLevel));
+    driver.start().onTrue(new ZeroElevator());
+    driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
+    driver.povLeft().onTrue(new SetElevator(ElevatorState.L3));
+    driver.povRight().onTrue(new SetElevator(ElevatorState.L2));
+    driver.povDown().onTrue(new SetElevator(ElevatorState.L1));
     // driver.povRight().onTrue(new SetElevator(ElevatorState.L4));
     // driver.povLeft().onTrue(new SetElevator(ElevatorState.SOURCE));
 
     // Slapdown
-    driver.povLeft().onTrue(CommandFactory.SmartAlgeaIntake());
-    driver.povRight().onTrue(CommandFactory.AlgeaOuttake());
+    // driver.povLeft().onTrue(CommandFactory.SmartAlgeaIntake());
+    // driver.povRight().onTrue(CommandFactory.AlgeaOuttake());
 
     // driver.rightTrigger().onTrue(new InstantCommand(() -> endEffector.setAlgaeSpeed(0.5)));
     // EndEffector
