@@ -6,8 +6,6 @@ package frc.robot.commands.Elevator;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
@@ -16,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+
+import java.util.function.Supplier;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SetElevator extends Command {
@@ -38,6 +38,10 @@ public class SetElevator extends Command {
   private PIDController controller = new PIDController(1.5, 0.5, 0.12);
   public SetElevator(ElevatorState newState) {
     this(newState.getEncoderPosition());
+  }
+
+  public SetElevator(Supplier<ElevatorState> targetStateSupplier){
+    this(targetStateSupplier.get().getEncoderPosition());
   }
 
   public SetElevator(double goalPosition){
