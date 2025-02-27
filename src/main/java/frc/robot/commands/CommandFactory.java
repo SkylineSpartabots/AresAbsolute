@@ -76,6 +76,27 @@ public class CommandFactory {
         );
     }
 
+    public static Command CoralIntake(){
+        return new ParallelCommandGroup(
+            new SetFunnel(FunnelState.INTAKING),
+            new SetElevator(ElevatorState.SOURCE)
+        );
+    }
+
+    public static Command ShootCoral(){
+        return new SequentialCommandGroup(
+            new SetOuttake(OuttakeState.SCOREMID),
+            new SetElevator(ElevatorState.SOURCE)
+        );
+    }
+
+    public static Command FinishIntake(){
+        return new ParallelCommandGroup(
+            new SetFunnel(FunnelState.OFF),
+            new SetOuttake(OuttakeState.INDEX)
+        );
+    }
+
     public static Command SmartCoralIntake() {
         return new SequentialCommandGroup(    
             new ParallelCommandGroup(

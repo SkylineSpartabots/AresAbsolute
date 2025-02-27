@@ -35,6 +35,7 @@ import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown;
+import frc.robot.Subsystems.CommandSwerveDrivetrain.CANCoders;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.commands.CommandFactory;
@@ -44,6 +45,7 @@ import frc.robot.commands.Autos.FollowChoreoTrajectory;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Slapdown.SetPivot;
+import frc.robot.commands.Slapdown.ZeroSlapdown;
 
 public class Robot extends LoggedRobot {
   private SequentialCommandGroup m_autonomousCommand;
@@ -126,6 +128,7 @@ public class Robot extends LoggedRobot {
       Slapdown.getInstance();
       EndEffector.getInstance();
       RobotContainer.getInstance();
+      CANCoders.getInstance();
 
       // CanBridge.runTCP();
     }
@@ -211,6 +214,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    new ZeroSlapdown().schedule();
   }
 
   @Override

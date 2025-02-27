@@ -88,7 +88,7 @@ public class DriveControlSystems {
             driverRX = homingL1();
         }
 
-        return new SwerveRequest.FieldCentric().withVelocityX(driverLY).withVelocityY(-driverLX).withRotationalRate(driverRX);
+        return new SwerveRequest.FieldCentric().withVelocityX(driverLY).withVelocityY(driverLX).withRotationalRate(driverRX);
         // return new SwerveRequest.FieldCentricFacingAngle()
         // .withVelocityX(driverLY)
         // .withVelocityY(-driverLX)

@@ -76,7 +76,7 @@ public class Slapdown extends SubsystemBase {
     position.GravityType = GravityTypeValue.Arm_Cosine;
     position.kP = 7.2;
     position.kI = 2.3;
-    position.kG = 1.3;
+    position.kG = 1.5;
 
 
     motor.getConfigurator().apply(config);
@@ -84,6 +84,7 @@ public class Slapdown extends SubsystemBase {
     motor.getStatorCurrent().setUpdateFrequency(50);
     motor.getPosition().setUpdateFrequency(50);
     motor.getSupplyCurrent().setUpdateFrequency(50);
+    motor.getVelocity().setUpdateFrequency(50);
     motor.optimizeBusUtilization(); 
   }
 
@@ -170,6 +171,10 @@ public class Slapdown extends SubsystemBase {
     return roller.getVelocity().getValueAsDouble();
   }
 
+  public double getPivotVelocity(){
+    return leader.getVelocity().getValueAsDouble();
+  }
+
   public void brakePivot(){
     leader.setControl(
       new PositionVoltage(leader.getPosition().getValueAsDouble())
@@ -193,7 +198,7 @@ public class Slapdown extends SubsystemBase {
   }
 
   public void setPivotPosition(PivotState state){
-    leader.setControl(new PositionVoltage(state.getPosition()));
+    leader.setControl(new PositionVoltage(state.getPosition()).withSlot(1));
   }
 
   public double getSupplyCurrent(){

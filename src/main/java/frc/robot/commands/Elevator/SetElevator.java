@@ -60,7 +60,7 @@ public class SetElevator extends Command {
     setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
     pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
 
-    s_Elevator.setVoltage(pidoutput + ff.calculate(setpoint.velocity)); // used to tune feedforward
+    s_Elevator.setVoltage(pidoutput); // used to tune feedforward
 
     error = s_Elevator.getPosition() - setpoint.position;
 

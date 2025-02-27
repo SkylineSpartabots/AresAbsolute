@@ -41,6 +41,7 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
+import frc.robot.commands.SwerveCommands.SlowDrive;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.RobotState.RobotState;
@@ -125,7 +126,7 @@ public class RobotContainer {
         drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY(), -driver.getLeftX(), -driver.getRightX()) // Drive counterclockwise with negative X (left)
     ));
     //bindings
-    
+    driver.leftTrigger().whileTrue(new SlowDrive());
     // driver.leftTrigger().onTrue(CommandFactory.OffEverything());
     // driver.a().onTrue(new InstantCommand(()->intake.testUnbrake()));
     // driver.b().onTrue(new InstantCommand(()->intake.testBrake()));
@@ -188,28 +189,33 @@ public class RobotContainer {
     // Elevator
     // driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
     // driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
+    // driver.povUp().onTrue(new SetElevator(reefPoleLevel));
     // driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
-driver.rightTrigger().onTrue(new InstantCommand(()->elevator.setSpeed(-0.1)));
-    driver.start().onTrue(new ZeroElevator());
+// driver.rightTrigger().onTrue(
+new InstantCommand(()->elevator.setSpeed(-0.1));
+     driver.start().onTrue(new ZeroElevator());
+//     driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
+//     driver.povLeft().onTrue(new SetElevator(ElevatorState.L3));
+//     driver.povRight().onTrue(new SetElevator(ElevatorState.L2));
+//     driver.povDown().onTrue(new SetElevator(ElevatorState.L1));
+    driver.povDown().onTrue(new SetElevator(ElevatorState.SOURCE));
     driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
-    driver.povLeft().onTrue(new SetElevator(ElevatorState.L3));
-    driver.povRight().onTrue(new SetElevator(ElevatorState.L2));
-    driver.povDown().onTrue(new SetElevator(ElevatorState.L1));
-    driver.a().onTrue(new SetElevator(ElevatorState.SOURCE));
+    driver.povRight().onTrue(new SetElevator(ElevatorState.L3));
+    driver.povLeft().onTrue(new SetElevator(ElevatorState.L2));
     // driver.povRight().onTrue(new SetElevator(ElevatorState.L4));
     // driver.povLeft().onTrue(new SetElevator(ElevatorState.sSOURCE));
 
     // Slapdown
-    // driver.povLeft().onTrue(CommandFactory.SmartAlgeaIntake());
-    // driver.povRight().onTrue(CommandFactory.AlgeaOuttake());
+    driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
+    driver.b().onTrue(CommandFactory.AlgeaOuttake());
 
     // driver.rightTrigger().onTrue(new InstantCommand(() -> endEffector.setAlgaeSpeed(0.5)));
     // EndEffector
-    driver.x().onTrue(new SetOuttake(OuttakeState.INDEX));
-    driver.b().onTrue(new SetOuttake(OuttakeState.SCOREMID));
+    driver.y().onTrue(new SetOuttake(OuttakeState.INDEX));
+    driver.rightTrigger().onTrue(CommandFactory.ShootCoral());
 
     // Funnel
-    driver.y().onTrue(new SetFunnel(FunnelState.INTAKING));
+    driver.x().onTrue(CommandFactory.CoralIntake());
     // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
   }
 
