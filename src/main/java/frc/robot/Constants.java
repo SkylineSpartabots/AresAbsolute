@@ -321,24 +321,6 @@ public final class Constants {
                 R11,
                 R12
             }
-
-
-            public enum ReefPoleLevel { //We can also leave these empty and just use for display
-                L1(0.0),
-                L2(0.0),
-                L3(0.0); //wont be using l4
-
-                private final double elevatorLevel;
-
-                ReefPoleLevel(double height) {
-                    this.elevatorLevel = height;
-                }
-
-                public double getElevatorLevel() {
-                    return this.elevatorLevel;
-                }
-            }
-
         }
 
         

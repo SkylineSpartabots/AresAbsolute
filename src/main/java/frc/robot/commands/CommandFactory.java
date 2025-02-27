@@ -27,12 +27,12 @@ import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.SwerveCommands.DriveToPose;
+import frc.robot.commands.SwerveCommands.DriveToPoseElevator;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.Constants.FieldConstants.ReefConstants.SourceNumber;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefNumber;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
 import frc.robot.RobotState.RobotState;
 
 /** Add your docs here. */
@@ -108,9 +108,9 @@ public class CommandFactory {
     }    
 
     public static Command AutoScoreCoral(ElevatorState level, ReefPoleSide side, CommandXboxController controller){
-        return new ParallelCommandGroup(
-            new SetElevator(level),
-            new DriveToPose(side)
+        return new SequentialCommandGroup(
+            new DriveToPoseElevator(side, level),
+            new SetOuttake(level)
         ).raceWith(new CancelableCommand(controller));
     }
 
@@ -118,9 +118,9 @@ public class CommandFactory {
         return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
 
-    public static Command AutoScorefromSource(ReefPoleLevel level, SourceNumber source, ReefNumber reef){
-        return new ParallelCommandGroup(
+    // public static Command AutoScorefromSource(ElevatorState level, SourceNumber source, ReefNumber reef){
+    //     return new ParallelCommandGroup(
             
-        );
-    }
+    //     );
+    // }
 }
