@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -15,6 +16,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import au.grapplerobotics.CanBridge;
@@ -60,10 +62,14 @@ public class Robot extends LoggedRobot {
   private AutoCommand thirdSavedChoice;
   private AutoCommand fourthSavedChoice;
   private AutoCommand fifthSavedChoice;
+
  
     public Robot() { 
       // oops just realized logging needs to be in the constructor lol
       // facebookdata
+      SignalLogger.setPath("/media/sda/ctre-logs/");
+
+      DataLogManager.start();
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
       Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
       Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);

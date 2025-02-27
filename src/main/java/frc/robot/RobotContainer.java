@@ -13,6 +13,7 @@ import org.opencv.core.Point;
 
 // import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,7 +43,6 @@ import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.SwerveCommands.SlowDrive;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
@@ -127,6 +127,14 @@ public class RobotContainer {
     ));
     //bindings
     driver.leftTrigger().whileTrue(new SlowDrive());
+
+driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+    driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
     // driver.leftTrigger().onTrue(CommandFactory.OffEverything());
     // driver.a().onTrue(new InstantCommand(()->intake.testUnbrake()));
     // driver.b().onTrue(new InstantCommand(()->intake.testBrake()));
@@ -186,14 +194,16 @@ public class RobotContainer {
     // final binds (not really)
     driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo()));
 
+
+
     // Elevator
     // driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
     // driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
     // driver.povUp().onTrue(new SetElevator(reefPoleLevel));
     // driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
 // driver.rightTrigger().onTrue(
-new InstantCommand(()->elevator.setSpeed(-0.1));
-     driver.start().onTrue(new ZeroElevator());
+// new InstantCommand(()->elevator.setSpeed(-0.1));
+     // driver.start().onTrue(new ZeroElevator());
 //     driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
 //     driver.povLeft().onTrue(new SetElevator(ElevatorState.L3));
 //     driver.povRight().onTrue(new SetElevator(ElevatorState.L2));
@@ -209,14 +219,19 @@ new InstantCommand(()->elevator.setSpeed(-0.1));
     driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
     driver.b().onTrue(CommandFactory.AlgeaOuttake());
 
-    // driver.rightTrigger().onTrue(new InstantCommand(() -> endEffector.setAlgaeSpeed(0.5)));
-    // EndEffector
-    driver.y().onTrue(new SetOuttake(OuttakeState.INDEX));
+    driver.rightTrigger().onTrue(new InstantCommand(() -> endEffector.setAlgaeSpeed(0.5)));
+    
+//     driver.y().onTrue(CommandFactory.FinishIntake());
     driver.rightTrigger().onTrue(CommandFactory.ShootCoral());
 
     // Funnel
-    driver.x().onTrue(CommandFactory.CoralIntake());
-    // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
+//     driver.x().onTrue(CommandFactory.CoralIntake());
+    driver.a().onTrue(new SetFunnel(FunnelState.OFF));
+  }
+
+  private ElevatorState getElevatorState() {
+        System.out.println(reefPoleLevel.getEncoderPosition());
+        return reefPoleLevel;
   }
 
   private void raisePoleLevel() {
