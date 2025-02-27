@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
 
 public class Elevator extends SubsystemBase {
   
@@ -96,7 +95,8 @@ public class Elevator extends SubsystemBase {
     Slot0Configs configuration = new Slot0Configs();
     configuration.kG = 0.4;
     configuration.kP = 0.1;
-  motor.getConfigurator().apply(configuration);
+
+    motor.getConfigurator().apply(configuration);
      // motor.optimizeBusUtilization();
   }
 

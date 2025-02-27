@@ -58,8 +58,6 @@ public class Robot extends LoggedRobot {
   private AutoCommand thirdSavedChoice;
   private AutoCommand fourthSavedChoice;
   private AutoCommand fifthSavedChoice;
-
-  
  
     public Robot() { 
       // oops just realized logging needs to be in the constructor lol

@@ -3,6 +3,7 @@ package frc.robot.commands.EndEffector;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystems.EndEffector;
+import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
 
 public class SetOuttake extends Command {
@@ -16,6 +17,16 @@ public class SetOuttake extends Command {
     addRequirements(s_EndEffector);
     this.state = state;
   }
+
+  public SetOuttake(ElevatorState state) {
+    s_EndEffector = EndEffector.getInstance();
+    addRequirements(s_EndEffector);
+
+    if(state == ElevatorState.L4)
+      this.state = OuttakeState.SCOREL4;
+    else
+      this.state = OuttakeState.SCOREMID;
+  } 
 
   @Override
   public void initialize() {
@@ -35,6 +46,6 @@ public class SetOuttake extends Command {
   @Override
   public boolean isFinished() {
     return (state == OuttakeState.INDEX && timer.hasElapsed(0.09)
-     || (state == OuttakeState.SCOREMID && timer.hasElapsed(0.5)));
+     || (timer.hasElapsed(0.5)));
   }
 }
