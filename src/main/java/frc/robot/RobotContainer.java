@@ -5,57 +5,26 @@
 package frc.robot;
 
 
-import static frc.robot.Constants.LimelightConstants.roll;
-
-import java.time.Instant;
-
-import org.opencv.core.Point;
-
-// import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Subsystems.Elevator;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
-import frc.robot.commands.CancelableCommand;
-import frc.robot.commands.CommandFactory;
-import frc.robot.commands.Autos.FollowChoreoTrajectory;
-import frc.robot.commands.CommandFactory.*;
-import frc.robot.commands.Elevator.SetElevator;
-import frc.robot.commands.Elevator.ZeroElevator;
-import frc.robot.commands.EndEffector.SetOuttake;
-import frc.robot.commands.EndEffector.SmartCoralIndex;
-import frc.robot.commands.Funnel.SetFunnel;
-import frc.robot.commands.Slapdown.SetRoller;
-import frc.robot.commands.Slapdown.SetPivot;
-import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.SwerveCommands.SlowDrive;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
-import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
-import frc.robot.Subsystems.EndEffector.OuttakeState;
-import frc.robot.Subsystems.Funnel.FunnelState;
-import frc.robot.Subsystems.Slapdown.PivotState;
-import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
+import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.commands.CommandFactory;
+import frc.robot.commands.Elevator.SetElevator;
+import frc.robot.commands.Funnel.SetFunnel;
+import frc.robot.commands.SwerveCommands.SlowDrive;
 
 public class RobotContainer {
 
@@ -197,23 +166,19 @@ driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
 
     // Elevator
-    // driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
-    // driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
-    // driver.povUp().onTrue(new SetElevator(reefPoleLevel));
-    // driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(reefPoleLevel)));
+     driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
+     driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
+//     driver.povUp().onTrue(new SetElevator(reefPoleLevel));
+     driver.povUp().onTrue(new SetElevator(() -> reefPoleLevel));
+     driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(getElevatorState())));
 // driver.rightTrigger().onTrue(
 // new InstantCommand(()->elevator.setSpeed(-0.1));
      // driver.start().onTrue(new ZeroElevator());
-//     driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
-//     driver.povLeft().onTrue(new SetElevator(ElevatorState.L3));
-//     driver.povRight().onTrue(new SetElevator(ElevatorState.L2));
-//     driver.povDown().onTrue(new SetElevator(ElevatorState.L1));
+
     driver.povDown().onTrue(new SetElevator(ElevatorState.SOURCE));
     driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
     driver.povRight().onTrue(new SetElevator(ElevatorState.L3));
     driver.povLeft().onTrue(new SetElevator(ElevatorState.L2));
-    // driver.povRight().onTrue(new SetElevator(ElevatorState.L4));
-    // driver.povLeft().onTrue(new SetElevator(ElevatorState.sSOURCE));
 
     // Slapdown
     driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
