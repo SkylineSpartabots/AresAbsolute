@@ -236,6 +236,8 @@ public final class Constants {
         public static final int slapdownFollowerID = 42;
 
         public static final int funnelID = 51;
+
+        public static final int climbID = 61;
     }
 
     //change for next game

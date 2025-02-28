@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.SensorUtils;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.Subsystems.Climb;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
@@ -133,6 +134,7 @@ public class Robot extends LoggedRobot {
       EndEffector.getInstance();
       RobotContainer.getInstance();
       CANCoders.getInstance();
+      Climb.getInstance();
 
       // CanBridge.runTCP();
     }
