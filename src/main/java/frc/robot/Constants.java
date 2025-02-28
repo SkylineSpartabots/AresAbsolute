@@ -189,6 +189,8 @@ public final class Constants {
         public static final double k_reprojectionLimit = 0.3;
         public static final double k_normThreshold = 0.1;
         public static final double k_ambiguityLimit = 0.35;
+        public static final double k_areaMinimum = 0.35; //TODO
+        public static final double k_skewLimit = 0.35; //TODO
         }
 
         public static final class AprilTags {

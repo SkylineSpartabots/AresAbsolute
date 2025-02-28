@@ -106,46 +106,61 @@ public class Vision extends SubsystemBase {
         List<MultiTagOutput> multitags = new ArrayList<>();
 
         for (PhotonPipelineResult photonPipelineResult : cameraResult) {
-            if(photonPipelineResult.getMultiTagResult().isPresent() && multitagChecks(photonPipelineResult.getMultiTagResult().get())) {
-                multitags.add(new MultiTagOutput(photonPipelineResult.getMultiTagResult().get(), photonPipelineResult.getTimestampSeconds(), photonPipelineResult.getBestTarget()));
+            if(photonPipelineResult.getMultiTagResult().isPresent() && multitagChecks(photonPipelineResult)) {
+                multitags.add(new MultiTagOutput(
+                    photonPipelineResult.getMultiTagResult().get(),
+                    photonPipelineResult.getTimestampSeconds(),
+                    photonPipelineResult.getBestTarget()));
             }
         }
 
         return multitags;
     }
 
-    private Boolean multitagChecks(MultiTargetPNPResult multiTagResult) {
+    private Boolean multitagChecks(PhotonPipelineResult photonPipelineResult) {
+
+        MultiTargetPNPResult multiTagResult = photonPipelineResult.getMultiTagResult().get();
         
-        System.out.println("repiroor" + multiTagResult.estimatedPose.bestReprojErr);
+        System.out.println("Reproj error: " + multiTagResult.estimatedPose.bestReprojErr);
         if(multiTagResult.estimatedPose.bestReprojErr > VisionLimits.k_reprojectionLimit) {
             SmartDashboard.putString("Multitag updates", "high error");
             // Logger.recordOutput("Vision/MultiTag updates", "high error");
             return false;
         }
+
         if(multiTagResult.fiducialIDsUsed.size() < 2 || multiTagResult.fiducialIDsUsed.isEmpty()) {
             SmartDashboard.putString("Multitag updates", "insufficient ids");
             // Logger.recordOutput("Vision/MultiTag updates", "insufficient ids");
             return false;
         } 
+        System.out.println("Norm: " + multiTagResult.estimatedPose.best.getTranslation().getNorm());
         if(multiTagResult.estimatedPose.best.getTranslation().getNorm() < VisionLimits.k_normThreshold) {
             SmartDashboard.putString("Multitag updates", "norm check failed");
             // Logger.recordOutput("Vision/MultiTag updates", "norm check failed");
             return false;
         }
-
-        System.out.println("abigug" + multiTagResult.estimatedPose.ambiguity);
+        System.out.println("Ambiguity: " + multiTagResult.estimatedPose.ambiguity);
         if(multiTagResult.estimatedPose.ambiguity > VisionLimits.k_ambiguityLimit) {
             SmartDashboard.putString("Multitag updates", "high ambiguity");
             // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
             return false;
         }
+        for (PhotonTrackedTarget photonTrackedTarget : photonPipelineResult.getTargets()) {
+            System.out.println("Area: " + multiTagResult.estimatedPose.ambiguity);
+            if(photonTrackedTarget.area < VisionLimits.k_areaMinimum) {
+                SmartDashboard.putString("Multitag updates", "Tag too far");
+                // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
+                return false;
+            }
 
-        //in the future we would have a set of tags we would only want to mega tag
-        // for (var fiducialID : multiTagResult.fiducialIDsUsed) {
-        //     if (fiducialID =! idk) {
-        //     }
-        // }
-
+            //trasform to skew
+            // if(photonTrackedTarget. < VisionLimits.k_areaMinimum) {
+            //     SmartDashboard.putString("Multitag updates", "Too far");
+            //     // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
+            //     return false;
+            // }
+        }
+        
         return true;
     }
 
@@ -165,10 +180,11 @@ public class Vision extends SubsystemBase {
 
         if(!multiTagResult.isEmpty()) { //Use multitag if available
             for (MultiTagOutput multiTagOutput : multiTagResult) {
-                System.out.println("Used multitag");
-                Pose3d tagPose = aprilTagFieldLayout.getTagPose(multiTagOutput.getBestTarget().getFiducialId()).get();
 
-                Pose3d robotPose = PhotonUtils.estimateFieldToRobotAprilTag(multiTagOutput.estimatedPose.best, tagPose, cameraToRobotTransform);
+                //Multitag gives fieldToCamera 
+                Pose3d robotPose = new Pose3d() //start at 0,0
+                    .plus(multiTagOutput.getMultiTag().estimatedPose.best) //transform to camera
+                        .plus(cameraToRobotTransform); //transform to robot
     
                 VisionOutput newPose = new VisionOutput(robotPose, multiTagOutput.getTimestamp(),  multiTagOutput.getBestTarget());
                 
@@ -179,7 +195,7 @@ public class Vision extends SubsystemBase {
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
                 if(validateTarget(photonPipelineResult)) {
                     VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get());
-                    System.out.println("Used single tag:");
+                    System.out.println("Used single tag");
                     robotState.visionUpdate(newPose); 
                 }
             } 
