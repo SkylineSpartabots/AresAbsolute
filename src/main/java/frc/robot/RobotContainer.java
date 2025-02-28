@@ -6,6 +6,9 @@ package frc.robot;
 
 
 import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -15,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.Subsystems.Climb;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
@@ -45,7 +49,8 @@ public class RobotContainer {
 
   private DriveControlSystems controlSystem  = DriveControlSystems.getInstance();
 
-  private ElevatorState reefPoleLevel = ElevatorState.L3; //default reef pole level
+  // private ElevatorState reefPoleLevel; //default reef pole level
+
 
 
   //instances
@@ -91,6 +96,8 @@ public class RobotContainer {
       return driver;
   }
 
+  private ElevatorState[] reefPoleLevel = {ElevatorState.L1};
+
   private void configureBindings() {
 
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -99,9 +106,9 @@ public class RobotContainer {
     //bindings
     driver.leftTrigger().whileTrue(new SlowDrive());
 
-driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
-    driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+        driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+        driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
@@ -163,16 +170,17 @@ driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
     // operatorLeftBumper.onTrue(new InstantCommand(()-> operatorPoleLevel = operatorPoleLevel.raiseLevel()));
 
     // final binds (not really)
-//     driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo()));
+    driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0.4208, 6.412663459777832, new Rotation2d(0)))));
+    driver.a().onTrue(CommandFactory.AutoScoreCoral(ElevatorState.SOURCE, ReefPoleSide.RIGHT, driver));
+    driver.povUp().onTrue(new SetElevator(reefPoleLevel[0]));
 
 
-
-//     // Elevator
+    // Elevator
 //      driver.rightBumper().onTrue(new InstantCommand(() -> raisePoleLevel()));
 //      driver.leftBumper().onTrue(new InstantCommand(() -> lowerPoleLevel()));
 // //     driver.povUp().onTrue(new SetElevator(reefPoleLevel));
 //      driver.povUp().onTrue(new SetElevator(() -> reefPoleLevel));
-//      driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(getElevatorState())));
+    //  driver.rightTrigger().onTrue(new InstantCommand(() -> System.out.println(getElevatorState())));
 // driver.rightTrigger().onTrue(
 // new InstantCommand(()->elevator.setSpeed(-0.1));
      // driver.start().onTrue(new ZeroElevator());
@@ -186,9 +194,9 @@ driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
     // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
     // driver.b().onTrue(CommandFactory.AlgeaOuttake());
 
-    driver.povLeft().onTrue(new InstantCommand(() -> climb.setSpeed(0.6)));
-    driver.povRight().onTrue(new InstantCommand(() -> climb.setSpeed(-0.6)));
-    driver.povUp().onTrue(new InstantCommand(() -> climb.setSpeed(0.0)));
+    // driver.povLeft().onTrue(new InstantCommand(() -> climb.setSpeed(0.6)));
+    // driver.povRight().onTrue(new InstantCommand(() -> climb.setSpeed(-0.6)));
+    // driver.povUp().onTrue(new InstantCommand(() -> climb.setSpeed(0.0)));
     
 //     driver.y().onTrue(CommandFactory.FinishIntake());
     // driver.rightTrigger().onTrue(CommandFactory.ShootCoral());
@@ -198,22 +206,17 @@ driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
     // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
   }
 
-  private ElevatorState getElevatorState() {
-        System.out.println(reefPoleLevel.getEncoderPosition());
-        return reefPoleLevel;
-  }
-
   private void raisePoleLevel() {
-    if(!(reefPoleLevel.ordinal() == 3)) {
-      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() + 1].name());
-      reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() + 1];
+    if(!(reefPoleLevel[0].ordinal() == 3)) {
+      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel[0].ordinal() + 1].name());
+      reefPoleLevel[0] = ElevatorState.values()[reefPoleLevel[0].ordinal() + 1];
     }
   }
 
   private void lowerPoleLevel() {
-    if(!(reefPoleLevel.ordinal() == 0)) {
-      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() - 1].name());
-      reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() - 1];
+    if(!(reefPoleLevel[0].ordinal() == 0)) {
+      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel[0].ordinal() - 1].name());
+      reefPoleLevel[0] = ElevatorState.values()[reefPoleLevel[0].ordinal() - 1];
     }
   }
 

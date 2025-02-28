@@ -64,6 +64,7 @@ public class DriveToPoseElevator extends Command {
     public void initialize() {
         Pose2d currentPose = robotState.getCurrentPose2d();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
+        
         driveController.reset(
                 currentPose.getTranslation().getDistance(targetPose.getTranslation()),
                 Math.min(
@@ -109,6 +110,7 @@ public class DriveToPoseElevator extends Command {
 
         if (currentDistance < driveController.getPositionTolerance())
             driveVelocityScalar = 0.0;
+            
         lastSetpointTranslation = new Pose2d(
                 targetPose.getTranslation(),
                 currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
@@ -118,6 +120,7 @@ public class DriveToPoseElevator extends Command {
 
         //while farther away we prioritize drive over turning
         double distanceFactor = MathUtil.clamp(1 - (driveErrorAbs / ffMaxRadius), 0.2, 1.0); // Reduce rotation influence when far
+        
         // Calculate theta speed
         double thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
                 + thetaController.calculate(
@@ -131,6 +134,7 @@ public class DriveToPoseElevator extends Command {
         var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
                 .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
                 .getTranslation();
+                
                 s_Swerve.applyFieldSpeeds((ChassisSpeeds.fromFieldRelativeSpeeds(
                         driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation())));
     }
@@ -142,6 +146,6 @@ public class DriveToPoseElevator extends Command {
 
     @Override
     public boolean isFinished() {
-        return targetPose.equals(null) || (driveController.atGoal() && thetaController.atGoal());
+        return targetPose == null || (driveController.atGoal() && thetaController.atGoal());
     }
 }

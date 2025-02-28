@@ -109,7 +109,7 @@ public class CommandFactory {
 
     public static Command AutoScoreCoral(ElevatorState level, ReefPoleSide side, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new DriveToPoseElevator(side, level),
+            new DriveToPose(side),
             new SetOuttake(level)
         ).raceWith(new CancelableCommand(controller));
     }
