@@ -25,7 +25,7 @@ import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
  */
 public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            4.5, 0.1, 0.015, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            4.5, 0.1, 0.015, new TrapezoidProfile.Constraints(Constants.MaxSpeed -2, Constants.MaxAcceleration -1), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             1.25, 0.1, 0.03, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
     private CommandSwerveDrivetrain s_Swerve;
@@ -48,14 +48,16 @@ public class DriveToPose extends Command {
     public DriveToPose(ReefPoleSide side) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
-        this.targetPose = side.getClosestPoint(s_Swerve.getPose());
+        this.targetPose = new Pose2d(3.61677, 2.5978, Rotation2d.fromRadians(1.048303533904225)); // Point A
 
         addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
     }
 
     @Override
     public void initialize() {
+
+        System.out.println("WAWA" + targetPose.toString());
         Pose2d currentPose = robotState.getCurrentPose2d();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
@@ -106,12 +108,12 @@ public class DriveToPose extends Command {
                 .getTranslation();
 
         //while farther away we prioritize drive over turning
-        double distanceFactor = MathUtil.clamp(1 - (driveErrorAbs / ffMaxRadius), 0.2, 1.0); // Reduce rotation influence when far
+        // double distanceFactor = MathUtil.clamp(1 - (ffMaxRadius/driveErrorAbs), 0.2, 1.0); // Reduce rotation influence when far
         // Calculate theta speed
         double thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
                 + thetaController.calculate(
                         currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians())
-                        * distanceFactor;
+                        * 1;
         thetaErrorAbs = Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
         if (thetaErrorAbs < thetaController.getPositionTolerance())
             thetaVelocity = 0.0;
@@ -120,8 +122,13 @@ public class DriveToPose extends Command {
         var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
                 .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
                 .getTranslation();
-                s_Swerve.applyFieldSpeeds((ChassisSpeeds.fromFieldRelativeSpeeds(
-                        driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation())));
+                s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
+
+        //prints
+        System.out.println("Theta error: " + thetaErrorAbs);
+        // System.out.println("Theta setpoint: " + thetaVelocity);
+        System.out.println("Drive error: " + driveErrorAbs);
+        // System.out.println("Drive velocity: " + driveVelocityScalar);
     }
 
     @Override

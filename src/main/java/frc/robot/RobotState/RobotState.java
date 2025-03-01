@@ -81,6 +81,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
     public synchronized void visionUpdate(VisionOutput updatePose) {
 
+        System.out.println(updatePose.estimatedPose.toString());
+
         double timestamp = updatePose.timestampSeconds;
 
         IChassisSpeeds filteredVelocity = getInterpolatedValue(filteredRobotVelocities, timestamp, IChassisSpeeds.identity());
@@ -88,16 +90,16 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         //calculate std of vision estimate for UKF
         Vector<N2> stdevs = VecBuilder.fill(Math.pow(updatePose.standardDev, 2), Math.pow(updatePose.standardDev, 2));
 
-                UKF.correct(
-                        VecBuilder.fill(filteredVelocity.getVx(), filteredVelocity.getVy()),
-                        VecBuilder.fill(
-                                updatePose.estimatedPose.getX(),
-                                updatePose.estimatedPose.getY()),
-                        StateSpaceUtil.makeCovarianceMatrix(Nat.N2(), stdevs));
+                // UKF.correct(
+                //         VecBuilder.fill(filteredVelocity.getVx(), filteredVelocity.getVy()),
+                //         VecBuilder.fill(
+                //                 updatePose.estimatedPose.getX(),
+                //                 updatePose.estimatedPose.getY()),
+                //         StateSpaceUtil.makeCovarianceMatrix(Nat.N2(), stdevs));
                         
-                filteredPoses.put(
-                        new IDouble(timestamp),
-                        new ITranslation2d(UKF.getXhat(0), UKF.getXhat(1)));
+                // filteredPoses.put(
+                //         new IDouble(timestamp),
+                //         new ITranslation2d(UKF.getXhat(0), UKF.getXhat(1)));
 
         SmartDashboard.putNumber("Vision std dev", updatePose.standardDev);
     }
@@ -113,10 +115,9 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         } else {
 
             //merge our velocities
-            IChassisSpeeds OdomVelocity = new IChassisSpeeds(state.Speeds).complimentaryFilter(
+            IChassisSpeeds OdomVelocity =
                 getInterpolatedValue(odometryPoses, prevOdomTimestamp.get(), IPose2d.identity())
-                .getVelocityBetween(new IPose2d(state.Pose), timestamp - prevOdomTimestamp.get()),
-                0.75);
+                .getVelocityBetween(new IPose2d(state.Pose), timestamp - prevOdomTimestamp.get());
 
             robotOdomVelocity.put(new IDouble(timestamp), OdomVelocity);
             
@@ -133,9 +134,9 @@ public class RobotState { //will estimate pose with odometry and correct drift w
                 //please look in desmos before changing these
                 //https://www.desmos.com/3d/xs2grgugoj
                 
-                double kv = 0.000004; //velocity weight
-                double ka = 0.000005; //acceleration weight
-                double ktheta = 0.0000025; //angular velocity weight
+                double kv = 0.0000028; //velocity weight
+                double ka = 0.00000482; //acceleration weight
+                double ktheta = 0.0000005; //angular velocity weight
 
                 double acceleration = Math.max(robotAcceleration.toMagnitude(), Constants.MaxAcceleration);
                 double velocity = Math.max(OdomVelocity.toMagnitude(), Constants.MaxSpeed);

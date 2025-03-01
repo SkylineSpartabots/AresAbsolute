@@ -162,9 +162,6 @@ public class Robot extends LoggedRobot {
 
     //start the logger here
 
-     //might need to move these depending on when command Scheduler is inited
-    // new SetPivot(PivotState.UP);
-    // new ZeroElevator();
     SmartDashboard.putString("Selected Pole Level", ElevatorState.L3.name());
   }
 

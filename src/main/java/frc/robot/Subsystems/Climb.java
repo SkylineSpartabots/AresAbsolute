@@ -32,9 +32,10 @@ public class Climb extends SubsystemBase {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.MotorOutput.Inverted = direction;
     config.MotorOutput.NeutralMode = neutralMode;
+    motor.getConfigurator().apply(config);
   }
 
-  private void setSpeed(double speed){
+  public void setSpeed(double speed){
     climb.set(speed);
   }
 
