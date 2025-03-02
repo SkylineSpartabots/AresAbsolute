@@ -46,7 +46,7 @@ public class Elevator extends SubsystemBase {
     L3(39),
     L4(60),
     GROUND(0.11),
-    SOURCE(4.75);
+    SOURCE(4.5);
     //48.1 should be max
     private double encoderPosition;
 
@@ -94,7 +94,8 @@ public class Elevator extends SubsystemBase {
 
     Slot0Configs configuration = new Slot0Configs();
     configuration.kG = 0.4;
-    configuration.kP = 0.1;
+    configuration.kI = 0.15;
+    configuration.kP = 0.13;
 
     motor.getConfigurator().apply(configuration);
      // motor.optimizeBusUtilization();

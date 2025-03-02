@@ -223,7 +223,7 @@ public final class Constants {
 
     public static final class HardwarePorts {
         // motor id
-        public static final int endEffectorBeamPort = 0;
+        public static final int endEffectorBeamPort = 9;
         public static final int funnelBeamPort = 0;
 
         public static final int outtakeID = 21;

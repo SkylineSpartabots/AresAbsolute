@@ -35,7 +35,7 @@ public class SetElevator extends Command {
   private State setpoint;
   private Timer timer = new Timer();
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
-  private PIDController controller = new PIDController(1.5, 0.5, 0.12);
+  private PIDController controller = new PIDController(1.4, 0.5, 0.1);
   public SetElevator(ElevatorState newState) {
     this(newState.getEncoderPosition());
   }
@@ -76,17 +76,18 @@ public class SetElevator extends Command {
     // System.out.println("pid output: " + pidoutput);
     // s_Elevator.setVoltage(controller.calculate(s_Elevator.getPosition(), setpoint.position) + feedforward.calculate(setpoint.velocity));
     // SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
-    SmartDashboard.putNumber("current error", error);
+    // SmartDashboard.putNumber("current error", error);
     System.out.println("current error: " + error);
-    // System.out.println(s_Elevator.getFollowerVoltage());
+    System.out.println(s_Elevator.getFollowerVoltage());
+    System.out.println("pidoutput: " + pidoutput);
     // System.out.println("current setpoint error " + error);
   }
 
   
   @Override
   public void end(boolean interrupted) {
-    // s_Elevator.setSpeed(0);
-    s_Elevator.setPosition(s_Elevator.getPosition());
+    s_Elevator.setSpeed(0);
+    // s_Elevator.setPosition(s_Elevator.getPosition());
     System.out.println(s_Elevator.getPosition());
     System.out.println("final time: " + timer.get());
     System.out.println("expected time: " + profile.totalTime());

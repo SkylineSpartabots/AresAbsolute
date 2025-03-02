@@ -27,7 +27,9 @@ import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.commands.CommandFactory;
+import frc.robot.commands.SmartCoralIntake;
 import frc.robot.commands.Elevator.SetElevator;
+import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.SwerveCommands.SlowDrive;
 
@@ -123,11 +125,11 @@ public class RobotContainer {
 
         // driver.a().onTrue(new InstantCommand(()->intake.testUnbrake()));
         // driver.b().onTrue(new InstantCommand(()->intake.testBrake()));
-        // driver.povDown().onTrue(new SetElevator(ElevatorState.SOURCE));
+        driver.povDown().onTrue(new SetElevator(ElevatorState.SOURCE));
 
-        // driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
-        // driver.povRight().onTrue(new SetElevator(ElevatorState.L3));
-        // driver.povLeft().onTrue(new SetElevator(ElevatorState.L2));
+        driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
+        driver.povRight().onTrue(new SetElevator(ElevatorState.L3));
+        driver.povLeft().onTrue(new SetElevator(ElevatorState.L2));
 
       //Manual Pivot
         // driver.a().onTrue(new SetIntakePivot(PivotState.UP));
@@ -153,20 +155,20 @@ public class RobotContainer {
 
       //Zeroing commands
         // driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0.4208, 6.412663459777832, new Rotation2d(0)))));
-        // driver.start().onTrue(new ZeroElevator());
+        driver.start().onTrue(new ZeroElevator());
           
       // Scholarly Commands
         // driverDpadRight.onTrue(new SmartIntake());
-        // driver.x().onTrue(CommandFactory.CoralIntake());
+        driver.x().onTrue(CommandFactory.FullCoralIntake());
         // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
         // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
         // driver.b().onTrue(CommandFactory.AlgeaOuttake());
         // driver.y().onTrue(CommandFactory.FinishIntake());
-        // driver.rightTrigger().onTrue(CommandFactory.ShootCoral());
+        driver.rightTrigger().onTrue(CommandFactory.SmartCoralOuttake(ElevatorState.L4));
               
-    // ----------====# Active bindings #====----------
+    // ----------====# Active binding
     driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0.4208, 6.412663459777832, new Rotation2d(0)))));
-    driver.povUp().onTrue(new SetElevator(reefPoleLevel[0]));
+    // driver.povUp().onTrue(new SetElevator(reefPoleLevel[0]));
   }
 
   private void raisePoleLevel() {

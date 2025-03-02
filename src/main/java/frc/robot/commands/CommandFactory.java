@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -15,7 +16,9 @@ import frc.robot.Constants.FieldConstants.ReefConstants;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
+import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
@@ -37,6 +40,7 @@ import frc.robot.RobotState.RobotState;
 
 /** Add your docs here. */
 public class CommandFactory {
+
 
     //add all mechanism off functions as they are tested; currently only pivot
     public static Command OffEverything() {
@@ -90,6 +94,23 @@ public class CommandFactory {
         );
     }
 
+    public static Command SmartCoralOuttake(){
+        return new SequentialCommandGroup(
+            new SetOuttake(OuttakeState.SCOREMID),
+            new SetElevator(ElevatorState.SOURCE)
+        );
+    }
+
+    public static Command SmartCoralOuttake(ElevatorState state){
+        return new SequentialCommandGroup(
+            new SetElevator(state),
+            new SetOuttake(OuttakeState.SCOREMID),
+            new SetElevator(ElevatorState.SOURCE)
+        );
+    }
+
+    
+
     public static Command FinishIntake(){
         return new ParallelCommandGroup(
             new SetFunnel(FunnelState.OFF),
@@ -106,6 +127,13 @@ public class CommandFactory {
             new SetFunnel(FunnelState.OFF)
         );
     }    
+
+    public static Command FullCoralIntake(){
+        return new SequentialCommandGroup(
+            new SetElevator(ElevatorState.SOURCE),
+            new SmartCoralIntake()
+        );
+    }
 
     public static Command AutoScoreCoral(ElevatorState level, ReefPoleSide side, CommandXboxController controller){
         return new SequentialCommandGroup(
