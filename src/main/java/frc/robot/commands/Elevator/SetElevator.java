@@ -20,39 +20,35 @@ import java.util.function.Supplier;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SetElevator extends Command {
   private Elevator s_Elevator;
-  // private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.17, 0.112, 0);
-  // private PIDController controller = new PIDController(0.0000000001, 0, 0.2);
+
   private double goalPosition;
+
   private ElevatorFeedforward ff = new ElevatorFeedforward(0, 0, 0.15);
   private TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration);
-  // private Timer timer;
-  // private State initialState;
-  // private State setpoint;
-  // private State goal;
+  
   private double error;
   private double pidoutput;
-  private State initialState;
   private State setpoint;
+  private State initialState;
+  private Supplier<ElevatorState> state;
+
   private Timer timer = new Timer();
+
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
   private PIDController controller = new PIDController(1.4, 0.5, 0.1);
-  public SetElevator(ElevatorState newState) {
-    this(newState.getEncoderPosition());
-  }
 
-  public SetElevator(Supplier<ElevatorState> targetStateSupplier){
-    this(targetStateSupplier.get().getEncoderPosition());
-  }
+  // pls dont add more constructors
+  public SetElevator(Supplier<ElevatorState> state){
+    this.state = state;
 
-  public SetElevator(double goalPosition){
-    this.goalPosition = goalPosition;
     s_Elevator = Elevator.getInstance();
-    
     addRequirements(s_Elevator);
   }
 
   @Override
   public void initialize() {
+    this.goalPosition = state.get().getEncoderPosition();
+    
     timer.restart();
     controller.disableContinuousInput();
     initialState = new State(s_Elevator.getPosition(), s_Elevator.getVelocity());
@@ -60,7 +56,6 @@ public class SetElevator extends Command {
 
   @Override
   public void execute() {
-
     setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
     pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
 

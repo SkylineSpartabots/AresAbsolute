@@ -162,7 +162,7 @@ public class Robot extends LoggedRobot {
 
     //start the logger here
 
-    SmartDashboard.putString("Selected Pole Level", ElevatorState.L3.name());
+    SmartDashboard.putString("Selected Pole Level", ElevatorState.L1.name());
   }
 
   @Override
