@@ -267,22 +267,22 @@ public final class Constants {
 
 
                 //BLUE SIDE
-                LEFT(new Pose2d[]{ //these are wrong obvi
-                    new Pose2d(0, 0, Rotation2d.fromRadians(0 - Math.PI)), // Point A
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point C
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point E
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point G
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point I
-                    new Pose2d(temp, temp, new Rotation2d(0.0))  // Point K
+                LEFT(new Pose2d[]{ // ~ 0.02 m buffer distance from the walls (untested)
+                        new Pose2d(2.86, 4.18854, Rotation2d.fromRadians(0.0)), // Point A
+                        new Pose2d(3.53394, 2.70151, Rotation2d.fromRadians(1.0472)), // Point C
+                        new Pose2d(5.16132, 2.53966, Rotation2d.fromRadians(2.0944)), // Point E
+                        new Pose2d(6.12, 3.85134, Rotation2d.fromRadians(3.14159)), // Point G 
+                        new Pose2d(5.45350, 5.35134, Rotation2d.fromRadians(-2.0944)), // Point I 
+                        new Pose2d(3.826, 5.52715, Rotation2d.fromRadians(-1.0472))  // Point K
                 }),
 
                 RIGHT(new Pose2d[]{
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point B
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point D
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point F
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point H
-                    new Pose2d(temp, temp, new Rotation2d(0.0)), // Point J
-                    new Pose2d(temp, temp, new Rotation2d(0.0))  // Point L
+                        new Pose2d(2.86, 3.85134, Rotation2d.fromRadians(0.0)), // Point B
+                        new Pose2d(3.82606, 2.53285, Rotation2d.fromRadians(1.0472)), // Point D 
+                        new Pose2d(5.45345, 2.70832, Rotation2d.fromRadians(2.0944)), // Point F
+                        new Pose2d(6.12, 4.18866, Rotation2d.fromRadians(3.14159)), // Point H  
+                        new Pose2d(5.16139, 5.52034, Rotation2d.fromRadians(-2.0944)), // Point J
+                        new Pose2d(3.53394, 5.35849, Rotation2d.fromRadians(-1.0472))  // Point L
                 });
 
                 private final Pose2d[] waypoints;
