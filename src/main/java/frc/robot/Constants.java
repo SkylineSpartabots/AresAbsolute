@@ -259,15 +259,16 @@ public final class Constants {
             public static final Pose2d BlueCage3 = new Pose2d(0,0, new Rotation2d(0));
         }
 
-        static double temp = 0.25;
+        static double temp = 100;
 
         public static final class ReefConstants{
 
             public enum ReefPoleSide {
 
+
                 //BLUE SIDE
                 LEFT(new Pose2d[]{ //these are wrong obvi
-                    new Pose2d(3.61677, 2.5978, Rotation2d.fromRadians(1.0483)), // Point A
+                    new Pose2d(0, 0, Rotation2d.fromRadians(0 - Math.PI)), // Point A
                     new Pose2d(temp, temp, new Rotation2d(0.0)), // Point C
                     new Pose2d(temp, temp, new Rotation2d(0.0)), // Point E
                     new Pose2d(temp, temp, new Rotation2d(0.0)), // Point G
