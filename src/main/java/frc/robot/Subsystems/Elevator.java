@@ -44,9 +44,9 @@ public class Elevator extends SubsystemBase {
 
   public enum ElevatorState {
     L1(15),
-    L2(25),
+    L2(21),
     L3(39),
-    L4(60),
+    L4(61),
     GROUND(0.11),
     A1(33),
     A2(13),

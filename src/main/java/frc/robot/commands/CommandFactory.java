@@ -46,7 +46,7 @@ public class CommandFactory {
 
     public static Command Dealgaeify(){
         return new SequentialCommandGroup(
-            new SetElevator(ElevatorState.A1),
+            new SetElevator(() -> ElevatorState.A1),
             new InstantCommand(()->ee.setAlgaeSpeed(0.4)),
             Commands.waitSeconds(0.5),
             new InstantCommand(()->ee.setAlgaeSpeed(0))
@@ -54,7 +54,7 @@ public class CommandFactory {
     }
     public static Command Dealgaeify(ElevatorState state){
         return new SequentialCommandGroup(
-            new SetElevator(state),
+            new SetElevator(() -> state),
             new InstantCommand(()->ee.setAlgaeSpeed(0.4)),
             Commands.waitSeconds(0.5),
             new InstantCommand(()->ee.setAlgaeSpeed(0))
@@ -120,13 +120,7 @@ public class CommandFactory {
         );
     }
 
-    public static Command SmartCoralOuttake(ElevatorState state){
-        return new SequentialCommandGroup(
-            new SetElevator(() -> state),
-            new SetOuttake(OuttakeState.SCOREMID),
-            new SetElevator(() -> ElevatorState.SOURCE)
-        );
-    }
+    
 
     
 
@@ -149,7 +143,8 @@ public class CommandFactory {
 
     public static Command FullCoralIntake(){
         return new SequentialCommandGroup(
-            new SetElevator(() -> ElevatorState.SOURCE)
+            new SetElevator(() -> ElevatorState.SOURCE),
+            new SmartCoralIntake()
         );
     }
 

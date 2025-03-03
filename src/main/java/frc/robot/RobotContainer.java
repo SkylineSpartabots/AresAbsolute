@@ -27,6 +27,7 @@ import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.commands.CommandFactory;
+import frc.robot.commands.SmartCoralIntake;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Funnel.SetFunnel;
@@ -165,14 +166,14 @@ public class RobotContainer {
         // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
         // driver.b().onTrue(CommandFactory.AlgeaOuttake());
         // driver.y().onTrue(CommandFactory.FinishIntake());
-        // driver.rightTrigger().onTrue(CommandFactory.SmartCoralOuttake(ElevatorState.L4));
+        driver.rightTrigger().onTrue(CommandFactory.SmartCoralOuttake());
 
               
     // ----------====# Active binding ====----------
     driver.start().onTrue(new ZeroElevator());
     driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0,0, new Rotation2d(0)))));
     
-    driver.a().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.LEFT, driver));
+    // driver.a().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.LEFT, driver));
     driver.povUp().onTrue(new SetElevator(() -> elevator.getSelectedState()));
 
     driver.rightBumper().onTrue(new InstantCommand(() -> elevator.raisePoleLevel()));
