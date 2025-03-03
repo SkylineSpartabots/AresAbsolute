@@ -1,6 +1,9 @@
 package frc.robot.commands.EndEffector;
 
 import edu.wpi.first.wpilibj2.command.Command;
+
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Elevator.ElevatorState;
@@ -18,11 +21,11 @@ public class SetOuttake extends Command {
     this.state = state;
   }
 
-  public SetOuttake(ElevatorState state) {
+  public SetOuttake(Supplier<ElevatorState> state) {
     s_EndEffector = EndEffector.getInstance();
     addRequirements(s_EndEffector);
 
-    if(state == ElevatorState.L4)
+    if(state.get() == ElevatorState.L4)
       this.state = OuttakeState.SCOREL4;
     else
       this.state = OuttakeState.SCOREMID;
