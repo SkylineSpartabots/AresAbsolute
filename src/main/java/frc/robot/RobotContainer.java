@@ -158,8 +158,10 @@ public class RobotContainer {
           
       // Scholarly Commands
         // driverDpadRight.onTrue(new SmartIntake());
-        // driver.x().onTrue(CommandFactory.FullCoralIntake());
-         // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
+        driver.x().onTrue(CommandFactory.FullCoralIntake());
+        
+
+        // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
         // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
         // driver.b().onTrue(CommandFactory.AlgeaOuttake());
         // driver.y().onTrue(CommandFactory.FinishIntake());

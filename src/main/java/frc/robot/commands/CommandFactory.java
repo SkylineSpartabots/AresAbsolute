@@ -42,6 +42,24 @@ import frc.robot.RobotState.RobotState;
 /** Add your docs here. */
 public class CommandFactory {
 
+    static EndEffector ee = EndEffector.getInstance();
+
+    public static Command Dealgaeify(){
+        return new SequentialCommandGroup(
+            new SetElevator(ElevatorState.A1),
+            new InstantCommand(()->ee.setAlgaeSpeed(0.4)),
+            Commands.waitSeconds(0.5),
+            new InstantCommand(()->ee.setAlgaeSpeed(0))
+        );
+    }
+    public static Command Dealgaeify(ElevatorState state){
+        return new SequentialCommandGroup(
+            new SetElevator(state),
+            new InstantCommand(()->ee.setAlgaeSpeed(0.4)),
+            Commands.waitSeconds(0.5),
+            new InstantCommand(()->ee.setAlgaeSpeed(0))
+        );
+    }
 
     //add all mechanism off functions as they are tested; currently only pivot
     public static Command OffEverything() {
