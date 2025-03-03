@@ -21,15 +21,22 @@ public class SetRoller extends Command {
   public SetRoller(RollerState state) {
     s_Slapdown = Slapdown.getInstance();
     this.state = state;
+    addRequirements(s_Slapdown);
   }
 
   @Override
   public void initialize() {
+    timer.start();
     s_Slapdown.setRollerSpeed(state.getRollerSpeed());
   }
 
   @Override
   public void end(boolean interrupted) {
+    timer.stop();
+    timer.reset();
+    if(state == RollerState.OUTTAKE){
+      s_Slapdown.setRollerSpeed(0);
+    }
   }
 
   // Returns true when the command should end.

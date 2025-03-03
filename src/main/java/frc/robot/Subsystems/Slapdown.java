@@ -74,8 +74,8 @@ public class Slapdown extends SubsystemBase {
 
     Slot1Configs position = new Slot1Configs();
     position.GravityType = GravityTypeValue.Arm_Cosine;
-    position.kP = 7.2;
-    position.kI = 2.3;
+    position.kP = 9.3;
+    position.kI = 3.2;
     position.kG = 1.5;
 
 
@@ -103,8 +103,8 @@ public class Slapdown extends SubsystemBase {
     config.CurrentLimits = currentLimitsConfigs;
 
     Slot1Configs position = new Slot1Configs();
-    position.kP = 2;
-    position.kG = 1;
+    position.kP = 3.6;
+    position.kG = 1.7;
     position.kD = 0.5;
     motor.getSupplyCurrent().setUpdateFrequency(50);
     motor.getStatorCurrent().setUpdateFrequency(50);

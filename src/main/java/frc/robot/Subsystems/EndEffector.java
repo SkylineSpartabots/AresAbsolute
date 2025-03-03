@@ -50,7 +50,7 @@ public class EndEffector extends SubsystemBase {
     aligner = new LaserCan(Constants.HardwarePorts.laserID);
     configLaser();
     // config(roller, InvertedValue.Clockwise_Positive, NeutralModeValue.Brake);
-    algae = new TalonFX(Constants.HardwarePorts.algaeID);
+    algae = new TalonFX(Constants.HardwarePorts.algaeID, "mechbus");
     config(coral, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
     config(algae, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
 

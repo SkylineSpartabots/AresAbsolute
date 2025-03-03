@@ -31,6 +31,7 @@ public class Funnel extends SubsystemBase {
 
   public enum FunnelState{
     INTAKING(0.254),
+    EJECT(-0.3),
     OFF(0);
     private double rollerSpeed;
     private FunnelState(double rollerSpeed){

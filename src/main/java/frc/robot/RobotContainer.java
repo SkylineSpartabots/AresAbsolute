@@ -26,11 +26,13 @@ import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown;
+import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.SmartCoralIntake;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Funnel.SetFunnel;
+import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.SwerveCommands.DriveToPose;
 import frc.robot.commands.SwerveCommands.SlowDrive;
 
@@ -106,7 +108,7 @@ public class RobotContainer {
         drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY(), -driver.getLeftX(), -driver.getRightX()) // Drive counterclockwise with negative X (left)
     ));
     //SysID
-        // driver.leftTrigger().whileTrue(new SlowDrive());
+        driver.leftTrigger().whileTrue(new SlowDrive());
         // driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
         // driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
         // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -160,11 +162,14 @@ public class RobotContainer {
       // Scholarly Commands
         // driverDpadRight.onTrue(new SmartIntake());
         driver.x().onTrue(CommandFactory.FullCoralIntake());
+        driver.y().onTrue(CommandFactory.EjectFunnel());
+        driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+        driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
         
 
         // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
-        // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
-        // driver.b().onTrue(CommandFactory.AlgeaOuttake());
+        driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
+        driver.b().onTrue(new SetRoller(RollerState.OUTTAKE));
         // driver.y().onTrue(CommandFactory.FinishIntake());
         driver.rightTrigger().onTrue(CommandFactory.SmartCoralOuttake());
 

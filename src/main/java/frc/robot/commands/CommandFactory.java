@@ -46,16 +46,21 @@ public class CommandFactory {
 
     public static Command Dealgaeify(){
         return new SequentialCommandGroup(
-            new SetElevator(() -> ElevatorState.A1),
-            new InstantCommand(()->ee.setAlgaeSpeed(0.4)),
-            Commands.waitSeconds(0.5),
+            new ParallelCommandGroup(
+                new SetElevator(() -> ElevatorState.A1),
+                new InstantCommand(()->ee.setAlgaeSpeed(0.65))
+            ),
+            Commands.waitSeconds(0.7),
             new InstantCommand(()->ee.setAlgaeSpeed(0))
         );
     }
     public static Command Dealgaeify(ElevatorState state){
         return new SequentialCommandGroup(
-            new SetElevator(() -> state),
-            new InstantCommand(()->ee.setAlgaeSpeed(0.4)),
+            new ParallelCommandGroup(
+                new SetElevator(() -> state),
+                new InstantCommand(()->ee.setAlgaeSpeed(0.4))
+            ),
+            
             Commands.waitSeconds(0.5),
             new InstantCommand(()->ee.setAlgaeSpeed(0))
         );
@@ -92,12 +97,6 @@ public class CommandFactory {
         );
     }
 
-    public static Command AlgeaOuttake() {
-        return new SequentialCommandGroup(
-            new SetRoller(RollerState.OUTTAKE),
-            new SetRoller(RollerState.OFF)
-        );
-    }
 
     public static Command CoralIntake(){
         return new ParallelCommandGroup(
@@ -110,6 +109,15 @@ public class CommandFactory {
         return new SequentialCommandGroup(
             new SetOuttake(OuttakeState.SCOREMID),
             new SetElevator(() -> ElevatorState.SOURCE)
+        );
+    }
+
+    public static Command EjectFunnel(){
+        return new SequentialCommandGroup(
+            new SetFunnel(FunnelState.EJECT),
+            Commands.waitSeconds(0.5),
+            new SetFunnel(FunnelState.OFF)
+
         );
     }
 
