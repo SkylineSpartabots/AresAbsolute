@@ -265,24 +265,31 @@ public final class Constants {
 
             public enum ReefPoleSide {
 
+                //Now 4.2545 cm offset (to the right)
+                //Or 0.042545 m
+                
+                //Offsets:
+                // dx = +- 0.0368450508 m
+                // dy = +- 0.0212725 m
+
 
                 //BLUE SIDE
                 LEFT(new Pose2d[]{ // ~ 0.02 m buffer distance from the walls (untested)
-                        new Pose2d(2.86, 4.18854, Rotation2d.fromRadians(0.0)), // Point A
-                        new Pose2d(3.53394, 2.70151, Rotation2d.fromRadians(1.0472)), // Point C
-                        new Pose2d(5.16132, 2.53966, Rotation2d.fromRadians(2.0944)), // Point E
-                        new Pose2d(6.12, 3.85134, Rotation2d.fromRadians(3.14159)), // Point G 
-                        new Pose2d(5.45350, 5.35134, Rotation2d.fromRadians(-2.0944)), // Point I 
-                        new Pose2d(3.826, 5.52715, Rotation2d.fromRadians(-1.0472))  // Point K
+                        new Pose2d(2.86, 4.231085, Rotation2d.fromRadians(0.0)), // Point A
+                        new Pose2d(3.4970949492 , 2.7227825, Rotation2d.fromRadians(1.0472)), // Point C
+                        new Pose2d(5.1244749492, 2.5183875, Rotation2d.fromRadians(2.0944)), // Point E
+                        new Pose2d(6.12, 3.808795, Rotation2d.fromRadians(3.14159)), // Point G 
+                        new Pose2d(5.490345, 5.33, Rotation2d.fromRadians(-2.0944)), // Point I 
+                        new Pose2d(3.8628450508, 5.5484225, Rotation2d.fromRadians(-1.0472))  // Point K
                 }),
 
                 RIGHT(new Pose2d[]{
-                        new Pose2d(2.86, 3.85134, Rotation2d.fromRadians(0.0)), // Point B
-                        new Pose2d(3.82606, 2.53285, Rotation2d.fromRadians(1.0472)), // Point D 
-                        new Pose2d(5.45345, 2.70832, Rotation2d.fromRadians(2.0944)), // Point F
-                        new Pose2d(6.12, 4.18866, Rotation2d.fromRadians(3.14159)), // Point H  
-                        new Pose2d(5.16139, 5.52034, Rotation2d.fromRadians(-2.0944)), // Point J
-                        new Pose2d(3.53394, 5.35849, Rotation2d.fromRadians(-1.0472))  // Point L
+                        new Pose2d(2.86, 3.893885, Rotation2d.fromRadians(0.0)), // Point B
+                        new Pose2d(3.7892149492 , 2.5541225, Rotation2d.fromRadians(1.0472)), // Point D 
+                        new Pose2d(5.4166049492, 2.6870475, Rotation2d.fromRadians(2.0944)), // Point F
+                        new Pose2d(6.12, 4.146115, Rotation2d.fromRadians(3.14159)), // Point H  
+                        new Pose2d(5.1982350508, 5.4990675, Rotation2d.fromRadians(-2.0944)), // Point J
+                        new Pose2d(3.5707850508, 5.3797625, Rotation2d.fromRadians(-1.0472))  // Point L
                 });
 
                 private final Pose2d[] waypoints;
