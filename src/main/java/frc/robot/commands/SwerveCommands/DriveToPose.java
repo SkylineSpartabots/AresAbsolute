@@ -27,13 +27,14 @@ import frc.robot.commands.Elevator.SetElevator;
  */
 public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            4.6, 0.11, 0.015, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            4.5, 0.13, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 2, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            2, 0.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
+            5, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity + 2*Math.PI, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
 
-    private Supplier<ElevatorState> elevatorLevel = null;
+    private Supplier<ElevatorState> elevatorLevel;
+    private Double elevatorGoalPos = null;
 
     private Pose2d targetPose;
     private RobotState robotState;
@@ -72,6 +73,9 @@ public class DriveToPose extends Command {
 
     @Override
     public void initialize() {
+        if(elevatorLevel != null)
+                elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
+
         Pose2d currentPose = robotState.getCurrentPose2d();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
@@ -87,10 +91,10 @@ public class DriveToPose extends Command {
                                                 .unaryMinus())
                                 .getX())); // Distance between current and target pose
 
-        thetaController.reset(currentPose.getRotation().getRadians(),
+        thetaController.reset(s_Swerve.getHeading(),
                 robotState.getLatestFilteredVelocity().getOmega());
         
-        thetaController.setTolerance(0.0524); //3 degrees
+        thetaController.setTolerance(0.04);
                 
         lastSetpointTranslation = robotState.getCurrentPose2d().getTranslation();
     }
@@ -116,17 +120,19 @@ public class DriveToPose extends Command {
 
         if (currentDistance < driveController.getPositionTolerance())
             driveVelocityScalar = 0.0;
-        lastSetpointTranslation = new Pose2d(
+            lastSetpointTranslation = new Pose2d(
                 targetPose.getTranslation(),
                 currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
                 .transformBy(
                         new Transform2d(new Translation2d(driveController.getSetpoint().position, 0.0), new Rotation2d()))
                 .getTranslation();
 
+        System.out.println(driveErrorAbs);
         //Start bringing up elevator if included in command
-        if(elevatorLevel !=null && Math.abs(driveErrorAbs) < elevatorDistanceThreshold) {
-                new SetElevator(elevatorLevel).schedule();
-                elevatorLevel = null;
+        if(elevatorGoalPos != null && driveErrorAbs < elevatorDistanceThreshold) {
+                System.out.println("schedudelelellelelle: " + elevatorLevel.get().name());
+                new SetElevator(elevatorGoalPos).schedule();
+                elevatorGoalPos = null;
         }
 
         // Calculate theta speed
@@ -144,9 +150,11 @@ public class DriveToPose extends Command {
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
         //prints
-        // System.out.println("Theta error: " + thetaErrorAbs);
-        // System.out.println("Theta rn: " + currentPose.getRotation().getRadians());
-        // System.out.println("Drive error: " + driveErrorAbs);
+        System.out.println("Theta error: " + thetaErrorAbs);
+        System.out.println("drive error: " + driveErrorAbs);
+        // System.out.println("Position Drivetrain error: " + driveController.getPositionError());
+        // System.out.println("Drivetrain error: " + driveController.getPositionError());
+        // System.out.println("Position Theta error: " + thetaController.getPositionError());
         // System.out.println("Drive velocity: " + driveVelocityScalar);
     }
 

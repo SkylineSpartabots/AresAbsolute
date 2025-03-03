@@ -23,7 +23,7 @@ public class SetElevator extends Command {
 
   private double goalPosition;
 
-  // private ElevatorFeedforward ff = new ElevatorFeedforward(0, 0, 0.15);
+  private ElevatorFeedforward ff = new ElevatorFeedforward(0, 0, 0.15);
   private TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration);
   
   private double error;
@@ -34,8 +34,8 @@ public class SetElevator extends Command {
 
   private Timer timer = new Timer();
 
-  // private TrapezoidProfile profile = new TrapezoidProfile(constraints);
-  private PIDController controller = new PIDController(1.35, 1, 0.04);
+  private TrapezoidProfile profile = new TrapezoidProfile(constraints);
+  private PIDController controller = new PIDController(1.4, 0.5, 0.1);
 
   // pls dont add more constructors
   public SetElevator(Supplier<ElevatorState> state){
@@ -45,24 +45,31 @@ public class SetElevator extends Command {
     addRequirements(s_Elevator);
   }
 
+  public SetElevator(double goalPosition){
+    this.goalPosition = goalPosition;
+
+    s_Elevator = Elevator.getInstance();
+    addRequirements(s_Elevator);
+  }
+
   @Override
   public void initialize() {
-    this.goalPosition = state.get().getEncoderPosition();
+    if(state != null)
+      this.goalPosition = state.get().getEncoderPosition();
     
     timer.restart();
     controller.disableContinuousInput();
-    // initialState = new State(s_Elevator.getPosition(), s_Elevator.getVelocity());
+    initialState = new State(s_Elevator.getPosition(), s_Elevator.getVelocity());
   }
 
   @Override
   public void execute() {
-    // setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
-
-    pidoutput = controller.calculate(s_Elevator.getPosition(), goalPosition);
+    setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
+    pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
 
     s_Elevator.setVoltage(pidoutput); // used to tune feedforward
 
-    // error = s_Elevator.getPosition() - setpoint.position;
+    error = s_Elevator.getPosition() - setpoint.position;
 
     // System.out.println("current draw: " + s_Elevator.getCurrent());
     // System.out.println("current: " + s_Elevator.getCurrent());
@@ -73,7 +80,7 @@ public class SetElevator extends Command {
     // s_Elevator.setVoltage(controller.calculate(s_Elevator.getPosition(), setpoint.position) + feedforward.calculate(setpoint.velocity));
     // SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
     // SmartDashboard.putNumber("current error", error);
-    // System.out.println("current error: " + error);
+    System.out.println("current error: " + error);
     System.out.println(s_Elevator.getFollowerVoltage());
     System.out.println("pidoutput: " + pidoutput);
     // System.out.println("current setpoint error " + error);
@@ -86,7 +93,7 @@ public class SetElevator extends Command {
     // s_Elevator.setPosition(s_Elevator.getPosition());
     System.out.println(s_Elevator.getPosition());
     System.out.println("final time: " + timer.get());
-    // System.out.println("expected time: " + profile.totalTime());
+    System.out.println("expected time: " + profile.totalTime());
     // System.out.println("final error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));
   }
 

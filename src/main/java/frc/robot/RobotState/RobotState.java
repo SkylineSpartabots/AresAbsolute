@@ -299,7 +299,7 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         }
 
         public Pose2d getCurrentPose2d() {
-            return new Pose2d(getLatestFilteredPose().getX(), getLatestFilteredPose().getY(), drivetrain.getRotation3d().toRotation2d());
+            return new Pose2d(getLatestFilteredPose().getX(), getLatestFilteredPose().getY(), Rotation2d.fromRadians(drivetrain.getHeading()));
         }
 
         //// =======---===[ ⚙ Pigeon2.0  ]===---========
@@ -311,7 +311,6 @@ public class RobotState { //will estimate pose with odometry and correct drift w
             robotAccelerations.put(new IDouble(newAccel[2]), new ITwist2d(newAccel[0], newAccel[1]));
 
             SmartDashboard.putNumber("raw Accel X", newAccel[0]);
-
             SmartDashboard.putNumber("raw Accel Y", newAccel[1]);
             // Logger.recordOutput("RobotState/raw Accel X", newAccel[0]);
             // Logger.recordOutput("RobotState/raw Accel Y", newAccel[1]);
