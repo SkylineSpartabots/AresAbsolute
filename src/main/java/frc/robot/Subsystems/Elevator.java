@@ -76,7 +76,7 @@ public class Elevator extends SubsystemBase {
     voltOutput = new VoltageOut(0).withEnableFOC(true);
     torqueOutput = new TorqueCurrentFOC(0);
 
-    reefPoleLevel = ElevatorState.L1;
+    reefPoleLevel = ElevatorState.L1; //default state (needs to be L1 - L4)
   }
 
   private void configMotor(TalonFX motor, InvertedValue direction, NeutralModeValue neutralMode){

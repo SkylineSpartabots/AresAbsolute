@@ -143,8 +143,8 @@ public class CommandFactory {
 
     public static Command FullCoralIntake(){
         return new SequentialCommandGroup(
-            new SetElevator(() -> ElevatorState.SOURCE),
-            new SmartCoralIntake()
+            new SetElevator(() -> ElevatorState.SOURCE)
+            // new SmartCoralIntake()
         );
     }
 

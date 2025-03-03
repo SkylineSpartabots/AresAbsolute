@@ -74,7 +74,7 @@ public class Slapdown extends SubsystemBase {
 
     Slot1Configs position = new Slot1Configs();
     position.GravityType = GravityTypeValue.Arm_Cosine;
-    position.kP = 7.2;
+    position.kP = 8.7;
     position.kI = 2.3;
     position.kG = 1.5;
 

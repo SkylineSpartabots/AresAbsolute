@@ -280,8 +280,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void applyFieldSpeeds(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
-        System.out.println(speeds.toString());
-
+        
         setControl(
         new SwerveRequest.ApplyFieldSpeeds()
         .withSpeeds(speeds)
@@ -315,6 +314,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         robotState.reset(0.02, IPose2d.identity());
         robotState.resetUKF(IPose2d.identity());
     }
+
     public void resetOdo(Pose2d pose){
         resetOdoUtil(pose);
         robotState.reset(0.02, new IPose2d(pose));
