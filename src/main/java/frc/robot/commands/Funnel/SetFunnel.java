@@ -42,7 +42,6 @@ public class SetFunnel extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    System.out.println("setfunnel ended");
   }
 
   @Override

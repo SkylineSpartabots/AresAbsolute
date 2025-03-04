@@ -54,14 +54,14 @@ public class CommandFactory {
             new InstantCommand(()->ee.setAlgaeSpeed(0))
         );
     }
+    
     public static Command Dealgaeify(ElevatorState state){
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
                 new SetElevator(() -> state),
                 new InstantCommand(()->ee.setAlgaeSpeed(0.4))
             ),
-            
-            Commands.waitSeconds(0.5),
+            Commands.waitSeconds(0.25),
             new InstantCommand(()->ee.setAlgaeSpeed(0))
         );
     }
@@ -97,7 +97,6 @@ public class CommandFactory {
         );
     }
 
-
     public static Command CoralIntake(){
         return new ParallelCommandGroup(
             new SetFunnel(FunnelState.INTAKING),
@@ -128,10 +127,6 @@ public class CommandFactory {
         );
     }
 
-    
-
-    
-
     public static Command FinishIntake(){
         return new ParallelCommandGroup(
             new SetFunnel(FunnelState.OFF),
@@ -160,6 +155,12 @@ public class CommandFactory {
         return new SequentialCommandGroup(
             new DriveToPose(side, level),
             new SetOuttake(level)
+        ).raceWith(new CancelableCommand(controller));
+    }
+
+    public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
+        return new SequentialCommandGroup(
+            new DriveToPose(level)
         ).raceWith(new CancelableCommand(controller));
     }
 

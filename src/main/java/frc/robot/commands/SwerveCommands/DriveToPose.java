@@ -14,12 +14,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 
 /**
@@ -29,33 +31,39 @@ public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
             4.5, 0.13, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 2, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            5, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity + 2*Math.PI, Constants.MaxAngularRate), 0.02);
+            3, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity + 2*Math.PI, Constants.MaxAngularRate + Math.PI/2), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
 
     private Supplier<ElevatorState> elevatorLevel;
-    private Double elevatorGoalPos = null;
+    private Double elevatorGoalPos = Double.POSITIVE_INFINITY;
+
+    private ReefPoleSide targetReefPoleSide; 
 
     private Pose2d targetPose;
     private RobotState robotState;
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
-    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1;
-
-    public DriveToPose(Supplier<Pose2d> targetPose) {
-        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
-        this.robotState = RobotState.getInstance();
-        this.targetPose = targetPose.get();
-
-        addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    }
+    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
     
     public DriveToPose(ReefPoleSide side) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
+
         this.targetPose = side.getClosestPoint(s_Swerve.getPose()); // Point A
+
+        addRequirements(s_Swerve);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
+    }
+
+    public DriveToPose(Supplier<ElevatorState> elevatorLevel) {
+        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
+        this.robotState = RobotState.getInstance();
+
+        this.targetPose = ReefPoleSide.CENTER.getClosestPoint(s_Swerve.getPose()); // Point A
+        this.targetReefPoleSide = ReefPoleSide.CENTER;
+        this.elevatorLevel = elevatorLevel;
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
@@ -64,6 +72,7 @@ public class DriveToPose extends Command {
     public DriveToPose(ReefPoleSide side, Supplier<ElevatorState> elevatorLevel) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
+
         this.targetPose = side.getClosestPoint(s_Swerve.getPose());
         this.elevatorLevel = elevatorLevel;
 
@@ -73,9 +82,14 @@ public class DriveToPose extends Command {
 
     @Override
     public void initialize() {
-        if(elevatorLevel != null)
+        if(elevatorLevel != null && targetReefPoleSide != ReefPoleSide.CENTER) {
                 elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
-
+                System.out.println("elvelb" + elevatorGoalPos);
+                if(elevatorGoalPos == null) {
+                        System.out.println("HELPPPPPPPPPPPPPPPPP");
+                }
+        }
+        
         Pose2d currentPose = robotState.getCurrentPose2d();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
@@ -127,14 +141,6 @@ public class DriveToPose extends Command {
                         new Transform2d(new Translation2d(driveController.getSetpoint().position, 0.0), new Rotation2d()))
                 .getTranslation();
 
-        System.out.println(driveErrorAbs);
-        //Start bringing up elevator if included in command
-        if(elevatorGoalPos != null && driveErrorAbs < elevatorDistanceThreshold) {
-                System.out.println("schedudelelellelelle: " + elevatorLevel.get().name());
-                new SetElevator(elevatorGoalPos).schedule();
-                elevatorGoalPos = null;
-        }
-
         // Calculate theta speed
         double thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
                 + thetaController.calculate(
@@ -148,6 +154,19 @@ public class DriveToPose extends Command {
                 .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
                 .getTranslation();
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
+
+        // other actions
+        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold) {
+                new SetElevator(elevatorGoalPos).schedule();
+                elevatorGoalPos = Double.POSITIVE_INFINITY;
+        }
+
+        if(targetReefPoleSide == ReefPoleSide.CENTER && driveErrorAbs < dealgeaDistanceThreshold) {
+                if(elevatorLevel.get().getEncoderPosition() <= ElevatorState.L2.getEncoderPosition()) 
+                        CommandFactory.Dealgaeify(ElevatorState.A1).schedule();
+                else    
+                        CommandFactory.Dealgaeify(ElevatorState.A2).schedule();
+        }
 
         //prints
         System.out.println("Theta error: " + thetaErrorAbs);

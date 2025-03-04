@@ -121,7 +121,6 @@ public class Vision extends SubsystemBase {
 
         MultiTargetPNPResult multiTagResult = photonPipelineResult.getMultiTagResult().get();
         
-        System.out.println("Reproj error: " + multiTagResult.estimatedPose.bestReprojErr);
         if(multiTagResult.estimatedPose.bestReprojErr > VisionLimits.k_reprojectionLimit) {
             SmartDashboard.putString("Multitag updates", "high error");
             // Logger.recordOutput("Vision/MultiTag updates", "high error");
@@ -133,20 +132,17 @@ public class Vision extends SubsystemBase {
             // Logger.recordOutput("Vision/MultiTag updates", "insufficient ids");
             return false;
         } 
-        System.out.println("Norm: " + multiTagResult.estimatedPose.best.getTranslation().getNorm());
         if(multiTagResult.estimatedPose.best.getTranslation().getNorm() < VisionLimits.k_normThreshold) {
             SmartDashboard.putString("Multitag updates", "norm check failed");
             // Logger.recordOutput("Vision/MultiTag updates", "norm check failed");
             return false;
         }
-        System.out.println("Ambiguity: " + multiTagResult.estimatedPose.ambiguity);
         if(multiTagResult.estimatedPose.ambiguity > VisionLimits.k_ambiguityLimit) {
             SmartDashboard.putString("Multitag updates", "high ambiguity");
             // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
             return false;
         }
         for (PhotonTrackedTarget photonTrackedTarget : photonPipelineResult.getTargets()) {
-            System.out.println("Area: " + multiTagResult.estimatedPose.ambiguity);
             if(photonTrackedTarget.area < VisionLimits.k_areaMinimum) {
                 SmartDashboard.putString("Multitag updates", "Tag too far");
                 // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
@@ -188,15 +184,15 @@ public class Vision extends SubsystemBase {
     
                 VisionOutput newPose = new VisionOutput(robotPose, multiTagOutput.getTimestamp(),  multiTagOutput.getBestTarget());
                 
-                robotState.visionUpdate(newPose);  
+                s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds, newPose.standardDev);
             }
         
         } else { // if no multitags, use other tag data
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
                 if(validateTarget(photonPipelineResult)) {
                     VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get());
-                    System.out.println("Used single tag");
-                    robotState.visionUpdate(newPose); 
+                    
+                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds, newPose.standardDev); 
                 }
             } 
         }

@@ -39,6 +39,7 @@ import choreo.util.ChoreoAllianceFlipUtil.Flipper;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -86,8 +87,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double lastTimeReset = -1;
 
     RobotState robotState;
-
-
     // private DriveControlSystems controlSystem  = new DriveControlSystems(); //only for trajectory following
 
     StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
@@ -192,8 +191,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public static CommandSwerveDrivetrain getInstance(){
         if(s_Swerve == null){
-            s_Swerve = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants, 250, TunerConstants.FrontLeft,
-            TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);  
+            s_Swerve = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants,
+             250,
+            VecBuilder.fill(0.03, 0.03, 0.03), //Odometry stddev, how much we trust odometry
+            VecBuilder.fill(0.045, 0.045, 0.045), //Vision stddev, overestimated for initial vision update
+            TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);  
         }
         
         return s_Swerve;
@@ -262,6 +264,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      *                                  and radians
      * @param modules                   Constants for each specific module
      */
+
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
@@ -312,13 +315,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void resetOdo(){ //not being used, drivetrain.seedFieldRelative() instead for field centric driving
         s_Swerve.seedFieldCentric();
         robotState.reset(0.02, IPose2d.identity());
-        robotState.resetUKF(IPose2d.identity());
     }
 
     public void resetOdo(Pose2d pose){
         resetOdoUtil(pose);
         robotState.reset(0.02, new IPose2d(pose));
-        robotState.resetUKF(new IPose2d(pose));
     }
 
     public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
@@ -329,12 +330,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return s_Swerve.getState().Pose;
     }
 
+    public void addVisionMeasurment(Pose3d estimatedPose){
+        s_Swerve.updateOdometryByVision(estimatedPose); 
+    }
+
     public SwerveModuleState getDesiredState(){
         return s_Swerve.getModule(1).getTargetState();
     }
 
     public ChassisSpeeds getRobotRelativeSpeeds(){
-        System.out.println(s_Swerve.getState().Speeds.toString());
         return s_Swerve.getState().Speeds;
     }
 
@@ -374,7 +378,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void updateOdometryByVision(Pose3d estimatedPose){
-        System.out.println("Pose received");
         if(estimatedPose != null){
             s_Swerve.addVisionMeasurement(estimatedPose.toPose2d(), 0); //Timer.getFPGATimestamp()
         }
@@ -386,8 +389,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
-    
-
     private Pose2d autoStartPose = new Pose2d(2.0, 2.0, new Rotation2d());
 
     public void setAutoStartPose(Pose2d pose){
@@ -396,15 +397,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        // System.out.println(robotState);
-        Pose2d currentPose = getPose();
+
         if(robotState != null){
              robotState.odometryUpdate(this.getState(), Timer.getFPGATimestamp());
-
-            ITranslation2d currFilteredPose = robotState.getLatestFilteredPose();
-
-            SmartDashboard.putNumber("FILT X", currFilteredPose.getX());
-            SmartDashboard.putNumber("FILT Y", currFilteredPose.getY());
         }else{
             robotState = RobotState.getInstance();
         }
@@ -417,25 +412,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         };
         // StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
         publisher.set(states);
-
-        //allows driver to see if resetting worked
-        // SmartDashboard.putBoolean("Odo Reset (last 5 sec)", lastTimeReset != -1 && Timer.getFPGATimestamp() - lastTimeReset < 5);
-        SmartDashboard.putNumber("ODO X", currentPose.getX());
-        SmartDashboard.putNumber("ODO Y", currentPose.getY());
-         SmartDashboard.putNumber("ODO ROT", currentPose.getRotation().getRadians());
-        // SmartDashboard.putNumber("AUTO INIT X", autoStartPose.getX());
-        // SmartDashboard.putNumber("AUTO INIT Y", autoStartPose.getY());
-         SmartDashboard.putNumber("current heading", getHeading());
-         SmartDashboard.putNumber("desired swerve state", getDesiredState().speedMetersPerSecond);
-        // SmartDashboard.putNumber("DT Vel", robotAbsoluteVelocity());
-//        Logger.recordOutput("Odo Reset (last 5 sec)", lastTimeReset != -1 && Timer.getFPGATimestamp() - lastTimeReset < 5);
-        // Logger.recordOutput("Swerve/ODO X", currentPose.getX());
-        // Logger.recordOutput("Swerve/ODO Y", currentPose.getY());
-        // Logger.recordOutput("Swerve/ODO ROT", currentPose.getRotation().getRadians());
-//        Logger.recordOutput("Swerve/AUTO INIT X", autoStartPose.getX());
-//        Logger.recordOutput("Swerve/AUTO INIT Y", autoStartPose.getY());
-        // Logger.recordOutput("Swerve/CurrentHeading", getHeading());
-//        Logger.recordOutput("Swerve/DT Vel", robotAbsoluteVelocity());
     }
 
 }
