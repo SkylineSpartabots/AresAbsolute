@@ -48,7 +48,7 @@ public class Elevator extends SubsystemBase {
     L3(38.3),
     L4(61.5),
     GROUND(0.11),
-    A1(7.5),
+    A1(7.3),
     A2(22),
     SOURCE(4.5);
     //48.1 should be max
