@@ -84,6 +84,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
         updateSensors();
 
+        Pose2d currentPose = state.Pose;
+
         if(!prevOdomTimestamp.isEmpty()) {
             //merge our velocities
             IChassisSpeeds OdomVelocity =
@@ -93,16 +95,17 @@ public class RobotState { //will estimate pose with odometry and correct drift w
             robotOdomVelocity.put(new IDouble(timestamp), OdomVelocity);
             odometryPoses.put(new IDouble(timestamp), new IPose2d(state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation()));
     
-        }
-
-        // Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
+                    // Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
         // Logger.recordOutput("Robot State/ODO velocity", OdomVelocity.toMagnitude());
-        // Logger.recordOutput("Robot State/ODO X", currentPose.getX());
-        // Logger.recordOutput("Robot State/ODO Y", currentPose.getY());
-        // Logger.recordOutput("Robot State/ODO ROT", currentPose.getRotation().getRadians());
+        System.out.println("hi");
+        SmartDashboard.putNumber("ODO X", currentPose.getX());
+        SmartDashboard.putNumber("ODO Y", currentPose.getY());
+        SmartDashboard.putNumber("Robot State/ODO ROT", currentPose.getRotation().getRadians());
         // Logger.recordOutput("Kinematics/Swerve/DT velocity", robotVelocityVector());
         // Logger.recordOutput("Kinematics/Swerve/DT angular velocity", robotAngularMagnitude.toDouble());
         // Logger.recordOutput("Kinematics/Swerve/DT acceleration", robotAcceleration.toMagnitude());
+
+        }
 
         prevOdomTimestamp = Optional.of(timestamp);
     }

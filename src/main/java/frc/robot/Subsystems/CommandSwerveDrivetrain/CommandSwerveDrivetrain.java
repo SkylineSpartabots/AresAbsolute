@@ -193,8 +193,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if(s_Swerve == null){
             s_Swerve = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants,
              250,
-            VecBuilder.fill(0.03, 0.03, 0.03), //Odometry stddev, how much we trust odometry
-            VecBuilder.fill(0.045, 0.045, 0.045), //Vision stddev, overestimated for initial vision update
             TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);  
         }
         
@@ -319,7 +317,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void resetOdo(Pose2d pose){
         resetOdoUtil(pose);
-        // robotState.reset(0.02, new IPose2d(pose));
+        robotState.reset(0.02, new IPose2d(pose));
     }
 
     public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
@@ -399,7 +397,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void periodic() {
 
         if(robotState != null){
-             // .odometryUpdate(this.getState(), Timer.getFPGATimestamp());
+             robotState.odometryUpdate(this.getState(), Timer.getFPGATimestamp());
         }else{
             robotState = RobotState.getInstance();
         }
