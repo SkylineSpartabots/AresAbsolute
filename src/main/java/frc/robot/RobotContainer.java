@@ -199,7 +199,6 @@ public class RobotContainer {
     driver.povLeft().onTrue(new SetRoller(RollerState.OUTTAKE));
 
     driver.start().onTrue(new ZeroElevator());
-    driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(8.844,1.914906, new Rotation2d(0)))));
   }
 
 

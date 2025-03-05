@@ -278,13 +278,12 @@ public final class Constants {
 
                 //BLUE SIDE
                 LEFT(new Pose2d[]{ // ~ 0.02 m buffer distance from the walls (untested)
-                        new Pose2d(9.02208, 1.914906, Rotation2d.fromRadians(0.0)), // testing point
-                        // new Pose2d(2.86, 4.231085, Rotation2d.fromRadians(0.0)), // Point A
-                        // new Pose2d(3.4970949492 , 2.7227825, Rotation2d.fromRadians(1.0472)), // Point C
-                        // new Pose2d(5.1244749492, 2.5183875, Rotation2d.fromRadians(2.0944)), // Point E
-                        // new Pose2d(6.12, 3.808795, Rotation2d.fromRadians(3.14159)), // Point G 
-                        // new Pose2d(5.490345, 5.33, Rotation2d.fromRadians(-2.0944)), // Point I 
-                        // new Pose2d(3.8628450508, 5.5484225, Rotation2d.fromRadians(-1.0472))  // Point K
+                        new Pose2d(2.86, 4.231085, Rotation2d.fromRadians(0.0)), // Point A
+                        new Pose2d(3.4970949492 , 2.7227825, Rotation2d.fromRadians(1.0472)), // Point C
+                        new Pose2d(5.1244749492, 2.5183875, Rotation2d.fromRadians(2.0944)), // Point E
+                        new Pose2d(6.12, 3.808795, Rotation2d.fromRadians(3.14159)), // Point G 
+                        new Pose2d(5.490345, 5.33, Rotation2d.fromRadians(-2.0944)), // Point I 
+                        new Pose2d(3.8628450508, 5.5484225, Rotation2d.fromRadians(-1.0472))  // Point K
                 }),
 
                 CENTER(new Pose2d[]{ // ~ 0.02 m buffer distance from the walls (untested)
