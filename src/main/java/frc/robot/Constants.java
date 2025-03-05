@@ -34,15 +34,18 @@ import com.pathplanner.lib.config.RobotConfig;
  */
 public final class Constants {
 
-    public static double intakePivotCurrentThreshold = 70;
-    public static double MaxSpeed = 6; //can be lowered during testing
-    public static double MaxAcceleration = 4; //can be lowered during testing
-    public static double MaxAngularRate = 1 * Math.PI; // 3/4 of a rotation per second max angular velocity
-    public static double MaxAngularVelocity = 2 * Math.PI;
+    public static double MaxSpeed = 8; //can be lowered during testing
+    public static double MaxAcceleration = 4.5; //can be lowered during testing
+    public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+    public static double MaxAngularVelocity = 2.5 * Math.PI;
+
+    //all these are outdated but we are not using them anymore so its fine tbh
     public static double robotMass = 58.9; //kg
     public static double MOI = 0.14782; //sum of kg * m^2 to center of rotation
     public static double CoF = 1; // coefficient of friction TODO get better one
     public static double wheelRadiusInches = 1.9125; //inches
+
+    public static double intakePivotCurrentThreshold = 70;
 
     public static DCMotor motorConfig = new DCMotor(
         Constants.KrakenConstants.nominalVoltageVolts,
@@ -186,6 +189,7 @@ public final class Constants {
 
         public static final class VisionLimits {
         public static final double k_rotationLimit = Math.PI;
+        public static final double k_velocityLimit = 6;
         public static final double k_reprojectionLimit = 0.3;
         public static final double k_normThreshold = 0.1;
         public static final double k_ambiguityLimit = 0.35;

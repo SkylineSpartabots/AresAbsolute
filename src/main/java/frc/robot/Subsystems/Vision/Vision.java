@@ -25,6 +25,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -166,10 +167,15 @@ public class Vision extends SubsystemBase {
     private void updateVision(List<PhotonPipelineResult> cameraResult, Transform3d cameraToRobotTransform) throws Exception {
 
         // something is wrong with this... (we still need it tho)
-        // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
-        //     SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
-        //     return;
-        // }
+        if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
+            SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
+            return;
+        }
+
+        if(Math.abs(robotState.robotVelocityVector()) > VisionLimits.k_velocityLimit) {
+            SmartDashboard.putString("Vision accepter", "Vision failed: High speed");
+            return;
+        }
         
         //get data from camera
         List<MultiTagOutput> multiTagResult = updateMultiTag(cameraResult);
@@ -182,7 +188,10 @@ public class Vision extends SubsystemBase {
                     .plus(multiTagOutput.getMultiTag().estimatedPose.best) //transform to camera
                         .plus(cameraToRobotTransform); //transform to robot
     
-                VisionOutput newPose = new VisionOutput(robotPose, multiTagOutput.getTimestamp(),  multiTagOutput.getBestTarget());
+                VisionOutput newPose = new VisionOutput(robotPose,
+                    multiTagOutput.getTimestamp(),
+                    multiTagOutput.getBestTarget(),
+                    robotState.getOdomRobotVelocity(multiTagOutput.getTimestamp()));
                 
                 s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds, newPose.standardDev);
             }
@@ -190,7 +199,8 @@ public class Vision extends SubsystemBase {
         } else { // if no multitags, use other tag data
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
                 if(validateTarget(photonPipelineResult)) {
-                    VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get());
+                    VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get(),
+                        robotState.getOdomRobotVelocity(photonPipelineResult.getTimestampSeconds()));
                     
                     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds, newPose.standardDev); 
                 }

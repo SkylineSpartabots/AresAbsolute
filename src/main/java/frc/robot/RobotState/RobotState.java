@@ -54,7 +54,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 	private InterpolatingTreeMap<IDouble, ITranslation2d> filteredPoses;
     private InterpolatingTreeMap<IDouble, ITwist2d> robotIMUVelocity;
     private InterpolatingTreeMap<IDouble, IChassisSpeeds> robotOdomVelocity;
-    private InterpolatingTreeMap<IDouble, IDouble> robotAngularVelocity;
+    private InterpolatingTreeMap<IDouble, IDouble> robotIMUAngularVelocity;
+    private InterpolatingTreeMap<IDouble, IDouble> robotOdomAngularVelocity;
     private InterpolatingTreeMap<IDouble, ITwist2d> robotAccelerations;
     private InterpolatingTreeMap<IDouble, IChassisSpeeds> filteredRobotVelocities;
 
@@ -89,9 +90,9 @@ public class RobotState { //will estimate pose with odometry and correct drift w
             getInterpolatedValue(odometryPoses, prevOdomTimestamp.get(), IPose2d.identity())
             .getVelocityBetween(new IPose2d(state.Pose), timestamp - prevOdomTimestamp.get());
         
-        IDouble robotAngularMagnitude = getInterpolatedValue(robotAngularVelocity, timestamp, new IDouble(0.0));
+        IDouble robotAngularMagnitude = getInterpolatedValue(robotIMUAngularVelocity, timestamp, new IDouble(0.0));
         ITwist2d robotAcceleration = getInterpolatedValue(robotAccelerations, timestamp, ITwist2d.identity());
-        
+
         Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
         Logger.recordOutput("Robot State/ODO velocity", OdomVelocity.toMagnitude());
         Logger.recordOutput("Robot State/ODO X", currentPose.getX());
@@ -116,8 +117,10 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         robotOdomVelocity.put(new IDouble(time), IChassisSpeeds.identity());          
         robotAccelerations = new InterpolatingTreeMap<>(observationSize);
         robotAccelerations.put(new IDouble(time), ITwist2d.identity());
-        robotAngularVelocity = new InterpolatingTreeMap<>(observationSize);
-        robotAngularVelocity.put(new IDouble(time), new IDouble(0.0));
+        robotOdomAngularVelocity = new InterpolatingTreeMap<>(observationSize);
+        robotOdomAngularVelocity.put(new IDouble(time), new IDouble(0.0));
+        robotIMUAngularVelocity = new InterpolatingTreeMap<>(observationSize);
+        robotIMUAngularVelocity.put(new IDouble(time), new IDouble(0.0));
         filteredRobotVelocities = new InterpolatingTreeMap<>(observationSize);
         filteredRobotVelocities.put(new IDouble(time), IChassisSpeeds.identity());
     }
@@ -182,14 +185,14 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         public void updateSensors() {
             double[] newAccel = accelFilter.filterAcceleration(rawRobotAcceleration());
             double[] newAngularVelocity = angularVelocityFilter.filterAngularVelocity(robotAngularVelocityMagnitude());
-            robotAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
+            robotIMUAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
             robotAccelerations.put(new IDouble(newAccel[2]), new ITwist2d(newAccel[0], newAccel[1]));
         }
 
         public void updateSensors(double[] wheelVelocity) {
             double[] newAccel = accelFilter.filterAcceleration(rawRobotAcceleration());
             double[] newAngularVelocity = robotAngularVelocityMagnitude();
-            robotAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
+            robotIMUAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
             robotAccelerations.put(new IDouble(newAccel[2]), new ITwist2d(newAccel[0], newAccel[1]));
 
             SmartDashboard.putNumber("raw Accel X", newAccel[0]);

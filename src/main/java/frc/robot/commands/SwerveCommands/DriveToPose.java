@@ -29,9 +29,9 @@ import frc.robot.commands.Elevator.SetElevator;
  */
 public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            4.5, 0.13, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 2, Constants.MaxAcceleration), 0.02);
+            4.5, 0.13, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            3, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity + 2*Math.PI, Constants.MaxAngularRate + Math.PI/2), 0.02);
+            3, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity + Math.PI, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
 
