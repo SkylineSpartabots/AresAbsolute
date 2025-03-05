@@ -38,6 +38,7 @@ import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.Constants.FieldConstants.ReefConstants.SourceNumber;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefNumber;
 import frc.robot.RobotState.RobotState;
+import frc.robot.commands.EndEffector.SmartCoralIntake;
 
 /** Add your docs here. */
 public class CommandFactory {
@@ -106,8 +107,7 @@ public class CommandFactory {
 
     public static Command ShootCoral(){
         return new SequentialCommandGroup(
-            new SetOuttake(OuttakeState.SCOREMID),
-            new SetElevator(() -> ElevatorState.SOURCE)
+            new SetOuttake(OuttakeState.SCOREMID)
         );
     }
 
@@ -122,8 +122,8 @@ public class CommandFactory {
 
     public static Command SmartCoralOuttake(){
         return new SequentialCommandGroup(
-            new SetOuttake(OuttakeState.SCOREMID),
-            new SetElevator(() -> ElevatorState.SOURCE)
+            new SetOuttake(OuttakeState.SCOREMID)
+            
         );
     }
 
@@ -146,8 +146,8 @@ public class CommandFactory {
 
     public static Command FullCoralIntake(){
         return new SequentialCommandGroup(
-            new SetElevator(() -> ElevatorState.SOURCE)
-            // new SmartCoralIntake()
+            new SetElevator(() -> ElevatorState.SOURCE),
+            new SmartCoralIntake()
         );
     }
 

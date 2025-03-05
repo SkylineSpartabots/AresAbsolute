@@ -196,7 +196,7 @@ public class RobotContainer {
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
 
     driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
-    driver.b().onTrue(CommandFactory.SmartCoralOuttake());
+    driver.rightTrigger().onTrue(CommandFactory.SmartCoralOuttake());
 
     driver.start().onTrue(new ZeroElevator());
   }

@@ -34,10 +34,10 @@ import com.pathplanner.lib.config.RobotConfig;
  */
 public final class Constants {
 
-    public static double MaxSpeed = 8; //can be lowered during testing
+    public static double MaxSpeed = 5; //can be lowered during testing
     public static double MaxAcceleration = 4; //can be lowered during testing
-    public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
-    public static double MaxAngularVelocity = 3 * Math.PI;
+    public static double MaxAngularRate = 1.3 * Math.PI; // 3/4 of a rotation per second max angular velocity
+    public static double MaxAngularVelocity = 2 * Math.PI;
 
     //all these are outdated but we are not using them anymore so its fine tbh
     public static double robotMass = 58.9; //kg

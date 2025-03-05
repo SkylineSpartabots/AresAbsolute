@@ -167,15 +167,15 @@ public class Vision extends SubsystemBase {
     private void updateVision(List<PhotonPipelineResult> cameraResult, Transform3d cameraToRobotTransform) throws Exception {
 
         // something is wrong with this... (we still need it tho)
-        if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
-            SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
-            return;
-        }
+        // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
+        //     SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
+        //     return;
+        // }
 
-        if(Math.abs(robotState.robotVelocityVector()) > VisionLimits.k_velocityLimit) {
-            SmartDashboard.putString("Vision accepter", "Vision failed: High speed");
-            return;
-        }
+        // if(Math.abs(robotState.robotVelocityVector()) > VisionLimits.k_velocityLimit) {
+        //     SmartDashboard.putString("Vision accepter", "Vision failed: High speed");
+        //     return;
+        // }
         
         //get data from camera
         List<MultiTagOutput> multiTagResult = updateMultiTag(cameraResult);

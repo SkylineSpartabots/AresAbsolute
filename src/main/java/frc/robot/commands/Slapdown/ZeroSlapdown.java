@@ -44,7 +44,7 @@ public class ZeroSlapdown extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    s_Intake.setPivotPosition(PivotState.UP);;
+    s_Intake.setPivotPosition(PivotState.HOLD);;
     if(!interrupted){
       s_Intake.resetPivotPosition();
     }

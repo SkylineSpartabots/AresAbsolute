@@ -16,8 +16,8 @@ public class SlowDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Constants.MaxSpeed = 2;
-    Constants.MaxAngularRate = Math.PI;
+    Constants.MaxSpeed = 1.3;
+    Constants.MaxAngularRate = 0.8 * Math.PI;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -27,13 +27,13 @@ public class SlowDrive extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    Constants.MaxSpeed = 8;
-    Constants.MaxAngularRate = 3 * Math.PI;
+    Constants.MaxSpeed = 6;
+    Constants.MaxAngularRate = 2 * Math.PI;
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

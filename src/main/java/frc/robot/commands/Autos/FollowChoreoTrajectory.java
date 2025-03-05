@@ -55,6 +55,7 @@ public class FollowChoreoTrajectory extends Command {
       startPose = trajectory.getInitialPose(alliance.get() == DriverStation.Alliance.Red);
       s_Swerve.resetOdo(startPose.get());
     }
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
     
     
   }
@@ -85,7 +86,7 @@ public class FollowChoreoTrajectory extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return trajectory != null ? timer.hasElapsed(trajectory.getTotalTime()) : true;
+    return trajectory != null ? timer.hasElapsed(trajectory.getTotalTime() +  2) : true;
   }
 
   private void followAutoTrajectory(SwerveSample sample){

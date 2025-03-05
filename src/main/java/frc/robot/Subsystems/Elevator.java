@@ -46,7 +46,7 @@ public class Elevator extends SubsystemBase {
     L1(15),
     L2(19),
     L3(38.3),
-    L4(61.5),
+    L4(61.2),
     GROUND(0.11),
     A1(7.3),
     A2(22),
