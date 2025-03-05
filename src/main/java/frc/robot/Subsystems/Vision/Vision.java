@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 
+import javax.sound.midi.Soundbank;
+
 // import org.littletonrobotics.junction.Logger;
 import org.opencv.photo.Photo;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -16,6 +19,9 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
+import com.ctre.phoenix.Util;
+import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -55,11 +61,11 @@ public class Vision extends SubsystemBase {
     public double floorDistance;
 
     private Transform3d FLcameraToRobotTransform = new Transform3d(
-        new Translation3d(Units.inchesToMeters(-10.801), Units.inchesToMeters(-11.559), Units.inchesToMeters(-9.841)),
+        new Translation3d(Units.inchesToMeters(10.801), Units.inchesToMeters(-11.559), Units.inchesToMeters(-9.841)),
         new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
     
         private Transform3d FRcameraToRobotTransform = new Transform3d(
-        new Translation3d(Units.inchesToMeters(10.801), Units.inchesToMeters(-11.559), Units.inchesToMeters(-9.841)),
+        new Translation3d(Units.inchesToMeters(-10.801), Units.inchesToMeters(-11.559), Units.inchesToMeters(-9.841)),
         new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
     
         public static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // This is the field type that will be in PNW events
@@ -92,10 +98,12 @@ public class Vision extends SubsystemBase {
     }
 
     public boolean validateTarget(PhotonPipelineResult camera) {
+        if(!camera.hasTargets())
+            return false;
+
         PhotonTrackedTarget target = camera.getBestTarget();
         
-        if(camera.hasTargets()
-        && target.getFiducialId() >= 1
+        if(target.getFiducialId() >= 1
         && target.getFiducialId() <= Constants.VisionConstants.aprilTagMax
         && target.getPoseAmbiguity() < 0.2 && target.getPoseAmbiguity() > -1)
             return true;
@@ -143,20 +151,20 @@ public class Vision extends SubsystemBase {
             // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
             return false;
         }
-        for (PhotonTrackedTarget photonTrackedTarget : photonPipelineResult.getTargets()) {
-            if(photonTrackedTarget.area < VisionLimits.k_areaMinimum) {
-                SmartDashboard.putString("Multitag updates", "Tag too far");
-                // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
-                return false;
-            }
+        // for (PhotonTrackedTarget photonTrackedTarget : photonPipelineResult.getTargets()) {
+        //     if(photonTrackedTarget.area < VisionLimits.k_areaMinimum) {
+        //         SmartDashboard.putString("Multitag updates", "Tag too far");
+        //         // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
+        //         return false;
+        //     }
 
-            //trasform to skew
-            // if(photonTrackedTarget. < VisionLimits.k_areaMinimum) {
-            //     SmartDashboard.putString("Multitag updates", "Too far");
-            //     // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
-            //     return false;
-            // }
-        }
+        //     //trasform to skew
+        //     // if(photonTrackedTarget. < VisionLimits.k_areaMinimum) {
+        //     //     SmartDashboard.putString("Multitag updates", "Too far");
+        //     //     // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
+        //     //     return false;
+        //     // }
+        // }
         
         return true;
     }
@@ -165,7 +173,6 @@ public class Vision extends SubsystemBase {
      * calculates field-relative robot pose from vision reading, feed to pose estimator (Kalman filter)
      */
     private void updateVision(List<PhotonPipelineResult> cameraResult, Transform3d cameraToRobotTransform) throws Exception {
-
         // something is wrong with this... (we still need it tho)
         // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
         //     SmartDashboard.putString("Vision accepter", "Vision failed: High rotation");
@@ -192,17 +199,21 @@ public class Vision extends SubsystemBase {
                     multiTagOutput.getTimestamp(),
                     multiTagOutput.getBestTarget(),
                     robotState.getOdomRobotVelocity(multiTagOutput.getTimestamp()));
-                
-                s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds, newPose.standardDev);
+                s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds));
             }
         
         } else { // if no multitags, use other tag data
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
                 if(validateTarget(photonPipelineResult)) {
-                    VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get(),
-                        robotState.getOdomRobotVelocity(photonPipelineResult.getTimestampSeconds()));
+
+                    System.out.println(robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())).toString());
                     
-                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds, newPose.standardDev); 
+                    
+                    VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get(),
+                        robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds()
+                        )));
+                        System.out.println("sttdev: " + newPose.standardDev.toString());
+                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
                 }
             } 
         }
@@ -210,15 +221,15 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // updateAprilTagResults();
-        // try {
+        updateAprilTagResults();
+        try {
+        
+        if(!FLcameraResult.isEmpty()) 
+            updateVision(FLcameraResult, FLcameraToRobotTransform);
 
-        // if(!FLcameraResult.isEmpty()) 
-        //     updateVision(FLcameraResult, FLcameraToRobotTransform);
+        if(!FRcameraResult.isEmpty()) 
+            updateVision(FRcameraResult, FRcameraToRobotTransform);
 
-        // if(!FRcameraResult.isEmpty()) 
-        //     updateVision(FRcameraResult, FRcameraToRobotTransform);
-
-        // } catch (Exception e){}
+        } catch (Exception e){}
     }
 }
