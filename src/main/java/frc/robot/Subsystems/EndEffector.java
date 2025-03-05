@@ -46,11 +46,11 @@ public class EndEffector extends SubsystemBase {
 
   public EndEffector() {
     beam = new DigitalInput(Constants.HardwarePorts.endEffectorBeamPort);
-    coral = new TalonFX(Constants.HardwarePorts.outtakeID, "mechbus");
+    coral = new TalonFX(Constants.HardwarePorts.outtakeID);
     aligner = new LaserCan(Constants.HardwarePorts.laserID);
     configLaser();
     // config(roller, InvertedValue.Clockwise_Positive, NeutralModeValue.Brake);
-    algae = new TalonFX(Constants.HardwarePorts.algaeID, "mechbus");
+    algae = new TalonFX(Constants.HardwarePorts.algaeID);
     config(coral, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
     config(algae, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
 

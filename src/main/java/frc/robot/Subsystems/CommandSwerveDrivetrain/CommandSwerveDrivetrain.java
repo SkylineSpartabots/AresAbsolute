@@ -328,10 +328,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return s_Swerve.getState().Pose;
     }
 
-    public void addVisionMeasurment(Pose3d estimatedPose){
-        s_Swerve.updateOdometryByVision(estimatedPose); 
-    }
-
     public SwerveModuleState getDesiredState(){
         return s_Swerve.getModule(1).getTargetState();
     }
@@ -339,8 +335,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public ChassisSpeeds getRobotRelativeSpeeds(){
         return s_Swerve.getState().Speeds;
     }
-
-
 
     public double getHeading() {
         return getPose().getRotation().getRadians();
@@ -373,18 +367,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             velocity += s_Swerve.getStateCopy().ModuleStates[i].speedMetersPerSecond;
         }
         return velocity/4;
-    }
-
-    public void updateOdometryByVision(Pose3d estimatedPose){
-        if(estimatedPose != null){
-            s_Swerve.addVisionMeasurement(estimatedPose.toPose2d(), 0); //Timer.getFPGATimestamp()
-        }
-    }
-
-    public void updateOdometryByVision(Optional<EstimatedRobotPose> estimatedPose){
-        if(estimatedPose.isPresent()){
-            s_Swerve.addVisionMeasurement(estimatedPose.get().estimatedPose.toPose2d(), estimatedPose.get().timestampSeconds); 
-        }
     }
 
     private Pose2d autoStartPose = new Pose2d(2.0, 2.0, new Rotation2d());

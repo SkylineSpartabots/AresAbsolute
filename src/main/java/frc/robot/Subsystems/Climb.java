@@ -24,7 +24,7 @@ public class Climb extends SubsystemBase {
     return instance;
   }
   public Climb() {
-    climb = new TalonFX(Constants.HardwarePorts.climbID, "mechbus");
+    climb = new TalonFX(Constants.HardwarePorts.climbID);
     configMotor(climb, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
   }
 

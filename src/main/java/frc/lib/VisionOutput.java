@@ -94,6 +94,8 @@ public class VisionOutput {
             stddevX /= 1.75;
             stddevY /= 1.75;
             stddevTheta /= 1.75;
+        
+        System.out.println(stddevX);
     
         return VecBuilder.fill(stddevX, stddevY, stddevTheta);
     }

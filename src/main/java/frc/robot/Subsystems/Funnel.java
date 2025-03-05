@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -44,8 +45,8 @@ public class Funnel extends SubsystemBase {
 
 
   public Funnel() {
-    // beam = new DigitalInput(Constants.HardwarePorts.funnelBeamPort);
-    roller = new TalonFX(Constants.HardwarePorts.funnelID, "mechbus");
+    beam = new DigitalInput(Constants.HardwarePorts.funnelBeamPort);
+    roller = new TalonFX(Constants.HardwarePorts.funnelID);
     configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
   }
 
@@ -75,5 +76,6 @@ public class Funnel extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("funnel beam", getBeamResult());
   }
 }

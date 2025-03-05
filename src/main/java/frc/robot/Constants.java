@@ -176,7 +176,7 @@ public final class Constants {
         public static final String FRCamera = "Camera_0";
         public static final String FLCamera = "Camera_1";
         public static final String elevatorCamera = "Camera_2";
-        public static final int aprilTagMax = 16;
+        public static final int aprilTagMax = 22;
         public static final double aprilTagHeight = 0.122; //bottom of each april tag is 122cm above carpet | unnecessary, we have photonvision's field layout import
         public static final double cameraRollOffset = Units.degreesToRadians(0);
         public static final double cameraPitchOffset = Units.degreesToRadians(0);
@@ -228,7 +228,7 @@ public final class Constants {
     public static final class HardwarePorts {
         // motor id
         public static final int endEffectorBeamPort = 9;
-        public static final int funnelBeamPort = 0;
+        public static final int funnelBeamPort = 7;
 
         public static final int outtakeID = 21;
         public static final int algaeID = 22;

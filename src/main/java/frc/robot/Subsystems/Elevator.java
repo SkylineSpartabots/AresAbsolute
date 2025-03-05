@@ -64,8 +64,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public Elevator() {
-    leader = new TalonFX(Constants.HardwarePorts.elevatorLeaderId, "mechbus");
-    follower = new TalonFX(Constants.HardwarePorts.elevatorFollowerId, "mechbus");
+    leader = new TalonFX(Constants.HardwarePorts.elevatorLeaderId);
+    follower = new TalonFX(Constants.HardwarePorts.elevatorFollowerId);
     leader.setNeutralMode(NeutralModeValue.Brake);
     follower.setNeutralMode(NeutralModeValue.Brake);
     configMotor(leader, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);

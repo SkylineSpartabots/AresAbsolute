@@ -47,9 +47,9 @@ public class Slapdown extends SubsystemBase {
   }
 
   public Slapdown() {
-    leader = new TalonFX(Constants.HardwarePorts.slapdownLeaderID, "mechbus");
-    follower = new TalonFX(Constants.HardwarePorts.slapdownFollowerID, "mechbus");
-    roller = new TalonFX(Constants.HardwarePorts.slapdownRollerID, "mechbus");
+    leader = new TalonFX(Constants.HardwarePorts.slapdownLeaderID);
+    follower = new TalonFX(Constants.HardwarePorts.slapdownFollowerID);
+    roller = new TalonFX(Constants.HardwarePorts.slapdownRollerID);
     follower.setControl(new Follower(Constants.HardwarePorts.slapdownLeaderID, true));
 
     configPivot(leader, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
