@@ -35,9 +35,9 @@ import com.pathplanner.lib.config.RobotConfig;
 public final class Constants {
 
     public static double intakePivotCurrentThreshold = 70;
-    public static double MaxSpeed = 6; //can be lowered during testing
+    public static double MaxSpeed = 8; //can be lowered during testing
     public static double MaxAcceleration = 4; //can be lowered during testing
-    public static double MaxAngularRate = 1 * Math.PI; // 3/4 of a rotation per second max angular velocity
+    public static double MaxAngularRate = 3 * Math.PI; // 3/4 of a rotation per second max angular velocity
     public static double MaxAngularVelocity = 2 * Math.PI;
     public static double robotMass = 58.9; //kg
     public static double MOI = 0.14782; //sum of kg * m^2 to center of rotation

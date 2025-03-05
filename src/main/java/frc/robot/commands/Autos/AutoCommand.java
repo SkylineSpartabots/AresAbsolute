@@ -5,6 +5,7 @@
 package frc.robot.commands.Autos;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,12 +32,12 @@ public class AutoCommand {
         S2(new AutoCommand[]{}),
         R1(new AutoCommand[]{}), //Reef scoring areas
         R2(new AutoCommand[]{}),
-        R3(new AutoCommand[]{}),
+        R3(new AutoCommand[]{R3S1()}),
         R4(new AutoCommand[]{}),
         R5(new AutoCommand[]{}),
         R6(new AutoCommand[]{}),
         R7(new AutoCommand[]{}),
-        R8(new AutoCommand[]{}),
+        R8(new AutoCommand[]{R8S2(), Wait()}),
         R9(new AutoCommand[]{}),
         R10(new AutoCommand[]{}),
         R11(new AutoCommand[]{}),
@@ -71,6 +72,32 @@ public class AutoCommand {
     public static ArrayList<AutoCommand> getPotentialContinuations() {
         return autoList2;
     }
+
+    public static AutoCommand Wait(){
+        return new AutoCommand("wait", Commands.waitSeconds(10), EndPoint.GENERIC);
+    }
+
+    public static AutoCommand B1R3(){
+        return new AutoCommand("B1R3", Autos.B1R3(), EndPoint.R3);
+    }
+
+    public static AutoCommand B2R8(){
+        return new AutoCommand("B2R8", Autos.B2R8(), EndPoint.R8);
+    }
+
+    public static AutoCommand R8S2(){
+        return new AutoCommand("R8S2", Autos.R8S2(), EndPoint.S2);
+    }
+
+    public static AutoCommand R3S1(){
+        return new AutoCommand("R3S1", Autos.R3S1(), EndPoint.S1);
+    }
+
+    public static AutoCommand S2R10(){
+        return new AutoCommand("S2R10", Autos.S2R10(), EndPoint.R10);
+    }
+
+    
 
 
     public static AutoCommand Test1(){
