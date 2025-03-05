@@ -25,10 +25,7 @@ public class SetOuttake extends Command {
     s_EndEffector = EndEffector.getInstance();
     addRequirements(s_EndEffector);
 
-    if(state.get() == ElevatorState.L4)
-      this.state = OuttakeState.SCOREL4;
-    else
-      this.state = OuttakeState.SCOREMID;
+    this.state = OuttakeState.SCORE;
   } 
 
   @Override

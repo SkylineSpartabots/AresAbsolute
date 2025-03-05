@@ -59,20 +59,13 @@ public class EndEffector extends SubsystemBase {
   public enum OuttakeState{
     HOLD(0),
     INDEX(-0.2),
-    SCOREMID(-0.75),
-    SCOREL4(0.7, 0.4);
-    private double topSpeed;
-    private double botSpeed;
-    private OuttakeState(double topSpeed, double botSpeed){
-      this.topSpeed = topSpeed;
-      this.botSpeed = botSpeed;
-    }
+    SCORE(-0.75);
+    private double speed;
     private OuttakeState(double speed){
-      this.topSpeed = speed;
-      this.botSpeed = speed;
+      this.speed = speed;
     }
     private double getSpeed() {
-      return topSpeed;
+      return speed;
     }
   }
 
