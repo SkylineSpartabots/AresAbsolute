@@ -147,6 +147,8 @@ public class Robot extends LoggedRobot {
     firstAuto.addOption(AutoCommand.meter2().name, AutoCommand.meter2());
     firstAuto.addOption(AutoCommand.meter3().name, AutoCommand.meter3());
     firstAuto.addOption(AutoCommand.backandforth().name, AutoCommand.backandforth());
+    firstAuto.addOption(AutoCommand.B1R3().name, AutoCommand.B1R3());
+    firstAuto.addOption(AutoCommand.B2R8().name, AutoCommand.B2R8());
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
     // AutoCommand.loadAutos(); TODO ethan fix this
     SmartDashboard.putData("first auto", firstAuto);
@@ -196,11 +198,13 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = new SequentialCommandGroup();
+    new ZeroSlapdown().schedule();
     if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
+    
+    if(secondSavedChoice != null) m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    
     // CommandFactory.autoCommand().schedule();
   }
 

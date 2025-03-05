@@ -49,6 +49,43 @@ public class Autos {
     return Commands.waitSeconds(0);
   }
 
+  public static Command B1R3(){
+    return new FollowChoreoTrajectory("B1R3");
+  }
+
+  public static Command B2R8(){
+    return new FollowChoreoTrajectory("B2R8");
+  }
+
+  public static Command S1R1(){
+    return new FollowChoreoTrajectory("S1R1");
+  }
+
+  public static Command S1R2(){
+    return new FollowChoreoTrajectory("S1R2");
+  }
+
+  public static Command R8S2(){
+    return new FollowChoreoTrajectory("R8S2");
+  }
+  public static Command R3S1(){
+    return new FollowChoreoTrajectory("R3S1");
+  }
+  public static Command S2R9(){
+    return new FollowChoreoTrajectory("S2R9");
+  }
+
+  public static Command S2R10(){
+    return new FollowChoreoTrajectory("S2R10");
+  }
+
+  public static Command S2R11(){
+    return new FollowChoreoTrajectory("S2R11");
+  }
+  public static Command S2R12(){
+    return new FollowChoreoTrajectory("S2R12");
+  }
+
   public static Command Test3() {
     return Commands.waitSeconds(0);
   }

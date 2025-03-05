@@ -319,7 +319,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void resetOdo(Pose2d pose){
         resetOdoUtil(pose);
-        robotState.reset(0.02, new IPose2d(pose));
+        // robotState.reset(0.02, new IPose2d(pose));
     }
 
     public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
@@ -399,7 +399,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void periodic() {
 
         if(robotState != null){
-             robotState.odometryUpdate(this.getState(), Timer.getFPGATimestamp());
+             // .odometryUpdate(this.getState(), Timer.getFPGATimestamp());
         }else{
             robotState = RobotState.getInstance();
         }

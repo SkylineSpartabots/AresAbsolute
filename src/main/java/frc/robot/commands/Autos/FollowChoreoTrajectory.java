@@ -30,9 +30,9 @@ public class FollowChoreoTrajectory extends Command {
   private Timer timer;
   private DriveControlSystems controlSystems;
   private RobotState robotState;
-  private PIDController xController = new PIDController(1.1, 0, 0);
-  private PIDController yController = new PIDController(1.1, 0, 0);
-  private PIDController thetaController = new PIDController(0, 0, 0);
+  private PIDController xController = new PIDController(1.5, 0, 0);
+  private PIDController yController = new PIDController(1.5, 0, 0);
+  private PIDController thetaController = new PIDController(0.7, 0, 0);
 
   public FollowChoreoTrajectory(String name) {
     if (Choreo.loadTrajectory(name).isPresent()) {
@@ -73,17 +73,18 @@ public class FollowChoreoTrajectory extends Command {
   public void end(boolean interrupted) {
     System.out.println("final time: " + timer.get());
     System.out.println("expected time: " + trajectory.getTotalTime());
+    s_Swerve.setControl(controlSystems.autoDrive(0, 0, 0));
 
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return trajectory != null ? timer.get() >= trajectory.getTotalTime() : true;
+    return trajectory != null ? timer.hasElapsed(trajectory.getTotalTime()) : true;
   }
 
   private void followAutoTrajectory(SwerveSample sample){
-        Pose2d currPose = robotState.getCurrentPose2d();
+        Pose2d currPose = s_Swerve.getPose();
 
         System.out.println("forward velocity: " + sample.vx);
         
@@ -98,13 +99,13 @@ public class FollowChoreoTrajectory extends Command {
     //   )
     // );
 
-      //  s_Swerve.setControl(
-      //   // controlSystems.autoDrive(
-      //   //   sample.vx + xController.calculate(currPose.getX(), sample.x),
-      //   //   sample.vy + yController.calculate(currPose.getY(), sample.y),
-      //   //   sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
-      //   // )
-      //  )
+       s_Swerve.setControl(
+        controlSystems.autoDrive(
+          sample.vx + xController.calculate(currPose.getX(), sample.x),
+          sample.vy + yController.calculate(currPose.getY(), sample.y),
+          sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
+        )
+       );
        System.out.println("current error: " + (currPose.getX() - sample.x));
         // .withVelocityX(sample.vx + xController.calculate(currPose.getX(), sample.x))
         // .withVelocityY(sample.vy + yController.calculate(currPose.getY(), sample.y))

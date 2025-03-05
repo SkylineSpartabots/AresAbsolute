@@ -98,6 +98,25 @@ public class DriveControlSystems {
         // .withSteerRequestType(com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo)
         // .withDesaturateWheelSpeeds(true);
     }
+    public SwerveRequest autoDrive(double xVel, double yVel, double rot){
+        
+
+
+        SmartDashboard.putNumber("requested velocity x", xVel);
+        SmartDashboard.putNumber("requested velocity y", yVel);
+
+        
+
+        return new SwerveRequest.FieldCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(-rot);
+        // return new SwerveRequest.FieldCentricFacingAngle()
+        // .withVelocityX(driverLY)
+        // .withVelocityY(-driverLX)
+        // .withTargetRateFeedforward(driverRX)
+        // .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
+        // .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.Velocity)
+        // .withSteerRequestType(com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo)
+        // .withDesaturateWheelSpeeds(true);
+    }
 
     // private double[] previousVelocities = new double[4]; // To store previous velocity for each module
 
