@@ -107,7 +107,7 @@ public class CommandFactory {
 
     public static Command ShootCoral(){
         return new SequentialCommandGroup(
-            new SetOuttake(OuttakeState.SCOREMID)
+            new SetOuttake(OuttakeState.SCORE)
         );
     }
 
@@ -122,7 +122,7 @@ public class CommandFactory {
 
     public static Command SmartCoralOuttake(){
         return new SequentialCommandGroup(
-            new SetOuttake(OuttakeState.SCOREMID)
+            new SetOuttake(OuttakeState.SCORE)
             
         );
     }

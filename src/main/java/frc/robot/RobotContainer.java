@@ -22,6 +22,7 @@ import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.Subsystems.Climb;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.EndEffector.OuttakeState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
@@ -30,6 +31,7 @@ import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
+import frc.robot.commands.EndEffector.SetOuttake;
 import frc.robot.commands.EndEffector.SmartCoralIntake;
 import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
@@ -167,7 +169,6 @@ public class RobotContainer {
         // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
         // driver.b().onTrue(new SetRoller(RollerState.OUTTAKE));
         // driver.y().onTrue(CommandFactory.FinishIntake());
-        // driver.rightTrigger().onTrue(CommandFactory.SmartCoralOuttake());
 
               
     // ----------====# Active binding ====----------
@@ -196,7 +197,7 @@ public class RobotContainer {
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
 
     driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
-    driver.rightTrigger().onTrue(CommandFactory.SmartCoralOuttake());
+    driver.rightTrigger().onTrue(new SetOuttake(OuttakeState.SCORE));
 
     driver.start().onTrue(new ZeroElevator());
   }
