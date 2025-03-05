@@ -74,7 +74,12 @@ public class FollowChoreoTrajectory extends Command {
     System.out.println("final time: " + timer.get());
     System.out.println("expected time: " + trajectory.getTotalTime());
     s_Swerve.setControl(controlSystems.autoDrive(0, 0, 0));
-
+    timer.stop();
+    Pose2d pose = s_Swerve.getPose();
+    Optional<Pose2d> goal = trajectory.getFinalPose(alliance.get() == DriverStation.Alliance.Red);
+    System.out.println("x error: " + (pose.getX() - goal.get().getX()));
+    System.out.println("y error: " + (pose.getY() - goal.get().getY()));
+    System.out.println("rot error: " + (pose.getRotation().getDegrees() - goal.get().getRotation().getDegrees()));
   }
 
   // Returns true when the command should end.
@@ -84,7 +89,7 @@ public class FollowChoreoTrajectory extends Command {
   }
 
   private void followAutoTrajectory(SwerveSample sample){
-        Pose2d currPose = robotState.getCurrentPose2d();
+        Pose2d currPose = s_Swerve.getPose();
 
         System.out.println("forward velocity: " + sample.vx);
         
@@ -107,6 +112,7 @@ public class FollowChoreoTrajectory extends Command {
         )
        );
        System.out.println("current error: " + (currPose.getX() - sample.x));
+    
         // .withVelocityX(sample.vx + xController.calculate(currPose.getX(), sample.x))
         // .withVelocityY(sample.vy + yController.calculate(currPose.getY(), sample.y))
         // .withRotationalRate(sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading))
