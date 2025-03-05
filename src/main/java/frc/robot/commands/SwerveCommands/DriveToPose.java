@@ -90,7 +90,7 @@ public class DriveToPose extends Command {
                 }
         }
         
-        Pose2d currentPose = robotState.getCurrentPose2d();
+        Pose2d currentPose = s_Swerve.getPose();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
                 currentPose.getTranslation().getDistance(targetPose.getTranslation()),
@@ -100,7 +100,7 @@ public class DriveToPose extends Command {
                                 .rotateBy(
                                         targetPose
                                                 .getTranslation()
-                                                .minus(robotState.getCurrentPose2d().getTranslation())
+                                                .minus(s_Swerve.getPose().getTranslation())
                                                 .getAngle()
                                                 .unaryMinus())
                                 .getX())); // Distance between current and target pose
@@ -110,12 +110,12 @@ public class DriveToPose extends Command {
         
         thetaController.setTolerance(0.04);
                 
-        lastSetpointTranslation = robotState.getCurrentPose2d().getTranslation();
+        lastSetpointTranslation = s_Swerve.getPose().getTranslation();
     }
 
     @Override
     public void execute() {
-        Pose2d currentPose = robotState.getCurrentPose2d();
+        Pose2d currentPose = s_Swerve.getPose();
 
         double currentDistance = currentPose.getTranslation().getDistance(targetPose.getTranslation()); //error between poses
 

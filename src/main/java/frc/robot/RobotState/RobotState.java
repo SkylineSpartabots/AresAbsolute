@@ -97,10 +97,6 @@ public class RobotState { //will estimate pose with odometry and correct drift w
     
                     // Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
         // Logger.recordOutput("Robot State/ODO velocity", OdomVelocity.toMagnitude());
-        System.out.println("hi");
-        SmartDashboard.putNumber("ODO X", currentPose.getX());
-        SmartDashboard.putNumber("ODO Y", currentPose.getY());
-        SmartDashboard.putNumber("Robot State/ODO ROT", currentPose.getRotation().getRadians());
         // Logger.recordOutput("Kinematics/Swerve/DT velocity", robotVelocityVector());
         // Logger.recordOutput("Kinematics/Swerve/DT angular velocity", robotAngularMagnitude.toDouble());
         // Logger.recordOutput("Kinematics/Swerve/DT acceleration", robotAcceleration.toMagnitude());
@@ -176,10 +172,6 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         public synchronized double robotVelocityVector() {
             IChassisSpeeds latestVelocity = getLatestFilteredVelocity();
             return Math.signum(Math.atan2(latestVelocity.getVy(), latestVelocity.getVx())) * latestVelocity.toMagnitude();
-        }
-
-        public Pose2d getCurrentPose2d() {
-            return new Pose2d(getLatestFilteredPose().getX(), getLatestFilteredPose().getY(), Rotation2d.fromRadians(drivetrain.getHeading()));
         }
 
         //// =======---===[ ⚙ Pigeon2.0  ]===---========
