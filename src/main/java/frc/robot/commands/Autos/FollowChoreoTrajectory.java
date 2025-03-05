@@ -84,7 +84,7 @@ public class FollowChoreoTrajectory extends Command {
   }
 
   private void followAutoTrajectory(SwerveSample sample){
-        Pose2d currPose = s_Swerve.getPose();
+        Pose2d currPose = robotState.getCurrentPose2d();
 
         System.out.println("forward velocity: " + sample.vx);
         
