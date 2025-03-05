@@ -396,11 +396,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Override
     public void periodic() {
 
+        Pose2d currentPose = getPose();
+
         if(robotState != null){
              robotState.odometryUpdate(this.getState(), Timer.getFPGATimestamp());
         }else{
             robotState = RobotState.getInstance();
         }
+
+        SmartDashboard.putNumber("ODO X", currentPose.getX());
+        SmartDashboard.putNumber("ODO Y", currentPose.getY());
+        SmartDashboard.putNumber("ODO ROT", currentPose.getRotation().getRadians());
 
         SwerveModuleState[] states = new SwerveModuleState[] {
             s_Swerve.getModule(0).getCurrentState(),
