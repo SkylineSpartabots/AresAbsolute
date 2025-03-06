@@ -31,10 +31,10 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.SwerveCommands.AutomatedAction;
+import frc.robot.commands.SwerveCommands.AutomatedCoralAction;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.FieldConstants.ReefConstants.SourceNumber;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefNumber;
 import frc.robot.RobotState.RobotState;
@@ -156,18 +156,18 @@ public class CommandFactory {
     }
 
     //Automation commands
-    public static Command AutoScoreCoral(Supplier<ElevatorState> level, ReefPoleSide side, CommandXboxController controller){
+    public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new AutomatedAction(side, level),
+            new AutomatedCoralAction(level, pole),
             new SetOuttake(level)
         ).raceWith(new CancelableCommand(controller));
     }
 
-    public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
-        return new SequentialCommandGroup(
-            new AutomatedAction(level)
-        ).raceWith(new CancelableCommand(controller));
-    }
+    // public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
+    //     return new SequentialCommandGroup(
+    //         new AutomatedAlgaeAction(level)
+    //     ).raceWith(new CancelableCommand(controller));
+    // }
 
     // public static Command AutoScorefromSource(ElevatorState level, SourceNumber source, ReefNumber reef){
     //     return new ParallelCommandGroup(

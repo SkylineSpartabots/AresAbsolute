@@ -267,7 +267,7 @@ public final class Constants {
 
         public static final class ReefConstants{
 
-            public enum ReefPoleSide {
+            public enum ReefPoleScoringPoses {
 
                 //Now 4.2545 cm offset (to the right)
                 //Or 0.042545 m
@@ -277,48 +277,27 @@ public final class Constants {
                 // dy = +- 0.0212725 m
 
                 //BLUE SIDE
-                LEFT(new Pose2d[]{ // ~ 0.02 m buffer distance from the walls (untested)
-                        new Pose2d(2.86, 4.231085, Rotation2d.fromRadians(0.0 - Math.PI)), // Point A
-                        new Pose2d(3.4970949492 , 2.7227825, Rotation2d.fromRadians(1.0472 - Math.PI)), // Point C
-                        new Pose2d(5.1244749492, 2.5183875, Rotation2d.fromRadians(2.0944 - Math.PI)), // Point E
-                        new Pose2d(6.12, 3.808795, Rotation2d.fromRadians(3.14159 - Math.PI)), // Point G 
-                        new Pose2d(5.490345, 5.33, Rotation2d.fromRadians(-2.0944 - Math.PI)), // Point I 
-                        new Pose2d(3.8628450508, 5.5484225, Rotation2d.fromRadians(-1.0472 - Math.PI))  // Point K
-                }),
+                POLE_A(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(0.0))),
+                POLE_B(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(0.0))), 
+                POLE_C(new Pose2d(3.65 , 3.029, Rotation2d.fromRadians(1.0472))), 
+                POLE_D(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(1.0472))), 
+                POLE_E(new Pose2d(4.937, 2.798, Rotation2d.fromRadians(2.0944))), 
+                POLE_F(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(2.0944))),
+                POLE_G(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(3.14159))), 
+                POLE_H(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(3.14159))), 
+                POLE_I(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(-2.0944))), 
+                POLE_J(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(-2.0944))), 
+                POLE_K(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(-1.0472))), 
+                POLE_L(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(-1.0472))); 
 
-                CENTER(new Pose2d[]{ // ~ 0.02 m buffer distance from the walls (untested)
-                    new Pose2d(0, 0, Rotation2d.fromRadians(0.0 - Math.PI)), // Point A B
-                    new Pose2d(0,0, Rotation2d.fromRadians(1.0472 - Math.PI)), // Point C D
-                    new Pose2d(0,0, Rotation2d.fromRadians(2.0944 - Math.PI)), // Point E F
-                    new Pose2d(0,0, Rotation2d.fromRadians(3.14159 - Math.PI)), // Point G H
-                    new Pose2d(0,0, Rotation2d.fromRadians(-2.0944 - Math.PI)), // Point I J
-                    new Pose2d(0,0, Rotation2d.fromRadians(-1.0472 - Math.PI))  // Point K L
-                }),
+                private final Pose2d waypoints;
 
-                RIGHT(new Pose2d[]{
-                        new Pose2d(2.86, 3.893885, Rotation2d.fromRadians(0.0 - Math.PI)), // Point B
-                        new Pose2d(3.7892149492 , 2.5541225, Rotation2d.fromRadians(1.0472 - Math.PI)), // Point D 
-                        new Pose2d(5.4166049492, 2.6870475, Rotation2d.fromRadians(2.0944 - Math.PI)), // Point F
-                        new Pose2d(6.12, 4.146115, Rotation2d.fromRadians(3.14159 - Math.PI)), // Point H  
-                        new Pose2d(5.1982350508, 5.4990675, Rotation2d.fromRadians(-2.0944 - Math.PI)), // Point J
-                        new Pose2d(3.5707850508, 5.3797625, Rotation2d.fromRadians(-1.0472 - Math.PI))  // Point L
-                });
-
-                private final Pose2d[] waypoints;
-
-                ReefPoleSide(Pose2d[] poses) {
+                ReefPoleScoringPoses(Pose2d poses) {
                     this.waypoints = poses;
                 }
 
-                public Pose2d[] getPoints(ReefPoleSide side) {
-                    return side.waypoints;
-                }
-
-                public Pose2d getClosestPoint(Pose2d robotPose) {
-                    return Arrays.stream(this.waypoints)
-                        .min(Comparator.comparingDouble(
-                            point -> point.getTranslation().getDistance(robotPose.getTranslation())))
-                        .orElse(null);
+                public Pose2d getPose() {
+                    return this.waypoints;
                 }
             }
 

@@ -69,7 +69,7 @@ import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.robotPIDs.HeadingControlPID;
 import frc.robot.RobotState.RobotState;
 // import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
@@ -186,8 +186,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
-
-
 
     public static CommandSwerveDrivetrain getInstance(){
         if(s_Swerve == null){

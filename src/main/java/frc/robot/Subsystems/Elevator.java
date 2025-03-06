@@ -33,7 +33,6 @@ public class Elevator extends SubsystemBase {
 
   private boolean holdPosition = false;
 
-  private ElevatorState reefPoleLevel;
 
   public static Elevator getInstance(){
     if(instance == null){
@@ -76,7 +75,6 @@ public class Elevator extends SubsystemBase {
     voltOutput = new VoltageOut(0).withEnableFOC(true);
     torqueOutput = new TorqueCurrentFOC(0);
 
-    reefPoleLevel = ElevatorState.L1; //default state (needs to be L1 - L4)
   }
 
   private void configMotor(TalonFX motor, InvertedValue direction, NeutralModeValue neutralMode){
@@ -162,25 +160,6 @@ public class Elevator extends SubsystemBase {
   public void zeroPosition() {
     leader.setPosition(0);
     follower.setPosition(0);
-  }
-
-  public void raisePoleLevel() {
-    if(!(reefPoleLevel.ordinal() == 3)) {
-      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() + 1].name());
-      reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() + 1];
-      System.out.println(reefPoleLevel.name());
-    }
-  }
-
-  public void lowerPoleLevel() {
-    if(!(reefPoleLevel.ordinal() == 0)) {
-      SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() - 1].name());
-      reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() - 1];
-    }
-  }
-
-  public ElevatorState getSelectedState() {
-    return reefPoleLevel;
   }
 
   @Override

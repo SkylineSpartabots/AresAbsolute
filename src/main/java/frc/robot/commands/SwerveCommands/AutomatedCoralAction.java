@@ -17,8 +17,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.RobotState.RobotState;
+import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.commands.CommandFactory;
@@ -27,18 +28,20 @@ import frc.robot.commands.Elevator.SetElevator;
 /**
  * Drives to a specified pose.
  */
-public class AutomatedAction extends Command {
+public class AutomatedCoralAction extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            4.5, 0.13, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
+            3.75, 0.09, 0.006, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            3, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
+            3, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
+    private EndEffector s_EndEffector;
 
     private Supplier<ElevatorState> elevatorLevel;
+    private Supplier<ReefPoleScoringPoses> targetReefPole; 
+
     private Double elevatorGoalPos = Double.POSITIVE_INFINITY;
 
-    private ReefPoleSide targetReefPoleSide; 
 
     private Pose2d targetPose;
     private RobotState robotState;
@@ -46,34 +49,13 @@ public class AutomatedAction extends Command {
     private double driveErrorAbs;
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
-    
-    public AutomatedAction(ReefPoleSide side) {
+
+    public AutomatedCoralAction(Supplier<ElevatorState> elevatorLevel, Supplier<ReefPoleScoringPoses> pole) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
+        this.s_EndEffector = EndEffector.getInstance();
 
-        this.targetPose = side.getClosestPoint(s_Swerve.getPose()); // Point A
-
-        addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
-    }
-
-    public AutomatedAction(Supplier<ElevatorState> elevatorLevel) {
-        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
-        this.robotState = RobotState.getInstance();
-
-        this.targetPose = ReefPoleSide.CENTER.getClosestPoint(s_Swerve.getPose()); // Point A
-        this.targetReefPoleSide = ReefPoleSide.CENTER;
-        this.elevatorLevel = elevatorLevel;
-
-        addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
-    }
-
-    public AutomatedAction(ReefPoleSide side, Supplier<ElevatorState> elevatorLevel) {
-        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
-        this.robotState = RobotState.getInstance();
-
-        this.targetPose = side.getClosestPoint(s_Swerve.getPose());
+        this.targetReefPole = pole;
         this.elevatorLevel = elevatorLevel;
 
         addRequirements(s_Swerve);
@@ -82,14 +64,9 @@ public class AutomatedAction extends Command {
 
     @Override
     public void initialize() {
-        if(elevatorLevel != null && targetReefPoleSide != ReefPoleSide.CENTER) {
-                elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
-                System.out.println("elvelb" + elevatorGoalPos);
-                if(elevatorGoalPos == null) {
-                System.out.println("HELPPPPPPPPPPPPPPPPP");
-                }
-        }
-        
+        elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
+        targetPose = targetReefPole.get().getPose();
+
         Pose2d currentPose = s_Swerve.getPose();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
@@ -111,10 +88,12 @@ public class AutomatedAction extends Command {
         thetaController.setTolerance(0.05235); //3 degrees
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
+
     }
 
     @Override
     public void execute() {
+
         Pose2d currentPose = s_Swerve.getPose();
 
         double currentDistance = currentPose.getTranslation().getDistance(targetPose.getTranslation()); //error between poses
@@ -156,21 +135,14 @@ public class AutomatedAction extends Command {
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
         // other actions
-        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold) {
+        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && s_EndEffector.getBeamResult()) {
                 new SetElevator(elevatorGoalPos).schedule();
                 elevatorGoalPos = Double.POSITIVE_INFINITY;
         }
 
-        if(targetReefPoleSide == ReefPoleSide.CENTER && driveErrorAbs < dealgeaDistanceThreshold) {
-                if(elevatorLevel.get().getEncoderPosition() <= ElevatorState.L2.getEncoderPosition()) 
-                        CommandFactory.Dealgaeify(ElevatorState.A1).schedule();
-                else    
-                        CommandFactory.Dealgaeify(ElevatorState.A2).schedule();
-        }
-
         //prints
-        System.out.println("Theta error: " + thetaErrorAbs);
-        System.out.println("drive error: " + driveErrorAbs);
+        // System.out.println("Theta error: " + thetaErrorAbs);
+        // System.out.println("drive error: " + driveErrorAbs);
         // System.out.println("Position Drivetrain error: " + driveController.getPositionError());
         // System.out.println("Drivetrain error: " + driveController.getPositionError());
         // System.out.println("Position Theta error: " + thetaController.getPositionError());
