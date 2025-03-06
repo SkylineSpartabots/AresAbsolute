@@ -32,7 +32,7 @@ public class AutoCommand {
         S2(new AutoCommand[]{}),
         R1(new AutoCommand[]{}), //Reef scoring areas
         R2(new AutoCommand[]{}),
-        R3(new AutoCommand[]{R3S1()}),
+        R3(new AutoCommand[]{R3S1(), Wait()}),
         R4(new AutoCommand[]{}),
         R5(new AutoCommand[]{}),
         R6(new AutoCommand[]{}),

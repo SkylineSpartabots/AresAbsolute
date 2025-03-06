@@ -98,6 +98,15 @@ public class DriveControlSystems {
         // .withSteerRequestType(com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo)
         // .withDesaturateWheelSpeeds(true);
     }
+
+    public SwerveRequest robotCentricDrive(double xVel, double yVel, double rot){
+        SmartDashboard.putNumber("requested velocity x", xVel);
+        SmartDashboard.putNumber("requested velocity y", yVel);
+
+        
+
+        return new SwerveRequest.RobotCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(rot);
+    }
     public SwerveRequest autoDrive(double xVel, double yVel, double rot){
         
 
@@ -107,7 +116,7 @@ public class DriveControlSystems {
 
         
 
-        return new SwerveRequest.FieldCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(-rot);
+        return new SwerveRequest.FieldCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(rot);
         // return new SwerveRequest.FieldCentricFacingAngle()
         // .withVelocityX(driverLY)
         // .withVelocityY(-driverLX)

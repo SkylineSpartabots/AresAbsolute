@@ -14,6 +14,7 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,9 +31,9 @@ public class FollowChoreoTrajectory extends Command {
   private Timer timer;
   private DriveControlSystems controlSystems;
   private RobotState robotState;
-  private PIDController xController = new PIDController(1.5, 0, 0);
-  private PIDController yController = new PIDController(1.5, 0, 0);
-  private PIDController thetaController = new PIDController(0.7, 0, 0);
+  private PIDController xController = new PIDController(3.6, 0, 0.02);
+  private PIDController yController = new PIDController(3.6, 0, 0.02);
+  private PIDController thetaController = new PIDController(1.4, 0, 0.02);
 
   public FollowChoreoTrajectory(String name) {
     if (Choreo.loadTrajectory(name).isPresent()) {
@@ -86,7 +87,7 @@ public class FollowChoreoTrajectory extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return trajectory != null ? timer.hasElapsed(trajectory.getTotalTime() +  2) : true;
+    return trajectory != null ? timer.hasElapsed(trajectory.getTotalTime()+ 0.9) : true;
   }
 
   private void followAutoTrajectory(SwerveSample sample){
@@ -112,7 +113,9 @@ public class FollowChoreoTrajectory extends Command {
           sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
         )
        );
-       System.out.println("current error: " + (currPose.getX() - sample.x));
+       System.out.println("x error: " + (currPose.getX() - sample.x));
+       System.out.println("y error: " + (currPose.getY() - sample.y));
+       System.out.println("rot error: " + Units.radiansToDegrees((currPose.getRotation().getRadians() - sample.heading)));
     
         // .withVelocityX(sample.vx + xController.calculate(currPose.getX(), sample.x))
         // .withVelocityY(sample.vy + yController.calculate(currPose.getY(), sample.y))

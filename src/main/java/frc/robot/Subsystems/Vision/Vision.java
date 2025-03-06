@@ -210,7 +210,7 @@ public class Vision extends SubsystemBase {
         
         } else { // if no multitags, use other tag data
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
-
+                
                 if(validateTarget(photonPipelineResult)) {
                     VisionOutput newPose = new VisionOutput(null, null);
 

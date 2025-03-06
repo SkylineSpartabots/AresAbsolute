@@ -19,11 +19,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.EndEffector.OuttakeState;
 import frc.robot.Subsystems.Vision.Vision;
+import frc.robot.commands.Elevator.SetElevator;
+import frc.robot.commands.EndEffector.SetOuttake;
 
 /** Add your docs here. */
 public class Autos {
@@ -50,7 +55,16 @@ public class Autos {
   }
 
   public static Command B1R3(){
-    return new FollowChoreoTrajectory("B1R3");
+    return new  SequentialCommandGroup(
+      new FollowChoreoTrajectory("B1R3"),
+      Commands.waitSeconds(0.1),
+      new SetElevator(() -> ElevatorState.L4),
+      Commands.waitSeconds(0.1),
+      new GoFlush(),
+      Commands.waitSeconds(0.4),
+      new SetOuttake(OuttakeState.SCORE)
+    );
+
   }
 
   public static Command B2R8(){
@@ -113,6 +127,7 @@ public class Autos {
   public static Command backandforth(){
     return new FollowChoreoTrajectory("backandforth");
   }
+
 
   // public static Command halfmeter(){
   //   return new FollowChoreoTrajectory("halfmeter");

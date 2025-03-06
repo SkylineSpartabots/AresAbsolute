@@ -45,6 +45,7 @@ import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Autos.AutoCommand;
 import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
+import frc.robot.commands.Autos.ForwardAuto;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Slapdown.SetPivot;
@@ -205,7 +206,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    // CommandFactory.autoCommand().schedule();
+    // new ForwardAuto().schedule();
   }
 
   @Override
