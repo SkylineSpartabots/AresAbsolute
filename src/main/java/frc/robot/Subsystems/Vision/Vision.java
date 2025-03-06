@@ -206,13 +206,13 @@ public class Vision extends SubsystemBase {
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
                 if(validateTarget(photonPipelineResult)) {
 
-                    System.out.println(robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())).toString());
+                    // System.out.println(robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())).toString());
                     
                     
                     VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds()
                         )));
-                        System.out.println("sttdev: " + newPose.standardDev.toString());
+                        // System.out.println("sttdev: " + newPose.standardDev.toString());
                     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
                 }
             } 

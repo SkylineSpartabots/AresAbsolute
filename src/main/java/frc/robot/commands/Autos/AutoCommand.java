@@ -97,6 +97,14 @@ public class AutoCommand {
         return new AutoCommand("S2R10", Autos.S2R10(), EndPoint.R10);
     }
 
+    public static AutoCommand R10S2(){
+        return new AutoCommand("R10S2", Autos.R10S2(), EndPoint.S2);
+    }
+
+    public static AutoCommand S2R9(){
+        return new AutoCommand("S2R9", Autos.S2R9(), EndPoint.R9);
+    }
+
     
 
 

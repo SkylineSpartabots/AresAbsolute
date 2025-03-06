@@ -71,7 +71,7 @@ public class Elevator extends SubsystemBase {
     configMotor(leader, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);
     configMotor(follower, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);
 
-    follower.setControl(new Follower(Constants.HardwarePorts.elevatorLeaderId, false));
+    follower.setControl(new Follower(Constants.HardwarePorts.elevatorLeaderId, false).withUpdateFreqHz(100));
 
     voltOutput = new VoltageOut(0).withEnableFOC(true);
     torqueOutput = new TorqueCurrentFOC(0);
@@ -96,6 +96,7 @@ public class Elevator extends SubsystemBase {
     motor.getConfigurator().apply(config);
     motor.getPosition().setUpdateFrequency(50);
     motor.getStatorCurrent().setUpdateFrequency(50);
+    motor.getMotorVoltage().setUpdateFrequency(50);
     motor.optimizeBusUtilization();
 
     Slot0Configs configuration = new Slot0Configs();
@@ -135,10 +136,15 @@ public class Elevator extends SubsystemBase {
   public void setVoltage(double voltage){
     holdPosition = false;
     leader.setControl(voltOutput.withOutput(voltage));
+    // follower.setControl(voltOutput.withOutput(voltage));
   }
 
   public double getVelocity(){
     return leader.getVelocity().getValueAsDouble();
+  }
+
+  public double getLeaderVoltage(){
+    return leader.getMotorVoltage().getValueAsDouble();
   }
 
   public double getFollowerVoltage(){
