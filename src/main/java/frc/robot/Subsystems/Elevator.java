@@ -96,6 +96,7 @@ public class Elevator extends SubsystemBase {
     motor.getConfigurator().apply(config);
     motor.getPosition().setUpdateFrequency(50);
     motor.getStatorCurrent().setUpdateFrequency(50);
+    motor.getMotorVoltage().setUpdateFrequency(50);
     motor.optimizeBusUtilization();
 
     Slot0Configs configuration = new Slot0Configs();
@@ -144,6 +145,10 @@ public class Elevator extends SubsystemBase {
 
   public double getVelocity(){
     return leader.getVelocity().getValueAsDouble();
+  }
+
+  public double getLeaderVoltage(){
+    return leader.getMotorVoltage().getValueAsDouble();
   }
 
   public double getFollowerVoltage(){

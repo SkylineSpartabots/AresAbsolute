@@ -86,6 +86,10 @@ public class Autos {
     return new FollowChoreoTrajectory("S2R12");
   }
 
+  public static Command R10S2(){
+    return new FollowChoreoTrajectory("R10S2");
+  }
+
   public static Command Test3() {
     return Commands.waitSeconds(0);
   }

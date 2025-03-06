@@ -70,7 +70,7 @@ public class SetElevator extends Command {
     s_Elevator.setVoltage(pidoutput); // used to tune feedforward
 
     error = s_Elevator.getPosition() - setpoint.position;
-
+    System.out.println("elevator follower voltage: " + s_Elevator.getFollowerVoltage());
     // System.out.println("current draw: " + s_Elevator.getCurrent());
     // System.out.println("current: " + s_Elevator.getCurrent());
     // setpoint = profile.calculate(timer.get(), initialState, goal);
@@ -80,9 +80,9 @@ public class SetElevator extends Command {
     // s_Elevator.setVoltage(controller.calculate(s_Elevator.getPosition(), setpoint.position) + feedforward.calculate(setpoint.velocity));
     // SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
     // SmartDashboard.putNumber("current error", error);
-    System.out.println("current error: " + error);
-    System.out.println(s_Elevator.getFollowerVoltage());
-    System.out.println("pidoutput: " + pidoutput);
+    // System.out.println("current error: " + error);
+    // System.out.println("voltage:s_Elevator.getFollowerVoltage());
+    // System.out.println("pidoutput: " + pidoutput);
     // System.out.println("current setpoint error " + error);
   }
 
