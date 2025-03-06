@@ -71,7 +71,7 @@ public class Elevator extends SubsystemBase {
     configMotor(leader, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);
     configMotor(follower, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);
 
-    follower.setControl(new Follower(Constants.HardwarePorts.elevatorLeaderId, false));
+    // follower.setControl(new Follower(Constants.HardwarePorts.elevatorLeaderId, false));
 
     voltOutput = new VoltageOut(0).withEnableFOC(true);
     torqueOutput = new TorqueCurrentFOC(0);
@@ -109,6 +109,7 @@ public class Elevator extends SubsystemBase {
 
   public void setPosition(double position){
     leader.setControl(new PositionVoltage(position).withSlot(0).withUpdateFreqHz(50));
+    follower.setControl(new PositionVoltage(position).withSlot(0).withUpdateFreqHz(50));
   }
 
   public double getPosition(){
@@ -117,6 +118,7 @@ public class Elevator extends SubsystemBase {
 
   public void setTorqueOutput(double output){
     leader.setControl(torqueOutput.withOutput(output));
+    follower.setControl(torqueOutput.withOutput(output));
   }
 
   public double getCurrent(){
@@ -125,16 +127,19 @@ public class Elevator extends SubsystemBase {
 
   public void stop(){
     leader.setControl(voltOutput.withOutput(0));
+    follower.setControl(voltOutput.withOutput(0));
   }
 
   public void setSpeed(double speed){
     holdPosition = false;
     leader.set(speed);
+    follower.set(speed);
   }
 
   public void setVoltage(double voltage){
     holdPosition = false;
     leader.setControl(voltOutput.withOutput(voltage));
+    follower.setControl(voltOutput.withOutput(voltage));
   }
 
   public double getVelocity(){
@@ -151,6 +156,7 @@ public class Elevator extends SubsystemBase {
 
   public void zeroPosition() {
     leader.setPosition(0);
+    follower.setPosition(0);
   }
 
   public void raisePoleLevel() {

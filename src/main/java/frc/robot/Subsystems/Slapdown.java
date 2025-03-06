@@ -50,7 +50,8 @@ public class Slapdown extends SubsystemBase {
     leader = new TalonFX(Constants.HardwarePorts.slapdownLeaderID);
     follower = new TalonFX(Constants.HardwarePorts.slapdownFollowerID);
     roller = new TalonFX(Constants.HardwarePorts.slapdownRollerID);
-    follower.setControl(new Follower(Constants.HardwarePorts.slapdownLeaderID, true));
+
+    // follower.setControl(new Follower(Constants.HardwarePorts.slapdownLeaderID, true));
 
     configPivot(leader, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
     configPivot(follower, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
@@ -159,6 +160,7 @@ public class Slapdown extends SubsystemBase {
 
   public void stopPivot(){
     leader.set(0);
+    follower.set(0);
   }
 
   public double getPosition(){
@@ -183,6 +185,12 @@ public class Slapdown extends SubsystemBase {
       .withEnableFOC(true)
       .withSlot(1)
       );
+      follower.setControl(
+      new PositionVoltage(leader.getPosition().getValueAsDouble())
+      .withLimitForwardMotion(true)
+      .withEnableFOC(true)
+      .withSlot(1)
+      );
   }
 
   public void brakePivot(PivotState state){
@@ -192,14 +200,23 @@ public class Slapdown extends SubsystemBase {
       .withEnableFOC(true)
       .withSlot(1)
       );
+      follower.setControl(
+      new PositionVoltage(state.getPosition())
+      .withLimitForwardMotion(true)
+      .withEnableFOC(true)
+      .withSlot(1)
+      );
+      
   }
 
   public void setPivotSpeed(double speed){
     leader.set(speed);
+    follower.set(speed);
   }
 
   public void setPivotPosition(PivotState state){
     leader.setControl(new PositionVoltage(state.getPosition()).withSlot(1));
+    follower.setControl(new PositionVoltage(state.getPosition()).withSlot(1));
   }
 
   public double getSupplyCurrent(){
@@ -208,10 +225,12 @@ public class Slapdown extends SubsystemBase {
   
   public void resetPivotPosition(){
     leader.setPosition(0);
+    follower.setPosition(0);
   }
 
   public void setPivotVoltage(double voltage){
     leader.setControl(new VoltageOut(voltage));
+    follower.setControl(new VoltageOut(voltage));
   }
 
   public void setRollerSpeed(double speed){

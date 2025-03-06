@@ -193,6 +193,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if(s_Swerve == null){
             s_Swerve = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants,
              250,
+             VecBuilder.fill(0.05, 0.05, 0.05),
+             VecBuilder.fill(0.04, 0.04, 0.02),
             TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);  
         }
         

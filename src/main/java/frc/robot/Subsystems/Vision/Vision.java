@@ -198,6 +198,8 @@ public class Vision extends SubsystemBase {
                     .plus(multiTagOutput.getMultiTag().estimatedPose.best) //transform to camera
                         .plus(cameraToRobotTransform); //transform to robot
     
+                System.out.println("Multitag pose TRANSFORMED: " + robotPose.toString());
+
                 VisionOutput newPose = new VisionOutput(robotPose,
                     multiTagOutput.getTimestamp(),
                     multiTagOutput.getBestTarget(),
@@ -213,12 +215,12 @@ public class Vision extends SubsystemBase {
                     VisionOutput newPose = new VisionOutput(null, null);
 
                     if(FLphotonPoseEstimator.getRobotToCameraTransform().equals(cameraToRobotTransform)) {
-
+                        System.out.println("FL pose " + FLphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
                         newPose = new VisionOutput(FLphotonPoseEstimator.update(photonPipelineResult).get(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
 
                     } else if (FRphotonPoseEstimator.getRobotToCameraTransform().equals(cameraToRobotTransform)) {
-
+                        System.out.println("FR pose " + FRphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
                         newPose = new VisionOutput(FRphotonPoseEstimator.update(photonPipelineResult).get(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
 

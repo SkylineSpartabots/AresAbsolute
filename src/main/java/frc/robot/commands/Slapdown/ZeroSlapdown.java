@@ -55,6 +55,6 @@ public class ZeroSlapdown extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(s_Intake.getPivotVelocity()) < 0.2 && timer.hasElapsed(0.2);
+    return Math.abs(s_Intake.getPivotVelocity()) < 0.2 && timer.hasElapsed(0.4);
   }
 }
