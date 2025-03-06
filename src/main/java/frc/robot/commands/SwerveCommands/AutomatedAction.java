@@ -27,7 +27,7 @@ import frc.robot.commands.Elevator.SetElevator;
 /**
  * Drives to a specified pose.
  */
-public class DriveToPose extends Command {
+public class AutomatedAction extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
             4.5, 0.13, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
@@ -47,7 +47,7 @@ public class DriveToPose extends Command {
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
     
-    public DriveToPose(ReefPoleSide side) {
+    public AutomatedAction(ReefPoleSide side) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
 
@@ -57,7 +57,7 @@ public class DriveToPose extends Command {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
     }
 
-    public DriveToPose(Supplier<ElevatorState> elevatorLevel) {
+    public AutomatedAction(Supplier<ElevatorState> elevatorLevel) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
 
@@ -69,7 +69,7 @@ public class DriveToPose extends Command {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
     }
 
-    public DriveToPose(ReefPoleSide side, Supplier<ElevatorState> elevatorLevel) {
+    public AutomatedAction(ReefPoleSide side, Supplier<ElevatorState> elevatorLevel) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
 
@@ -86,7 +86,7 @@ public class DriveToPose extends Command {
                 elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
                 System.out.println("elvelb" + elevatorGoalPos);
                 if(elevatorGoalPos == null) {
-                        System.out.println("HELPPPPPPPPPPPPPPPPP");
+                System.out.println("HELPPPPPPPPPPPPPPPPP");
                 }
         }
         
@@ -108,7 +108,7 @@ public class DriveToPose extends Command {
         thetaController.reset(s_Swerve.getHeading(),
                 robotState.getLatestFilteredVelocity().getOmega());
         
-        thetaController.setTolerance(0.04);
+        thetaController.setTolerance(0.05235); //3 degrees
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
     }

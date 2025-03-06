@@ -35,7 +35,7 @@ import frc.robot.commands.EndEffector.SetOuttake;
 import frc.robot.commands.EndEffector.SmartCoralIntake;
 import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
-import frc.robot.commands.SwerveCommands.DriveToPose;
+import frc.robot.commands.SwerveCommands.AutomatedAction;
 import frc.robot.commands.SwerveCommands.SlowDrive;
 
 public class RobotContainer {
