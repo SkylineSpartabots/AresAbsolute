@@ -36,7 +36,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.FieldConstants.ReefConstants.SourceNumber;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefNumber;
 import frc.robot.RobotState.RobotState;
 import frc.robot.commands.EndEffector.SmartCoralIntake;
 

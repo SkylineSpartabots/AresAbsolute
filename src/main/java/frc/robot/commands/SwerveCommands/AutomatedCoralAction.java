@@ -24,6 +24,8 @@ import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Drives to a specified pose.
@@ -42,6 +44,7 @@ public class AutomatedCoralAction extends Command {
 
     private Double elevatorGoalPos = Double.POSITIVE_INFINITY;
 
+    private Alliance alliance;
 
     private Pose2d targetPose;
     private RobotState robotState;
@@ -50,13 +53,17 @@ public class AutomatedCoralAction extends Command {
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
 
+
+
     public AutomatedCoralAction(Supplier<ElevatorState> elevatorLevel, Supplier<ReefPoleScoringPoses> pole) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
         this.s_EndEffector = EndEffector.getInstance();
-
+        
         this.targetReefPole = pole;
         this.elevatorLevel = elevatorLevel;
+
+        alliance = DriverStation.getAlliance().get();
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
@@ -66,6 +73,10 @@ public class AutomatedCoralAction extends Command {
     public void initialize() {
         elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
         targetPose = targetReefPole.get().getPose();
+
+        if(alliance.equals(Alliance.Red)) {
+                targetPose.plus(new Transform2d(8.57,0, new Rotation2d()));
+        }
 
         Pose2d currentPose = s_Swerve.getPose();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();

@@ -196,9 +196,7 @@ public class RobotContainer {
     driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
 
     driver.y().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
-
     driver.a().onTrue(CommandFactory.FullCoralIntake());
-
     driver.x().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
     // driver.b().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
