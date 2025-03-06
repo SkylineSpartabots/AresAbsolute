@@ -71,11 +71,11 @@ public class LEDs extends SubsystemBase {
 
     public void detectAprilTag(){
         //april tag detected
-        if(vision.getLatestAprilTagResult().hasTargets()){
+        /*if(!vision.cameraResult.isEmpty()){
             setColor(ledStates.RED);
         } else {
             setColor(ledStates.OFF);
-        }
+        } */
         
     }
 }
