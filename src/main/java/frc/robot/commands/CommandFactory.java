@@ -31,7 +31,7 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.SwerveCommands.DriveToPose;
+import frc.robot.commands.SwerveCommands.AutomatedAction;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
@@ -151,21 +151,22 @@ public class CommandFactory {
         );
     }
 
+    public static Command Outtake() {
+        return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
+    }
+
+    //Automation commands
     public static Command AutoScoreCoral(Supplier<ElevatorState> level, ReefPoleSide side, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new DriveToPose(side, level),
+            new AutomatedAction(side, level),
             new SetOuttake(level)
         ).raceWith(new CancelableCommand(controller));
     }
 
     public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new DriveToPose(level)
+            new AutomatedAction(level)
         ).raceWith(new CancelableCommand(controller));
-    }
-
-    public static Command Outtake() {
-        return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
 
     // public static Command AutoScorefromSource(ElevatorState level, SourceNumber source, ReefNumber reef){
