@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.SensorUtils;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.Subsystems.LEDs.LEDs;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
@@ -60,11 +61,15 @@ public class Robot extends LoggedRobot {
   private CommandSwerveDrivetrain drivetrain;
   private Elevator elevator;
   private RobotState robotState;
+
+  private LEDs leds;
+
   private Slapdown intake;
   private DriveControlSystems controlSystems;
 
  
     public Robot() { 
+
       // oops just realized logging needs to be in the constructor lol
       // facebookdata
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -122,9 +127,15 @@ public class Robot extends LoggedRobot {
       drivetrain = CommandSwerveDrivetrain.getInstance();
       robotState = RobotState.getInstance();
       vision = Vision.getInstance();
+
+
+      leds = LEDs.getInstance();
+      leds.initLEDs();
+      
       intake = Slapdown.getInstance();
       controlSystems = DriveControlSystems.getInstance();
       // CanBridge.runTCP();
+
     }
 
   @Override
