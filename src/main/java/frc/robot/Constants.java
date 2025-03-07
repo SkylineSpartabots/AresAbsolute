@@ -277,18 +277,18 @@ public final class Constants {
                 // dy = +- 0.0212725 m
 
                 //BLUE SIDE
-                POLE_A(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(0.0))), //tested
-                POLE_B(new Pose2d(3.23, 3.906, Rotation2d.fromRadians(0.0))), //tested
-                POLE_C(new Pose2d(3.65 , 3.029, Rotation2d.fromRadians(1.0472))), //untested
-                POLE_D(new Pose2d(3.955, 2.8465, Rotation2d.fromRadians(1.0472))), //untested
-                POLE_E(new Pose2d(4.937, 2.798, Rotation2d.fromRadians(2.0944))), //untested
-                POLE_F(new Pose2d(0, 0, Rotation2d.fromRadians(2.0944))),
-                POLE_G(new Pose2d(0, 0, Rotation2d.fromRadians(3.14159))), 
-                POLE_H(new Pose2d(0, 0, Rotation2d.fromRadians(3.14159))), 
-                POLE_I(new Pose2d(0, 0, Rotation2d.fromRadians(-2.0944))), 
-                POLE_J(new Pose2d(0, 0, Rotation2d.fromRadians(-2.0944))), 
-                POLE_K(new Pose2d(0, 0, Rotation2d.fromRadians(-1.0472))), 
-                POLE_L(new Pose2d(0, 0, Rotation2d.fromRadians(-1.0472))); 
+                POLE_1A(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(0.0))), //tested
+                POLE_2B(new Pose2d(3.23, 3.906, Rotation2d.fromRadians(0.0))), //tested
+                POLE_3C(new Pose2d(3.65 , 3.029, Rotation2d.fromRadians(1.0472))), //untested
+                POLE_4D(new Pose2d(3.955, 2.8465, Rotation2d.fromRadians(1.0472))), //untested
+                POLE_5E(new Pose2d(4.937, 2.798, Rotation2d.fromRadians(2.0944))), //untested
+                POLE_6F(new Pose2d(5.22, 2.964, Rotation2d.fromRadians(2.0944))),
+                POLE_7G(new Pose2d(5.774, 3.809, Rotation2d.fromRadians(3.14159))), 
+                POLE_8H(new Pose2d(5.774, 4.14, Rotation2d.fromRadians(3.14159))), 
+                POLE_9I(new Pose2d(5.233, 5.08, Rotation2d.fromRadians(-2.0944))), 
+                POLE_10J(new Pose2d(4.933, 5.254, Rotation2d.fromRadians(-2.0944))), 
+                POLE_11K(new Pose2d(4.3, 5.244, Rotation2d.fromRadians(-1.0472))), 
+                POLE_12L(new Pose2d(3.75, 5.079, Rotation2d.fromRadians(-1.0472))); 
 
                 private final Pose2d waypoints;
 

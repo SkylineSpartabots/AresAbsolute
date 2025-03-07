@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.SensorUtils;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Subsystems.Climb;
@@ -164,7 +165,7 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     //start the logger here
-
+    SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_1A.name());
     SmartDashboard.putString("Selected Pole Level", ElevatorState.L1.name());
   }
 

@@ -77,7 +77,10 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 	private boolean inAuto = false; //need to configure with auto but we dont have an auto yet (lol)
 
     public RobotState() {
+
         reefPoleLevel = ElevatorState.L1; //default state (needs to be L1 - L4)
+        reefPole = ReefPoleScoringPoses.POLE_1A;
+
         drivetrain = CommandSwerveDrivetrain.getInstance();
         pigeon = drivetrain.getPigeon2();  //getting the already constructed pigeon in swerve
         reset(0.02, IPose2d.identity()); //init
@@ -132,24 +135,25 @@ public class RobotState { //will estimate pose with odometry and correct drift w
   private ReefPoleScoringPoses reefPole;
 
     public void reefPoleSet7() {
-        reefPole = ReefPoleScoringPoses.POLE_G;
+        reefPole = ReefPoleScoringPoses.POLE_7G;
     }
 
     public void reefPoleSet1() {
-        reefPole = ReefPoleScoringPoses.POLE_A;
+        reefPole = ReefPoleScoringPoses.POLE_1A;
     }
 
     public void navigateReefPoleUp() {
+        System.out.println("up ordinal" + reefPole.ordinal());
         if(!(reefPole.ordinal() == 0)) {
-        SmartDashboard.putString("Selected Pole", ElevatorState.values()[reefPole.ordinal() + 1].name());
+        SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
         reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
-        System.out.println(reefPole.name());
         }
     }
 
     public void navigateReefPoleDown() {
-        if(!(reefPole.ordinal() == 0)) {
-        SmartDashboard.putString("Selected Pole", ElevatorState.values()[reefPole.ordinal() - 1].name());
+        System.out.println("down ordinal" + reefPole.ordinal());
+        if(!(reefPole.ordinal() == 11)) {
+        SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
         reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
         }
     }

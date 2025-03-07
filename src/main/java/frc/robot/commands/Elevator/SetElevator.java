@@ -35,7 +35,7 @@ public class SetElevator extends Command {
   private Timer timer = new Timer();
 
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
-  private PIDController controller = new PIDController(1.4, 0.65, 0.1254);
+  private PIDController controller = new PIDController(1.78, 1.42, 0.0115);
 
   // pls dont add more constructors
   public SetElevator(Supplier<ElevatorState> state){
@@ -66,6 +66,8 @@ public class SetElevator extends Command {
   public void execute() {
     setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
     pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
+    
+    System.out.println("error: " + (goalPosition - s_Elevator.getPosition()));
 
     s_Elevator.setVoltage(pidoutput); // used to tune feedforward
 
