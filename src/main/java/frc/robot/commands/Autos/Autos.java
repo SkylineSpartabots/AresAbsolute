@@ -55,16 +55,19 @@ public class Autos {
   }
 
   public static Command B1R3(){
-    return new  SequentialCommandGroup(
+    // return new  SequentialCommandGroup(
+    //   new FollowChoreoTrajectory("B1R3"),
+    //   Commands.waitSeconds(0.1),
+    //   new SetElevator(() -> ElevatorState.L4),
+    //   Commands.waitSeconds(0.1),
+    //   new GoFlush(),
+    //   Commands.waitSeconds(0.4),
+    //   new SetOuttake(OuttakeState.SCORE)
+    // );
+    return new SequentialCommandGroup(
       new FollowChoreoTrajectory("B1R3"),
-      Commands.waitSeconds(0.1),
-      new SetElevator(() -> ElevatorState.L4),
-      Commands.waitSeconds(0.1),
-      new GoFlush(),
-      Commands.waitSeconds(0.4),
-      new SetOuttake(OuttakeState.SCORE)
+      Commands.waitSeconds(0.1)
     );
-
   }
 
   public static Command B2R8(){

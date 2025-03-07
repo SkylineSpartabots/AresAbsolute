@@ -28,7 +28,7 @@ public class AutoCommand {
 
     private enum EndPoint {
         GENERIC(new AutoCommand[]{}), //use for wait commands, etc. Any paths that can lead into any other path
-        S1(new AutoCommand[]{}), //Source areas
+        S1(new AutoCommand[]{S1R1()}), //Source areas
         S2(new AutoCommand[]{}),
         R1(new AutoCommand[]{}), //Reef scoring areas
         R2(new AutoCommand[]{}),
@@ -52,6 +52,10 @@ public class AutoCommand {
         private EndPoint(AutoCommand[] branches){
             this.branches = branches;
         }
+    }
+
+    public static AutoCommand S1R1(){
+        return new AutoCommand("S1R1", Autos.S1R1(), EndPoint.R1);
     }
 
     public Command getCommand(){
