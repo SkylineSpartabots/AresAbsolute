@@ -144,7 +144,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
     public void navigateReefPoleUp() {
         System.out.println("up ordinal" + reefPole.ordinal());
-        if(!(reefPole.ordinal() == 0)) {
+        System.out.println(!(reefPole.ordinal() == 0));
+        if(!(reefPole.ordinal() == 11)) {
         SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
         reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
         }
@@ -152,7 +153,7 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
     public void navigateReefPoleDown() {
         System.out.println("down ordinal" + reefPole.ordinal());
-        if(!(reefPole.ordinal() == 11)) {
+        if(!(reefPole.ordinal() == 0)) {
         SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
         reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
         }
