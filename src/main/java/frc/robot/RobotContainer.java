@@ -9,6 +9,8 @@ import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -58,6 +60,8 @@ public class RobotContainer {
 
   private DriveControlSystems controlSystem  = DriveControlSystems.getInstance();
 
+  private int redFlip = 1;
+
   //instances
   private final CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance(); // Drivetrain
   private final RobotState robotstate = RobotState.getInstance(); // Drivetrain
@@ -102,15 +106,13 @@ public class RobotContainer {
       return driver;
   }
 
-
   private void configureBindings() {
 
+
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY(), -driver.getLeftX(), -driver.getRightX()) // Drive counterclockwise with negative X (left)
+        drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY() * redFlip, -driver.getLeftX() * redFlip, -driver.getRightX() * redFlip) // Drive counterclockwise with negative X (left)
     ));
     //SysID
-        driver.leftTrigger().whileTrue(new SlowDrive());
-
         // driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
         // driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
         // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -159,7 +161,7 @@ public class RobotContainer {
 
       //Zeroing commands
         // driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0.4208, 6.412663459777832, new Rotation2d(0)))));
-        // driver.start().onTrue(new ZeroElevator());
+        driver.start().onTrue(new ZeroElevator());
           
       // Scholarly Commands
         // driverDpadRight.onTrue(new SmartIntake());
@@ -172,16 +174,15 @@ public class RobotContainer {
         // driver.a().onTrue(new SetFunnel(FunnelState.OFF));
         // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
         // driver.b().onTrue(new SetRoller(RollerState.OUTTAKE));
-        driver.y().onTrue(CommandFactory.FinishIntake());
 
               
     // ----------====# Active binding ====----------
     // driver.start().onTrue(new ZeroElevator());
-    driver.back().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0,0, new Rotation2d(0)))));
 
-    // driver.povLeft().onTrue(new InstantCommand(() -> climb.setSpeed(0.1)));
-    // driver.povRight().onTrue(new InstantCommand(() -> climb.setSpeed(-0.35)));
-    // driver.povDown().onTrue(new InstantCommand(() -> climb.setSpeed(0)));
+    driver.povLeft().onTrue(new InstantCommand(() -> climb.setSpeed(0.1)));
+    driver.povRight().onTrue(new InstantCommand(() -> climb.setSpeed(-0.35)));
+    driver.povDown().onTrue(new InstantCommand(() -> climb.setSpeed(0)
+    ));
     
     // driver.a().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.LEFT, driver));
     // driver.povUp().onTrue(new SetElevator(() -> elevator.getSelectedState()));
@@ -192,6 +193,10 @@ public class RobotContainer {
 
 
     // ----------====# Automation bindings #====----------
+
+
+    driver.rightTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
+    driver.leftTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
 
     driver.povUp().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
     
@@ -207,15 +212,16 @@ public class RobotContainer {
     // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
     // driver.rightTrigger().onTrue(new SetOuttake(OuttakeState.SCORE));
 
-    driver.start().onTrue(new ZeroElevator());
+    // driver.start().onTrue(new FollowChoreoTrajectory("B1R3"));
+
 
     // ----------====# Operator bindings #====----------
 
-    operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
-    operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
+    // operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
+    // operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
 
-    operator.b().onTrue(new InstantCommand(() -> robotstate.reefPoleSet7()));
-    operator.a().onTrue(new InstantCommand(() -> robotstate.reefPoleSet1()));
+    // operator.b().onTrue(new InstantCommand(() -> robotstate.reefPoleSet7()));
+    // operator.a().onTrue(new InstantCommand(() -> robotstate.reefPoleSet1()));
   }
 
 
@@ -224,6 +230,9 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
+    if(DriverStation.getAlliance().get() == Alliance.Red)
+      redFlip = -1;
+
     configureBindings();
   }
 }

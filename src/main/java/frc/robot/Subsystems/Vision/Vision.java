@@ -102,6 +102,7 @@ public class Vision extends SubsystemBase {
     public boolean validateTarget(PhotonPipelineResult camera) {
         if(!camera.hasTargets())
             return false;
+
         PhotonTrackedTarget target = camera.getBestTarget();
 
         if(target.area > 0.06
@@ -198,8 +199,6 @@ public class Vision extends SubsystemBase {
                     .plus(multiTagOutput.getMultiTag().estimatedPose.best) //transform to camera
                         .plus(cameraToRobotTransform); //transform to robot
     
-                // System.out.println("Multitag pose TRANSFORMED: " + robotPose.toString());
-
                 VisionOutput newPose = new VisionOutput(robotPose,
                     multiTagOutput.getTimestamp(),
                     multiTagOutput.getBestTarget(),
@@ -210,25 +209,22 @@ public class Vision extends SubsystemBase {
         
         } else { // if no multitags, use other tag data
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
-
                 if(validateTarget(photonPipelineResult)) {
-                    VisionOutput newPose = new VisionOutput(null, null);
 
-                    if(FLphotonPoseEstimator.getRobotToCameraTransform().equals(cameraToRobotTransform)) {
-                        // System.out.println("FL pose " + FLphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
-                        newPose = new VisionOutput(FLphotonPoseEstimator.update(photonPipelineResult).get(),
+                    if(FLphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
+                        System.out.println("FL pose " + FLphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
+                        VisionOutput newPose = new VisionOutput(FLphotonPoseEstimator.update(photonPipelineResult).get(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
-
-                    } else if (FRphotonPoseEstimator.getRobotToCameraTransform().equals(cameraToRobotTransform)) {
-                        // System.out.println("FR pose " + FRphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
-                        newPose = new VisionOutput(FRphotonPoseEstimator.update(photonPipelineResult).get(),
+                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
+                    } else if (FRphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
+                        System.out.println("FR pose " + FRphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
+                        VisionOutput newPose = new VisionOutput(FRphotonPoseEstimator.update(photonPipelineResult).get(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
-
+                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
                     } else {
                         System.out.println("bruh");
                     }
-
-                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
+                    
                 }
 
             } 
