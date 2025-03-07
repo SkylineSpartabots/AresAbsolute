@@ -102,6 +102,6 @@ public class SetElevator extends Command {
   @Override
   public boolean isFinished() {
     //Dont end the command or the elevator will drop; Break mode is not strong enough to hold up carriage
-    return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.1;
+    return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.15;
   }
 }

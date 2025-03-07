@@ -27,6 +27,7 @@ import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
 import frc.robot.Subsystems.Vision.Vision;
+import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.EndEffector.SetOuttake;
 
@@ -65,9 +66,14 @@ public class Autos {
     //   new SetOuttake(OuttakeState.SCORE)
     // );
     return new SequentialCommandGroup(
-      new FollowChoreoTrajectory("B1R3"),
-      Commands.waitSeconds(0.1)
-    );
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("B1R3"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.5),
+          new SetElevator(()->ElevatorState.L4))
+        ),
+        new SetOuttake(OuttakeState.SCORE)
+      );
   }
 
   public static Command B2R8(){
@@ -75,7 +81,18 @@ public class Autos {
   }
 
   public static Command S1R1(){
-    return new FollowChoreoTrajectory("S1R1");
+    // return new FollowChoreoTrajectory("S1R1");
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.3),
+          new SetElevator(()->ElevatorState.L4)
+        ),
+        new FollowChoreoTrajectory("S1R1")
+      ),
+      Commands.waitSeconds(0.2),
+      new SetOuttake(OuttakeState.SCORE)
+    );
   }
 
   public static Command S1R2(){
@@ -86,7 +103,19 @@ public class Autos {
     return new FollowChoreoTrajectory("R8S2");
   }
   public static Command R3S1(){
-    return new FollowChoreoTrajectory("R3S1");
+    // return new ParallelCommandGroup(
+    //   new SequentialCommandGroup(
+    //     Commands.waitSeconds(0.2),
+    //     new FollowChoreoTrajectory("R3S1")
+    //   ),
+    //   new AutoCoralIntake()
+    // );
+    return new SequentialCommandGroup(
+      new SetElevator(()->ElevatorState.SOURCE),
+      new FollowChoreoTrajectory("R3S1"),
+      CommandFactory.FullCoralIntake()
+    );
+    
   }
   public static Command S2R9(){
     return new FollowChoreoTrajectory("S2R9");

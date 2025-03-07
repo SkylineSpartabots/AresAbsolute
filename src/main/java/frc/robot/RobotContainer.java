@@ -207,7 +207,7 @@ public class RobotContainer {
     // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
     // driver.rightTrigger().onTrue(new SetOuttake(OuttakeState.SCORE));
 
-    driver.start().onTrue(new FollowChoreoTrajectory("B1R3"));
+    driver.start().onTrue(new ZeroElevator());
 
     // ----------====# Operator bindings #====----------
 

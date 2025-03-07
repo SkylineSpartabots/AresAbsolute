@@ -38,6 +38,8 @@ public class FollowChoreoTrajectory extends Command {
   public FollowChoreoTrajectory(String name) {
     if (Choreo.loadTrajectory(name).isPresent()) {
       trajectory = Choreo.loadTrajectory(name).get();
+    } else{
+      System.out.println("AUTO BROKEN");
     }
     s_Swerve = CommandSwerveDrivetrain.getInstance();
     alliance = DriverStation.getAlliance();
