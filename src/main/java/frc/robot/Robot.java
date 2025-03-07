@@ -185,6 +185,7 @@ public class Robot extends LoggedRobot {
     }
     if(secondAuto.getSelected() != secondSavedChoice){
       secondSavedChoice = secondAuto.getSelected();
+      updateThirdAuto();
       // m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
     }
     if(thirdAuto.getSelected() != thirdSavedChoice){
@@ -203,6 +204,7 @@ public class Robot extends LoggedRobot {
     if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
     
     if(secondSavedChoice != null) m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
+    if(thirdSavedChoice != null) m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -255,6 +257,21 @@ public class Robot extends LoggedRobot {
         AutoCommand.getPotentialContinuations().get(i));
       }
       SmartDashboard.putData("second auto", secondAuto);
+  }
+
+  private void updateThirdAuto(){
+    if(thirdAuto != null){
+      thirdAuto.close();
+    }
+    thirdAuto = new SendableChooser<AutoCommand>();
+    secondSavedChoice = secondAuto.getSelected();
+    AutoCommand.clearContinuations();
+    AutoCommand.fillAutosList(secondSavedChoice);
+      for(int i = 0; i < AutoCommand.getPotentialContinuations().size(); i++){
+        thirdAuto.addOption(AutoCommand.getPotentialContinuations().get(i).name, 
+        AutoCommand.getPotentialContinuations().get(i));
+      }
+      SmartDashboard.putData("third auto", thirdAuto);
   }
 
 }

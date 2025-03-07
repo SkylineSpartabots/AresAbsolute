@@ -30,6 +30,8 @@ import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.CommandFactory;
+import frc.robot.commands.Autos.FFChoreoTrajectory;
+import frc.robot.commands.Autos.FollowChoreoTrajectory;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.EndEffector.SetOuttake;
@@ -108,6 +110,7 @@ public class RobotContainer {
     ));
     //SysID
         driver.leftTrigger().whileTrue(new SlowDrive());
+
         // driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
         // driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
         // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
@@ -204,7 +207,7 @@ public class RobotContainer {
     // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
     // driver.rightTrigger().onTrue(new SetOuttake(OuttakeState.SCORE));
 
-    driver.start().onTrue(new ZeroElevator());
+    driver.start().onTrue(new FollowChoreoTrajectory("B1R3"));
 
     // ----------====# Operator bindings #====----------
 
