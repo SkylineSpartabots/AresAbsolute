@@ -233,6 +233,10 @@ public class RobotContainer {
     operator.y().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
+    operatorDpadUp.onTrue(new InstantCommand(()-> elevator.setSpeed(0.05)));
+    operatorDpadUp.onFalse(new InstantCommand(()->elevator.setSpeed(0)));
+    operatorDpadDown.onTrue(new InstantCommand(()-> elevator.setSpeed(-0.05)));
+    operatorDpadDown.onFalse(new InstantCommand(()->elevator.setSpeed(0)));
 
     operator.a().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0, 0, new Rotation2d(0)))));
 
