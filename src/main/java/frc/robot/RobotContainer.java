@@ -196,9 +196,9 @@ public class RobotContainer {
 
     
     
-    driver.back().whileTrue(new RunClimb(0.25));
+    driver.back().whileTrue(new RunClimb(0.9));
     // driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
-    driver.start().whileTrue(new RunClimb(-0.4));
+    driver.start().whileTrue(new RunClimb(-0.9));
     // driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     driverLeftTrigger.whileTrue(new SlowDrive());
     driverRightTrigger.onTrue(CommandFactory.ShootCoral());
