@@ -29,7 +29,7 @@ public class AutoCommand {
     private enum EndPoint {
         GENERIC(new AutoCommand[]{}), //use for wait commands, etc. Any paths that can lead into any other path
         S1(new AutoCommand[]{S1R1()}), //Source areas
-        S2(new AutoCommand[]{}),
+        S2(new AutoCommand[]{S2R9()}),
         R1(new AutoCommand[]{}), //Reef scoring areas
         R2(new AutoCommand[]{}),
         R3(new AutoCommand[]{R3S1(), Wait()}),

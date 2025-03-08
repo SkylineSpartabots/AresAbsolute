@@ -234,6 +234,8 @@ public class RobotContainer {
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
 
+    operator.a().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0, 0, new Rotation2d(0)))));
+
     // operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     // operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
 

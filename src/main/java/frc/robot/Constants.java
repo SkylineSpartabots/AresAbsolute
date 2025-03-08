@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.VisionConstants.AprilTags;
 import frc.robot.RobotState.RobotState;
@@ -144,6 +145,7 @@ public final class Constants {
         public static final int elevatorPeakCurrentLimit = 120;
     }
     
+    public static Alliance alliance;
 
     public static Mode deployMode = Mode.REAL;
 

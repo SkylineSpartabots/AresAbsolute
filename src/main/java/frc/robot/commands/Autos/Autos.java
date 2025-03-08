@@ -100,7 +100,12 @@ public class Autos {
   }
 
   public static Command R8S2(){
-    return new FollowChoreoTrajectory("R8S2");
+    // return new FollowChoreoTrajectory("R8S2");
+    return new SequentialCommandGroup(
+      new SetElevator(()->ElevatorState.SOURCE),
+      new FollowChoreoTrajectory("R8S2"),
+      CommandFactory.FullCoralIntake()
+    );
   }
   public static Command R3S1(){
     // return new ParallelCommandGroup(
@@ -118,7 +123,18 @@ public class Autos {
     
   }
   public static Command S2R9(){
-    return new FollowChoreoTrajectory("S2R9");
+    // return new FollowChoreoTrajectory("S2R9");
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.3),
+          new SetElevator(()->ElevatorState.L4)
+        ),
+        new FollowChoreoTrajectory("S2R9")
+      ),
+      Commands.waitSeconds(0.2),
+      new SetOuttake(OuttakeState.SCORE)
+    );
   }
 
   public static Command S2R10(){
