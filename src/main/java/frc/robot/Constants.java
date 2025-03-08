@@ -173,9 +173,9 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
+        public static final String elevatorCamera = "Camera_2";
         public static final String FRCamera = "Camera_1";
         public static final String FLCamera = "Camera_0";
-        public static final String elevatorCamera = "Camera_2";
         public static final int aprilTagMax = 22;
         public static final double aprilTagHeight = 0.122; //bottom of each april tag is 122cm above carpet | unnecessary, we have photonvision's field layout import
         public static final double cameraRollOffset = Units.degreesToRadians(0);
@@ -277,18 +277,18 @@ public final class Constants {
                 // dy = +- 0.0212725 m
 
                 //BLUE SIDE
-                POLE_1A(new Pose2d(3.23, 4.235, Rotation2d.fromRadians(0.0))), //tested
-                POLE_2B(new Pose2d(3.23, 3.906, Rotation2d.fromRadians(0.0))), //tested
-                POLE_3C(new Pose2d(3.65 , 3.029, Rotation2d.fromRadians(1.0472))), //untested
-                POLE_4D(new Pose2d(3.955, 2.8465, Rotation2d.fromRadians(1.0472))), //untested
-                POLE_5E(new Pose2d(4.937, 2.798, Rotation2d.fromRadians(2.0944))), //untested
-                POLE_6F(new Pose2d(5.22, 2.964, Rotation2d.fromRadians(2.0944))),
-                POLE_7G(new Pose2d(5.774, 3.809, Rotation2d.fromRadians(3.14159))), 
-                POLE_8H(new Pose2d(5.774, 4.14, Rotation2d.fromRadians(3.14159))), 
-                POLE_9I(new Pose2d(5.233, 5.08, Rotation2d.fromRadians(-2.0944))), 
-                POLE_10J(new Pose2d(4.933, 5.254, Rotation2d.fromRadians(-2.0944))), 
-                POLE_11K(new Pose2d(4.3, 5.244, Rotation2d.fromRadians(-1.0472))), 
-                POLE_12L(new Pose2d(3.75, 5.079, Rotation2d.fromRadians(-1.0472))); 
+                POLE_1A(new Pose2d(3.23, 4.232, Rotation2d.fromRadians(0.0))), //
+                POLE_2B(new Pose2d(3.23, 3.90219, Rotation2d.fromRadians(0.0))), //
+                POLE_3C(new Pose2d(3.667, 3.019, Rotation2d.fromRadians(1.0472))), //
+                POLE_4D(new Pose2d(3.951, 2.854, Rotation2d.fromRadians(1.0472))), //
+                POLE_5E(new Pose2d(4.951,2.811, Rotation2d.fromRadians(2.0944))), //
+                POLE_6F(new Pose2d(5.235, 2.975, Rotation2d.fromRadians(2.0944))), //
+                POLE_7G(new Pose2d(5.774, 3.818, Rotation2d.fromRadians(3.14159))), //
+                POLE_8H(new Pose2d(5.774, 4.147, Rotation2d.fromRadians(3.14159))), //
+                POLE_9I(new Pose2d(5.311, 5.036, Rotation2d.fromRadians(-2.0944))), // 
+                POLE_10J(new Pose2d(4.989, 5.2215, Rotation2d.fromRadians(-2.0944))), //
+                POLE_11K(new Pose2d(4.026, 5.241, Rotation2d.fromRadians(-1.0472))), 
+                POLE_12L(new Pose2d(3.74, 5.076, Rotation2d.fromRadians(-1.0472))); 
 
                 private final Pose2d waypoints;
 
