@@ -69,7 +69,7 @@ public class Autos {
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("B1R3"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.5),
+          Commands.waitSeconds(0.7),
           new SetElevator(()->ElevatorState.L4))
         ),
         new SetOuttake(OuttakeState.SCORE)
@@ -77,7 +77,17 @@ public class Autos {
   }
 
   public static Command B2R8(){
-    return new FollowChoreoTrajectory("B2R8");
+    // return new FollowChoreoTrajectory("B2R8");
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("B2R8"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.7),
+          new SetElevator(()->ElevatorState.L4))
+        ),
+        new SetOuttake(OuttakeState.SCORE)
+      );
+     
   }
 
   public static Command S1R1(){
@@ -85,7 +95,7 @@ public class Autos {
     return new SequentialCommandGroup(
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.3),
+          Commands.waitSeconds(0.6),
           new SetElevator(()->ElevatorState.L4)
         ),
         new FollowChoreoTrajectory("S1R1")
@@ -96,7 +106,18 @@ public class Autos {
   }
 
   public static Command S1R2(){
-    return new FollowChoreoTrajectory("S1R2");
+    // return new FollowChoreoTrajectory("S1R2");
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.6),
+          new SetElevator(()->ElevatorState.L4)
+        ),
+        new FollowChoreoTrajectory("S1R1")
+      ),
+      Commands.waitSeconds(0.2),
+      new SetOuttake(OuttakeState.SCORE)
+    );
   }
 
   public static Command R8S2(){
@@ -127,7 +148,7 @@ public class Autos {
     return new SequentialCommandGroup(
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.3),
+          Commands.waitSeconds(0.6),
           new SetElevator(()->ElevatorState.L4)
         ),
         new FollowChoreoTrajectory("S2R9")
@@ -138,7 +159,18 @@ public class Autos {
   }
 
   public static Command S2R10(){
-    return new FollowChoreoTrajectory("S2R10");
+    // return new FollowChoreoTrajectory("S2R10");
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.6),
+          new SetElevator(()->ElevatorState.L4)
+        ),
+        new FollowChoreoTrajectory("S2R10")
+      ),
+      Commands.waitSeconds(0.2),
+      new SetOuttake(OuttakeState.SCORE)
+    );
   }
 
   public static Command S2R11(){

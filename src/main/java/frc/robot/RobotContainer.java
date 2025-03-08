@@ -211,8 +211,8 @@ public class RobotContainer {
 
     driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-    driverDpadUp.onTrue(CommandFactory.SmartAlgeaIntake());
-    driverDpadDown.onTrue(new SetRoller(RollerState.OUTTAKE));
+    driverDpadDown.onTrue(CommandFactory.SmartAlgeaIntake());
+    driverDpadUp.onTrue(new SetRoller(RollerState.OUTTAKE));
 
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
     driver.b().onTrue(CommandFactory.EjectFunnel());
