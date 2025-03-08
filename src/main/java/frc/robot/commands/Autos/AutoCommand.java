@@ -28,8 +28,8 @@ public class AutoCommand {
 
     private enum EndPoint {
         GENERIC(new AutoCommand[]{}), //use for wait commands, etc. Any paths that can lead into any other path
-        S1(new AutoCommand[]{S1R1()}), //Source areas
-        S2(new AutoCommand[]{S2R9()}),
+        S1(new AutoCommand[]{S1R1(), S1R2()}), //Source areas
+        S2(new AutoCommand[]{S2R9(), S2R10()}),
         R1(new AutoCommand[]{}), //Reef scoring areas
         R2(new AutoCommand[]{}),
         R3(new AutoCommand[]{R3S1(), Wait()}),
@@ -60,6 +60,10 @@ public class AutoCommand {
 
     public Command getCommand(){
         return this.autoCommand;
+    }
+
+    public static AutoCommand S1R2(){
+        return new AutoCommand("S1R2", Autos.S1R2(), EndPoint.R2);
     }
 
     public static void clearContinuations(){
