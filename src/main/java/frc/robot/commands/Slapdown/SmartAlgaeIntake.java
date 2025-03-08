@@ -37,7 +37,7 @@ public class SmartAlgaeIntake extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    s_Slapdown.brakeRoller();
+    // s_Slapdown.setRollerSpeed(-0.1);
   }
 
 

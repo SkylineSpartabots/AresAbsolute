@@ -94,6 +94,8 @@ public class CommandFactory {
                 new SmartAlgaeIntake()
             ),
             new SetPivot(PivotState.HOLD)
+        
+            
         );
     }
 
