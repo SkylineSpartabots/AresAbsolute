@@ -32,8 +32,10 @@ import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.CommandFactory;
+import frc.robot.commands.RunClimb;
 import frc.robot.commands.Autos.FFChoreoTrajectory;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
+import frc.robot.commands.Elevator.AdjustElevator;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.EndEffector.SetOuttake;
@@ -194,10 +196,10 @@ public class RobotContainer {
 
     
     
-    driver.back().onTrue(new InstantCommand(() -> climb.setSpeed(0.1)));
-    driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
-    driver.start().onTrue(new InstantCommand(() -> climb.setSpeed(-0.35)));
-    driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
+    driver.back().whileTrue(new RunClimb(0.25));
+    // driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
+    driver.start().whileTrue(new RunClimb(-0.4));
+    // driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     driverLeftTrigger.whileTrue(new SlowDrive());
     driverRightTrigger.onTrue(CommandFactory.ShootCoral());
 
@@ -233,10 +235,10 @@ public class RobotContainer {
     operator.y().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
-    operatorDpadUp.onTrue(new InstantCommand(()-> elevator.setSpeed(0.05)));
-    operatorDpadUp.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
-    operatorDpadDown.onTrue(new InstantCommand(()-> elevator.setSpeed(-0.05)));
-    operatorDpadDown.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
+    operatorDpadUp.whileTrue(new AdjustElevator(0.05));
+    // operatorDpadUp.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
+    operatorDpadDown.whileTrue(new AdjustElevator(-0.05));
+    // operatorDpadDown.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
 
     operator.a().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0, 0, new Rotation2d(0)))));
 
@@ -253,7 +255,6 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
-    if(DriverStation.getAlliance().get() == Alliance.Red)
 
     configureBindings();
   }

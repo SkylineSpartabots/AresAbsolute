@@ -146,7 +146,7 @@ public class AutomatedCoralAction extends Command {
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
         // other actions
-        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && s_EndEffector.getBeamResult()) {
+        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
                 new SetElevator(elevatorGoalPos).schedule();
                 elevatorGoalPos = Double.POSITIVE_INFINITY;
         }

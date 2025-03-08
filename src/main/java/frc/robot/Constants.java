@@ -34,6 +34,7 @@ import com.pathplanner.lib.config.RobotConfig;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static boolean usingVision = false;
 
     public static double MaxSpeed = 5; //can be lowered during testing
     public static double MaxAcceleration = 4; //can be lowered during testing

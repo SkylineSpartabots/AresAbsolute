@@ -208,6 +208,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    Constants.usingVision = false;
     m_autonomousCommand = new SequentialCommandGroup();
     new ZeroSlapdown().schedule();
     if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
@@ -230,6 +231,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    Constants.usingVision = true;
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

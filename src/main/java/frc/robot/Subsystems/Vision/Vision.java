@@ -251,19 +251,22 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // updateAprilTagResults();
-
-        // try {
+        updateAprilTagResults();
+        if(Constants.usingVision){
+            try {
         
-        // if(!FLcameraResult.isEmpty()) 
-        //     updateVision(FLcameraResult, FLcameraToRobotTransform);
+                if(!FLcameraResult.isEmpty()) 
+                    updateVision(FLcameraResult, FLcameraToRobotTransform);
+        
+                if(!FRcameraResult.isEmpty()) 
+                    updateVision(FRcameraResult, FRcameraToRobotTransform);
+        
+                if(!elevatorCameraResult.isEmpty()) 
+                    updateVision(elevatorCameraResult, elevatorCameraToRobotTransform);
+        
+                } catch (Exception e){}
+        }
 
-        // if(!FRcameraResult.isEmpty()) 
-        //     updateVision(FRcameraResult, FRcameraToRobotTransform);
-
-        // if(!elevatorCameraResult.isEmpty()) 
-        //     updateVision(elevatorCameraResult, elevatorCameraToRobotTransform);
-
-        // } catch (Exception e){}
+        
     }
 }
