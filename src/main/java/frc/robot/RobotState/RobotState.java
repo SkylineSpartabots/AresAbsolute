@@ -22,6 +22,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.SensorUtils;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
@@ -79,7 +80,14 @@ public class RobotState { //will estimate pose with odometry and correct drift w
     public RobotState() {
 
         reefPoleLevel = ElevatorState.L1; //default state (needs to be L1 - L4)
-        reefPole = ReefPoleScoringPoses.POLE_1A;
+        
+        if(Constants.alliance.equals(Alliance.Blue)) {
+            reefPole = ReefPoleScoringPoses.POLE_1A;
+            System.out.println("blued");
+        } else {
+            reefPole = ReefPoleScoringPoses.POLE_A;
+            System.out.println("redede");
+        }
 
         drivetrain = CommandSwerveDrivetrain.getInstance();
         pigeon = drivetrain.getPigeon2();  //getting the already constructed pigeon in swerve
@@ -144,18 +152,55 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
     public void navigateReefPoleUp() {
         System.out.println("up ordinal" + reefPole.ordinal());
-        System.out.println(!(reefPole.ordinal() == 0));
-        if(!(reefPole.ordinal() == 11)) {
-        SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
-        reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
+
+        if(Constants.alliance == Alliance.Blue) {
+
+            if(reefPole.ordinal() == 11) {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_1A.name());
+                reefPole = ReefPoleScoringPoses.POLE_1A;
+            } else {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
+                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
+            }
+
+        } else {
+
+            if(reefPole.ordinal() == 23) {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_A.name());
+                reefPole = ReefPoleScoringPoses.POLE_A;
+            } else {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
+                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
+            }
+
         }
+       
+
     }
 
     public void navigateReefPoleDown() {
         System.out.println("down ordinal" + reefPole.ordinal());
-        if(!(reefPole.ordinal() == 0)) {
-        SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
-        reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
+
+        if(Constants.alliance == Alliance.Blue) {
+
+            if(reefPole.ordinal() == 0) {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_1A.name());
+                reefPole = ReefPoleScoringPoses.POLE_1A;
+            } else {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
+                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
+            }
+
+        } else {
+
+            if(reefPole.ordinal() == 12) {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_L.name());
+                reefPole = ReefPoleScoringPoses.POLE_L;
+            } else {
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
+                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
+            }
+
         }
     }
 
@@ -182,8 +227,6 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         return reefPoleLevel;
     }
     
-
-
 
         public synchronized <T extends Interpolable<T>> T getInterpolatedValue(InterpolatingTreeMap<IDouble, T> map, Double timestamp, T identity) {
 

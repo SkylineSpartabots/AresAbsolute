@@ -125,6 +125,11 @@ public class Robot extends LoggedRobot {
 
       // Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
       
+      if(DriverStation.getAlliance() != null){
+        Constants.alliance = DriverStation.getAlliance().get();
+        System.out.println("allience: " + Constants.alliance.name());
+      }
+
       //Init all subsystems
       Vision.getInstance();
       Elevator.getInstance();
@@ -155,9 +160,7 @@ public class Robot extends LoggedRobot {
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
     // AutoCommand.loadAutos(); TODO ethan fix this
     SmartDashboard.putData("first auto", firstAuto);
-    if(DriverStation.getAlliance() != null){
-      Constants.alliance = DriverStation.getAlliance().get();
-    }
+
     
 
     if(isReal()){
@@ -170,7 +173,7 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     //start the logger here
-    SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_1A.name());
+    SmartDashboard.putString("Selected Pole", "First pole");
     SmartDashboard.putString("Selected Pole Level", ElevatorState.L1.name());
   }
 

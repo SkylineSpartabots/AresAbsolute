@@ -270,15 +270,9 @@ public final class Constants {
         public static final class ReefConstants{
 
             public enum ReefPoleScoringPoses {
-
                 //Now 4.2545 cm offset (to the right)
-                //Or 0.042545 m
-                
-                //Offsets:
-                // dx = +- 0.0368450508 m
-                // dy = +- 0.0212725 m
 
-                //BLUE SIDE
+                //blue
                 POLE_1A(new Pose2d(3.23, 4.232, Rotation2d.fromRadians(0.0))), //
                 POLE_2B(new Pose2d(3.23, 3.90219, Rotation2d.fromRadians(0.0))), //
                 POLE_3C(new Pose2d(3.667, 3.019, Rotation2d.fromRadians(1.0472))), //
@@ -289,8 +283,22 @@ public final class Constants {
                 POLE_8H(new Pose2d(5.774, 4.147, Rotation2d.fromRadians(3.14159))), //
                 POLE_9I(new Pose2d(5.311, 5.036, Rotation2d.fromRadians(-2.0944))), // 
                 POLE_10J(new Pose2d(4.989, 5.2215, Rotation2d.fromRadians(-2.0944))), //
-                POLE_11K(new Pose2d(4.026, 5.241, Rotation2d.fromRadians(-1.0472))), 
-                POLE_12L(new Pose2d(3.74, 5.076, Rotation2d.fromRadians(-1.0472))); 
+                POLE_11K(new Pose2d(4.026, 5.241, Rotation2d.fromRadians(-1.0472))), //
+                POLE_12L(new Pose2d(3.74, 5.076, Rotation2d.fromRadians(-1.0472))),  //
+
+                //red
+                POLE_A(new Pose2d(5.774 + 8.57, 3.818, Rotation2d.fromRadians(3.14159))), //
+                POLE_B(new Pose2d(5.774 + 8.57, 4.147, Rotation2d.fromRadians(3.14159))), //
+                POLE_C(new Pose2d(5.311 + 8.57, 5.036, Rotation2d.fromRadians(-2.0944))), // 
+                POLE_D(new Pose2d(4.989 + 8.57, 5.2215, Rotation2d.fromRadians(-2.0944))), //
+                POLE_E(new Pose2d(4.026 + 8.57, 5.241, Rotation2d.fromRadians(-1.0472))), //
+                POLE_F(new Pose2d(3.74 + 8.57, 5.076, Rotation2d.fromRadians(-1.0472))),  //
+                POLE_G(new Pose2d(3.23 + 8.57, 4.232, Rotation2d.fromRadians(0.0))), //
+                POLE_H(new Pose2d(3.23 + 8.57, 3.90219, Rotation2d.fromRadians(0.0))), //
+                POLE_I(new Pose2d(3.667 + 8.57, 3.019, Rotation2d.fromRadians(1.0472))), //
+                POLE_J(new Pose2d(3.951 + 8.57, 2.854, Rotation2d.fromRadians(1.0472))), //
+                POLE_K(new Pose2d(4.951 + 8.57,2.811, Rotation2d.fromRadians(2.0944))), //
+                POLE_L(new Pose2d(5.235 + 8.57, 2.975, Rotation2d.fromRadians(2.0944))); //
 
                 private final Pose2d waypoints;
 
