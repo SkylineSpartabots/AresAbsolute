@@ -111,7 +111,7 @@ public class RobotContainer {
 
 
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY() * redFlip, -driver.getLeftX() * redFlip, -driver.getRightX() * redFlip) // Drive counterclockwise with negative X (left)
+        drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY(), -driver.getLeftX(), -driver.getRightX()) // Drive counterclockwise with negative X (left)
     ));
 
     //SysID
@@ -206,8 +206,8 @@ public class RobotContainer {
 
     
     
-    // driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
-    // driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
+    driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
+    driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
 
     driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
@@ -254,7 +254,6 @@ public class RobotContainer {
 
   public RobotContainer() {
     if(DriverStation.getAlliance().get() == Alliance.Red)
-      redFlip = -1;
 
     configureBindings();
   }

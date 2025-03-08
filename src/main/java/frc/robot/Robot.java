@@ -234,6 +234,7 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.cancel();
     }
     new ZeroSlapdown().schedule();
+    Constants.alliance = DriverStation.getAlliance().get();
   }
 
   @Override
