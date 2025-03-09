@@ -46,6 +46,7 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
+import frc.robot.commands.SwerveCommands.AutomatedPoleAlign;
 import frc.robot.commands.SwerveCommands.SlowDrive;
 
 public class RobotContainer {
@@ -220,6 +221,7 @@ public class RobotContainer {
     driver.x().onTrue(CommandFactory.FullCoralIntake());
     driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
 
+    driver.povRight().onTrue(new AutomatedPoleAlign(() -> robotstate.getSelectedReefPole()));
     // driver.b().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
 
@@ -234,7 +236,7 @@ public class RobotContainer {
     operator.back().onTrue(new ZeroSlapdown());
 
     operator.y().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
-    
+
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
     // operatorDpadUp.whileTrue(new AdjustElevator(0.05));

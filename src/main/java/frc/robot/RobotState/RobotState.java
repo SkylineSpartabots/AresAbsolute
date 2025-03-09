@@ -83,10 +83,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         
         if(Constants.alliance.equals(Alliance.Blue)) {
             reefPole = ReefPoleScoringPoses.POLE_1A;
-            System.out.println("blued");
         } else {
             reefPole = ReefPoleScoringPoses.POLE_A;
-            System.out.println("redede");
         }
 
         drivetrain = CommandSwerveDrivetrain.getInstance();
@@ -109,12 +107,11 @@ public class RobotState { //will estimate pose with odometry and correct drift w
             robotOdomVelocity.put(new IDouble(timestamp), OdomVelocity);
             odometryPoses.put(new IDouble(timestamp), new IPose2d(state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation()));
     
-                    // Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
+        // Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
         // Logger.recordOutput("Robot State/ODO velocity", OdomVelocity.toMagnitude());
         // Logger.recordOutput("Kinematics/Swerve/DT velocity", robotVelocityVector());
         // Logger.recordOutput("Kinematics/Swerve/DT angular velocity", robotAngularMagnitude.toDouble());
         // Logger.recordOutput("Kinematics/Swerve/DT acceleration", robotAcceleration.toMagnitude());
-
         }
 
         prevOdomTimestamp = Optional.of(timestamp);
@@ -172,10 +169,7 @@ public class RobotState { //will estimate pose with odometry and correct drift w
                 SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
                 reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
             }
-
         }
-       
-
     }
 
     public void navigateReefPoleDown() {

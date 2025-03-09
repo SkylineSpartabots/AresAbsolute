@@ -26,6 +26,7 @@ import com.ctre.phoenix6.Utils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -161,6 +162,7 @@ public class Vision extends SubsystemBase {
             // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
             return false;
         }
+        
         // for (PhotonTrackedTarget photonTrackedTarget : photonPipelineResult.getTargets()) {
         //     if(photonTrackedTarget.area < VisionLimits.k_areaMinimum) {
         //         SmartDashboard.putString("Multitag updates", "Tag too far");
