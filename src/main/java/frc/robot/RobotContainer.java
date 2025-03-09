@@ -30,17 +30,20 @@ import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown;
+import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.RunClimb;
 import frc.robot.commands.Autos.FFChoreoTrajectory;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
 import frc.robot.commands.Elevator.AdjustElevator;
+import frc.robot.commands.Elevator.ManualElevatorZero;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.EndEffector.SetOuttake;
 import frc.robot.commands.EndEffector.SmartCoralIntake;
 import frc.robot.commands.Funnel.SetFunnel;
+import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
 import frc.robot.commands.SwerveCommands.SlowDrive;
@@ -230,7 +233,7 @@ public class RobotContainer {
 
 
     // ----------====# Operator bindings #====----------
-    operator.start().onTrue(new ZeroElevator());
+    operator.start().whileTrue(new ManualElevatorZero());
     operator.back().onTrue(new ZeroSlapdown());
     operator.y().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
@@ -240,7 +243,7 @@ public class RobotContainer {
     operatorDpadDown.whileTrue(new AdjustElevator(-0.05));
     // operatorDpadDown.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
 
-    operator.a().onTrue(new InstantCommand(() -> drivetrain.resetOdo(new Pose2d(0, 0, new Rotation2d(0)))));
+    operator.a().onTrue(new SetPivot(PivotState.HOLD));
 
     // operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     // operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));

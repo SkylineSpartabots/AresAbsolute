@@ -208,17 +208,22 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    Constants.usingVision = false;
-    m_autonomousCommand = new SequentialCommandGroup();
-    new ZeroSlapdown().schedule();
-    if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
+    // Constants.usingVision = false;
+    // m_autonomousCommand = new SequentialCommandGroup();
+    new SequentialCommandGroup(
+      new ZeroSlapdown(),
+      new ZeroElevator(),
+      new ForwardAuto()
+    ).schedule();
     
-    if(secondSavedChoice != null) m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
-    if(thirdSavedChoice != null) m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
-    // new ForwardAuto().schedule();
+    // if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
+    
+    // if(secondSavedChoice != null) m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
+    // if(thirdSavedChoice != null) m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
+    // if (m_autonomousCommand != null) {
+    //   m_autonomousCommand.schedule();
+    // }
+    
   }
 
   @Override

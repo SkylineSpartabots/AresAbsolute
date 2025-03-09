@@ -81,7 +81,7 @@ public class ForwardAuto extends Command {
     if(timer.hasElapsed(timebeforeextension) && !extended){
       new SequentialCommandGroup(
         new SetElevator(() -> ElevatorState.L4),
-        Commands.waitSeconds(1.6),
+        Commands.waitSeconds(1.7),
         new SetOuttake(OuttakeState.SCORE)
       ).schedule();
       extended = true;

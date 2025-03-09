@@ -184,8 +184,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         if(Constants.alliance == Alliance.Blue) {
 
             if(reefPole.ordinal() == 0) {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_1A.name());
-                reefPole = ReefPoleScoringPoses.POLE_1A;
+                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_12L.name());
+                reefPole = ReefPoleScoringPoses.POLE_12L;
             } else {
                 SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
                 reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
