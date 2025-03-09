@@ -16,7 +16,7 @@ public class SlowDrive extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Constants.MaxSpeed = 1.3;
+    Constants.MaxSpeed = 0.9;
     Constants.MaxAngularRate = 0.8 * Math.PI;
   }
 

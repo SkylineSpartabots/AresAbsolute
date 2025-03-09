@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystems.EndEffector;
+import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
 
@@ -14,10 +15,12 @@ public class SetOuttake extends Command {
   Timer timer = new Timer();
   boolean finished = false;
   OuttakeState state;
+  Elevator elevator;
 
   public SetOuttake(OuttakeState state) {
     s_EndEffector = EndEffector.getInstance();
     addRequirements(s_EndEffector);
+    elevator = Elevator.getInstance();
     this.state = state;
   }
 
@@ -31,7 +34,13 @@ public class SetOuttake extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    s_EndEffector.setOuttakeSpeed(state);
+    
+    if(elevator.getPosition() < (ElevatorState.L3.getEncoderPosition() - 5)) {
+      s_EndEffector.setOuttakeSpeed(0.2);
+    } else {
+      s_EndEffector.setOuttakeSpeed(state);
+    }
+
   }
 
   @Override
