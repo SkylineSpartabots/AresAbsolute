@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -27,7 +28,7 @@ public class ForwardAuto extends Command {
   private CommandSwerveDrivetrain dt;
   private DriveControlSystems controlSystems;
   double timebeforeextension = 0.3;
-  double drivetime = 2.4;
+  double drivetime = 8;
 
   boolean extended = false;
 
@@ -51,11 +52,11 @@ public class ForwardAuto extends Command {
     timer.reset();
     timer.start();
     if(alliance == Alliance.Blue){
-      dt.setControl(controlSystems.autoDrive(-1, 0,  0));
+      dt.setControl(controlSystems.autoDrive(-0.8, 0,  0));
     }else {
-      dt.setControl(controlSystems.autoDrive(1, 0,  0));
+      dt.setControl(controlSystems.autoDrive(0.8, 0,  0));
     }
- 
+    SmartDashboard.putBoolean("auto running", true);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     
   }
@@ -67,25 +68,18 @@ public class ForwardAuto extends Command {
     if(alliance == Alliance.Blue){
       dt.setControl(
       controlSystems.autoDrive(
-        -1, 0, thetaController.calculate(currPose.getRotation().getRadians(), Math.PI)
+        -0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), Math.PI)
       )
     );
     }else {
       dt.setControl(
       controlSystems.autoDrive(
-        1, 0, thetaController.calculate(currPose.getRotation().getRadians(), -Math.PI)
+        0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), 0)
       )
     );
     }
     
-    if(timer.hasElapsed(timebeforeextension) && !extended){
-      new SequentialCommandGroup(
-        new SetElevator(() -> ElevatorState.L4),
-        Commands.waitSeconds(1.7),
-        new SetOuttake(OuttakeState.SCORE)
-      ).schedule();
-      extended = true;
-    }
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -96,6 +90,8 @@ public class ForwardAuto extends Command {
     dt.setControl(
       controlSystems.autoDrive(0, 0, 0)
     );
+    new SetOuttake(OuttakeState.SCORE).schedule();
+    SmartDashboard.putBoolean("auto running", false);
   }
 
   // Returns true when the command should end.

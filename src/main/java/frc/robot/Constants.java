@@ -37,7 +37,7 @@ public final class Constants {
     public static boolean usingVision = true;
 
     public static double MaxSpeed = 5; //can be lowered during testing
-    public static double MaxAcceleration = 4; //can be lowered during testing
+    public static double MaxAcceleration = 3; //can be lowered during testing
     public static double MaxAngularRate = 1.3 * Math.PI; // 3/4 of a rotation per second max angular velocity
     public static double MaxAngularVelocity = 2 * Math.PI;
 
@@ -300,7 +300,7 @@ public final class Constants {
                 POLE_J(new Pose2d(3.951 + 8.57, 2.854, Rotation2d.fromRadians(1.0472))), //
                 POLE_K(new Pose2d(4.951 + 8.57,2.811, Rotation2d.fromRadians(2.0944))), //
                 POLE_L(new Pose2d(5.235 + 8.57, 2.975, Rotation2d.fromRadians(2.0944))); //
-
+                
                 private final Pose2d waypoints;
 
                 ReefPoleScoringPoses(Pose2d poses) {

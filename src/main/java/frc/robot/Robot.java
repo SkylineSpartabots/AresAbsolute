@@ -23,6 +23,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import au.grapplerobotics.CanBridge;
 import choreo.Choreo;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,6 +53,7 @@ import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
+import frc.robot.commands.SwerveCommands.AutomatedCoralAction;
 
 public class Robot extends LoggedRobot {
   private SequentialCommandGroup m_autonomousCommand;
@@ -210,11 +212,21 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     // Constants.usingVision = false;
     // m_autonomousCommand = new SequentialCommandGroup();
+    // new SequentialCommandGroup(
+    //   new ZeroSlapdown(),
+    //   new ZeroElevator(),
+    //   new ForwardAuto()
+    // ).schedule();
+
+
     new SequentialCommandGroup(
       new ZeroSlapdown(),
       new ZeroElevator(),
+      new SetElevator(()->ElevatorState.L4),
       new ForwardAuto()
+
     ).schedule();
+    
     
     // if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
     

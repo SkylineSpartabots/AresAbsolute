@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public class AutomatedCoralAction extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            3.75, 0.09, 0.006, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
+            3.75, 0.09, 0.006, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             3, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
@@ -73,10 +73,6 @@ public class AutomatedCoralAction extends Command {
     public void initialize() {
         elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
         targetPose = targetReefPole.get().getPose();
-
-        if(alliance.equals(Alliance.Red)) {
-                targetPose.plus(new Transform2d(8.57,0, new Rotation2d()));
-        }
 
         Pose2d currentPose = s_Swerve.getPose();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
