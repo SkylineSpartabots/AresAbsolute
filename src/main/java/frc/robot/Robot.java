@@ -128,7 +128,6 @@ public class Robot extends LoggedRobot {
       
       if(DriverStation.getAlliance() != null){
         Constants.alliance = DriverStation.getAlliance().get();
-        System.out.println("allience: " + Constants.alliance.name());
       }
 
       //Init all subsystems
@@ -209,14 +208,12 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    Constants.usingVision = false;
     // m_autonomousCommand = new SequentialCommandGroup();
     // new SequentialCommandGroup(
     //   new ZeroSlapdown(),
     //   new ZeroElevator(),
     //   new ForwardAuto()
     // ).schedule();
-
 
     new SequentialCommandGroup(
       new ZeroSlapdown(),
@@ -247,7 +244,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    Constants.usingVision = true;
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

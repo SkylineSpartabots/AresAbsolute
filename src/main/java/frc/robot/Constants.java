@@ -34,11 +34,10 @@ import com.pathplanner.lib.config.RobotConfig;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static boolean usingVision = false;
 
-    public static double MaxSpeed = 5; //can be lowered during testing
+    public static double MaxSpeed = 6; //can be lowered during testing
     public static double MaxAcceleration = 3; //can be lowered during testing
-    public static double MaxAngularRate = 1.3 * Math.PI; // 3/4 of a rotation per second max angular velocity
+    public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
     public static double MaxAngularVelocity = 2 * Math.PI;
 
     //all these are outdated but we are not using them anymore so its fine tbh
@@ -280,12 +279,12 @@ public final class Constants {
                 POLE_6KL(new Pose2d(3.7057, 5.3828, Rotation2d.fromRadians(-1.0472))), //
 
                 //red
-                POLE_AB(new Pose2d(5.774 + 8.57, 3.818, Rotation2d.fromRadians(3.14159))),
-                POLE_CD(new Pose2d(5.311 + 8.57, 5.036, Rotation2d.fromRadians(-2.0944))), 
-                POLE_EF(new Pose2d(4.026 + 8.57, 5.241, Rotation2d.fromRadians(-1.0472))),
-                POLE_GH(new Pose2d(3.23 + 8.57, 4.232, Rotation2d.fromRadians(0.0))),
-                POLE_IJ(new Pose2d(3.667 + 8.57, 3.019, Rotation2d.fromRadians(1.0472))),
-                POLE_KL(new Pose2d(4.951 + 8.57,2.811, Rotation2d.fromRadians(2.0944)));
+                POLE_GH(new Pose2d(8.57 + 6.0602, 4.0236, Rotation2d.fromRadians(3.14159))),  //
+                POLE_IJ(new Pose2d(8.57 + 5.274,5.3828, Rotation2d.fromRadians(-2.0944))), //
+                POLE_KL(new Pose2d(8.57 + 3.7057, 5.3828, Rotation2d.fromRadians(-1.0472))), //
+                POLE_AB(new Pose2d(8.57 + 2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                POLE_CD(new Pose2d(8.57 + 3.7057, 2.6695, Rotation2d.fromRadians(1.0472))), //
+                POLE_EF(new Pose2d(8.57 + 5.27304,2.6685, Rotation2d.fromRadians(2.0944))); //
 
                 private final Pose2d waypoints;
 
