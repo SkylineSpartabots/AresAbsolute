@@ -31,7 +31,8 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.SwerveCommands.AutomatedCoralAction;
+import frc.robot.commands.SwerveCommands.PoleAlign;
+import frc.robot.commands.SwerveCommands.ReefAlign;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
@@ -159,7 +160,8 @@ public class CommandFactory {
     //Automation commands
     public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new AutomatedCoralAction(level, pole),
+            new ReefAlign(pole),
+            new PoleAlign(level, pole),
             new SetOuttake(level)
         ).raceWith(new CancelableCommand(controller));
     }

@@ -1,17 +1,21 @@
 package frc.robot.commands.SwerveCommands;
 
 import java.awt.Robot;
+import java.util.Vector;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,9 +34,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 /**
  * Drives to a specified pose.
  */
-public class AutomatedAlgaeAction extends Command {
+public class PoleAlign extends Command {
+        
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            3.75, 0.09, 0.006, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
+            2.9, 0.1, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             3, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
@@ -51,11 +56,9 @@ public class AutomatedAlgaeAction extends Command {
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
-    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
+    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 0.5, dealgeaDistanceThreshold = 0.75;
 
-
-
-    public AutomatedAlgaeAction(Supplier<ElevatorState> elevatorLevel, Supplier<ReefPoleScoringPoses> pole) {
+    public PoleAlign(Supplier<ElevatorState> elevatorLevel, Supplier<ReefPoleScoringPoses> pole) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
         this.s_EndEffector = EndEffector.getInstance();
@@ -73,10 +76,6 @@ public class AutomatedAlgaeAction extends Command {
     public void initialize() {
         elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
         targetPose = targetReefPole.get().getPose();
-
-        if(alliance.equals(Alliance.Red)) {
-                targetPose.plus(new Transform2d(8.57,0, new Rotation2d()));
-        }
 
         Pose2d currentPose = s_Swerve.getPose();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
@@ -146,11 +145,8 @@ public class AutomatedAlgaeAction extends Command {
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
         // other actions
-        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < dealgeaDistanceThreshold) {
-                if(elevatorGoalPos <= ElevatorState.L2.getEncoderPosition())
-                        CommandFactory.Dealgaeify(ElevatorState.A1).schedule();
-                else
-                        CommandFactory.Dealgaeify(ElevatorState.A2).schedule();
+        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
+                new SetElevator(elevatorGoalPos).schedule();
                 elevatorGoalPos = Double.POSITIVE_INFINITY;
         }
 

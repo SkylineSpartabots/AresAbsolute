@@ -270,7 +270,35 @@ public final class Constants {
 
         public static final class ReefConstants{
 
-            public enum ReefPoleScoringPoses {
+            public enum ReefSidePositions {
+                //blue 
+                POLE_1AB(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                POLE_2CD(new Pose2d(3.7057, 2.6695, Rotation2d.fromRadians(1.0472))), //
+                POLE_3EF(new Pose2d(5.27304,2.6685, Rotation2d.fromRadians(2.0944))), //
+                POLE_4GH(new Pose2d(6.0602, 4.0236, Rotation2d.fromRadians(3.14159))),  //
+                POLE_5IJ(new Pose2d(5.274,5.3828, Rotation2d.fromRadians(-2.0944))), //
+                POLE_6KL(new Pose2d(3.7057, 5.3828, Rotation2d.fromRadians(-1.0472))), //
+
+                //red
+                POLE_AB(new Pose2d(5.774 + 8.57, 3.818, Rotation2d.fromRadians(3.14159))),
+                POLE_CD(new Pose2d(5.311 + 8.57, 5.036, Rotation2d.fromRadians(-2.0944))), 
+                POLE_EF(new Pose2d(4.026 + 8.57, 5.241, Rotation2d.fromRadians(-1.0472))),
+                POLE_GH(new Pose2d(3.23 + 8.57, 4.232, Rotation2d.fromRadians(0.0))),
+                POLE_IJ(new Pose2d(3.667 + 8.57, 3.019, Rotation2d.fromRadians(1.0472))),
+                POLE_KL(new Pose2d(4.951 + 8.57,2.811, Rotation2d.fromRadians(2.0944)));
+
+                private final Pose2d waypoints;
+
+                ReefSidePositions(Pose2d poses) {
+                    this.waypoints = poses;
+                }
+
+                public Pose2d getPose() {
+                    return this.waypoints;
+                }
+            }
+
+            public enum     ReefPoleScoringPoses {
                 //Now 4.2545 cm offset (to the right)
 
                 //blue

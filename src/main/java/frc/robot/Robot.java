@@ -53,7 +53,6 @@ import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
-import frc.robot.commands.SwerveCommands.AutomatedPoleAlign;
 
 public class Robot extends LoggedRobot {
   private SequentialCommandGroup m_autonomousCommand;
