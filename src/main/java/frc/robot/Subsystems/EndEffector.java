@@ -59,7 +59,7 @@ public class EndEffector extends SubsystemBase {
   public enum OuttakeState{
     HOLD(0),
     INDEX(-0.2),
-    SCORE(-0.3);
+    SCORE(-0.2);
     private double speed;
     private OuttakeState(double speed){
       this.speed = speed;

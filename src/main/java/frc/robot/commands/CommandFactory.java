@@ -59,9 +59,9 @@ public class CommandFactory {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
                 new SetElevator(() -> state),
-                new InstantCommand(()->ee.setAlgaeSpeed(0.4))
+                new InstantCommand(()->ee.setAlgaeSpeed(0.5))
             ),
-            Commands.waitSeconds(0.25),
+            Commands.waitSeconds(0.6),
             new InstantCommand(()->ee.setAlgaeSpeed(0))
         );
     }

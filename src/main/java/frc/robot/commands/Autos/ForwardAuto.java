@@ -6,6 +6,7 @@ package frc.robot.commands.Autos;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -51,11 +52,10 @@ public class ForwardAuto extends Command {
     alliance = DriverStation.getAlliance().get();
     timer.reset();
     timer.start();
-    if(alliance == Alliance.Blue){
-      dt.setControl(controlSystems.autoDrive(-0.8, 0,  0));
-    }else {
-      dt.setControl(controlSystems.autoDrive(0.8, 0,  0));
-    }
+    dt.resetPose(new Pose2d(0, 0, new Rotation2d(0)));
+    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, 0));
+    
+    
     SmartDashboard.putBoolean("auto running", true);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     
@@ -65,22 +65,11 @@ public class ForwardAuto extends Command {
   @Override
   public void execute() {
     Pose2d currPose = dt.getPose();
-    if(alliance == Alliance.Blue){
-      dt.setControl(
-      controlSystems.autoDrive(
-        -0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), Math.PI)
-      )
-    );
-    }else {
-      dt.setControl(
-      controlSystems.autoDrive(
-        0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), 0)
-      )
-    );
+    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), 0)));
     }
     
     
-  }
+  
 
   // Called once the command ends or is interrupted.
   @Override

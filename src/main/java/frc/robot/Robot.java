@@ -210,7 +210,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    // Constants.usingVision = false;
+    Constants.usingVision = false;
     // m_autonomousCommand = new SequentialCommandGroup();
     // new SequentialCommandGroup(
     //   new ZeroSlapdown(),
@@ -253,7 +253,7 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.cancel();
     }
     new ZeroSlapdown().schedule();
-    Constants.alliance = DriverStation.getAlliance().get();
+    // Constants.alliance = DriverStation.getAlliance().get();
   }
 
   @Override
