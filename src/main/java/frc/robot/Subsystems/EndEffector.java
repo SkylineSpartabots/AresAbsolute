@@ -22,10 +22,11 @@ public class EndEffector extends SubsystemBase {
 
     private static EndEffector instance;
 
-
-    private TalonFX coral;
-    private TalonFX algae;
-    private LaserCan laserCAN;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.OuttakeProfiler;
+import frc.robot.Constants;
 
     public static EndEffector getInstance() {
         if (instance == null) instance = new EndEffector();
@@ -37,10 +38,10 @@ public class EndEffector extends SubsystemBase {
         algae = new TalonFX(Constants.HardwarePorts.algaeID);
         laserCAN = new LaserCan(Constants.HardwarePorts.laserID);
 
-        config(coral, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
-        config(algae, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
-        configLaser(laserCAN);
-    }
+  private DigitalInput beam;
+  private TalonFX coral;
+  private TalonFX algae;
+  private LaserCan aligner;
 
     public enum OuttakeState { // not used
         OFF(0),
@@ -48,50 +49,33 @@ public class EndEffector extends SubsystemBase {
         OUTTAKE(0.6);
         private double speed;
 
-        private OuttakeState(double speed) {
-            this.speed = speed;
-        }
+  public EndEffector() {
+    beam = new DigitalInput(Constants.HardwarePorts.endEffectorBeamPort);
+    coral = new TalonFX(Constants.HardwarePorts.outtakeID);
+    aligner = new LaserCan(Constants.HardwarePorts.laserID);
+    configLaser();
+    // config(roller, InvertedValue.Clockwise_Positive, NeutralModeValue.Brake);
+    algae = new TalonFX(Constants.HardwarePorts.algaeID);
+    config(coral, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
+    config(algae, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
 
         public double getSpeed() {
             return speed;
         }
     }
 
-    private void configLaser(LaserCan aligner) {
-        try {
-            aligner.setRangingMode(RangingMode.SHORT);
-            aligner.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_20MS);
-            aligner.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4));
-
-            Logger.recordOutput("EndEffector/LaserCAN/Working", true);
-        } catch (ConfigurationFailedException e) {
-            Logger.recordOutput("EndEffector/LaserCAN/Working", false);
-        }
+  public enum OuttakeState{
+    HOLD(0),
+    INDEX(-0.2),
+    SCORE(-0.2);
+    private double speed;
+    private OuttakeState(double speed){
+      this.speed = speed;
     }
-
-
-    private void config(TalonFX motor, NeutralModeValue neutralMode, InvertedValue direction) {
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
-        config.MotorOutput.Inverted = direction;
-
-        currentLimitsConfigs.SupplyCurrentLimit = Constants.CurrentLimits.outtakeContinuousCurrentLimit;
-        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
-        currentLimitsConfigs.StatorCurrentLimit = Constants.CurrentLimits.outtakePeakCurrentLimit;
-        currentLimitsConfigs.StatorCurrentLimitEnable = true;
-        config.MotorOutput.NeutralMode = neutralMode;
-
-        config.CurrentLimits = currentLimitsConfigs;
-
-        motor.optimizeBusUtilization();
-
-//    motor.getSupplyCurrent().setUpdateFrequency(Constants.dtMs);
-//    motor.getStatorCurrent().setUpdateFrequency(Constants.dtMs);
-        motor.getVelocity().setUpdateFrequency(Constants.dtMs);
-
-        motor.getConfigurator().apply(config);
-
+    private double getSpeed() { //
+      return speed;
     }
+  }
 
     public void setCoralSpeed(double speed) {
         coral.set(speed);
@@ -105,70 +89,49 @@ public class EndEffector extends SubsystemBase {
         coral.set(0);
     }
 
-    public void stopAlgae() {
-        algae.set(0);
-    }
+  private void config(TalonFX motor, NeutralModeValue neutralMode, InvertedValue direction){
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    config.MotorOutput.Inverted = direction;
+    
+    CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
+    config.MotorOutput.NeutralMode = neutralMode;
+    
+    currentLimitsConfigs.SupplyCurrentLimit = Constants.CurrentLimits.outtakeContinuousCurrentLimit;
+    currentLimitsConfigs.SupplyCurrentLimitEnable = true;
+    currentLimitsConfigs.StatorCurrentLimit = Constants.CurrentLimits.outtakePeakCurrentLimit;
+    currentLimitsConfigs.StatorCurrentLimitEnable = true;
+    motor.optimizeBusUtilization();
+    // config.CurrentLimits = currentLimitsConfigs;
+    // // motor.optimizeBusUtilization();
+  }
+  
+  public boolean getBeamResult(){
+    return beam.get();
+  }
 
     public void stop() {
         stopCoral();
         stopAlgae();
     }
 
-    @AutoLogOutput(key = "EndEffector/Coral/Velocity")
-    public double getCoralVelocity() {
-        return algae.getVelocity().getValueAsDouble();
-    }
+  public void setOuttakeSpeed(OuttakeState state){
+    coral.set(state.getSpeed());
+  }
+
+  public void setAlgaeSpeed(double speed){
+    algae.set(speed);
+  }
+ 
+  //returns tangential speed of rollers
+  // public double getOutputSpeed(){
+  //   return roller.getVelocity().getValueAsDouble()*Math.PI*Constants.OuttakePhysicalConstants.outtakeRollerRadius;
+  // }
+    
 
     @AutoLogOutput(key = "EndEffector/Coral/Position")
     public double getCoralPosition() {
         return coral.getPosition().getValueAsDouble();
     }
-
-    @AutoLogOutput(key = "EndEffector/Algae/Velocity")
-    public double getAlgaeVelocity() {
-        return algae.getVelocity().getValueAsDouble();
-    }
-
-    /**
-     * Returns the speed of the game piece being ejected by the roller.
-     *
-     * @return the tangential speed of the outtake roller.
-     */
-    @AutoLogOutput(key = "EndEffector/TangentialSpeed")
-    public double getTangentialSpeed() {
-        return coral.getVelocity().getValueAsDouble() * Math.PI * Constants.OuttakePhysicalConstants.outtakeRollerRadius;
-    }
-
-
-    @AutoLogOutput(key = "EndEffector/LaserCAN/Measurement")
-    public Measurement getLaserMeasurement() {
-        return laserCAN.getMeasurement();
-    }
-
-    @AutoLogOutput(key = "EndEffector/LaserCAN/Distance")
-    public double getLaserDistance(){
-        return getLaserMeasurement().distance_mm;
-    }
-
-    @AutoLogOutput(key = "EndEffector/LaserCAN/CoralDetected")
-    public boolean isCoralDetected() {
-        return getLaserMeasurement().distance_mm < Constants.LaserCANConstants.discardDistanceMM;
-    }
-
-    @Override
-    public void periodic() {
-        Measurement measurement = getLaserMeasurement();
-        if (measurement != null) {
-            if (measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-                Logger.recordOutput("EndEffector/LaserCAN/Measurement", measurement.distance_mm);
-                Logger.recordOutput("EndEffector/LaserCAN/Working", true);
-                
-            } else {
-                Logger.recordOutput("EndEffector/LaserCAN/Working", false);
-                Logger.recordOutput("EndEffector/LaserCAN/Measurement", -1);
-                Logger.recordOutput("EndEffector/LaserCAN/Status", measurement.status);
-            }
-        }
-        
-    }
+    SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
+  }
 }

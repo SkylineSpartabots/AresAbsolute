@@ -50,17 +50,16 @@ public class Slapdown extends SubsystemBase {
 //    torqueOutput = new TorqueCurrentFOC(0);
     }
 
-    private void configPivot(TalonFX motor, NeutralModeValue neutralMode, InvertedValue direction) {
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs();
-        config.MotorOutput.Inverted = direction;
-        currentLimitsConfigs.SupplyCurrentLimit = Constants.CurrentLimits.slapdownContinuousCurrentLimit;
-        currentLimitsConfigs.SupplyCurrentLimitEnable = true;
-        currentLimitsConfigs.StatorCurrentLimit = Constants.CurrentLimits.slapdownPeakCurrentLimit;
-        currentLimitsConfigs.StatorCurrentLimitEnable = true;
-        config.MotorOutput.NeutralMode = neutralMode;
+  public Slapdown() {
+    leader = new TalonFX(Constants.HardwarePorts.slapdownLeaderID);
+    follower = new TalonFX(Constants.HardwarePorts.slapdownFollowerID);
+    roller = new TalonFX(Constants.HardwarePorts.slapdownRollerID);
 
-        config.CurrentLimits = currentLimitsConfigs;
+    // follower.setControl(new Follower(Constants.HardwarePorts.slapdownLeaderID, true));
+
+    configPivot(leader, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
+    configPivot(follower, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
+    configRoller(roller, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
 
         Slot1Configs position = new Slot1Configs();
         position.GravityType = GravityTypeValue.Arm_Cosine;
@@ -74,9 +73,11 @@ public class Slapdown extends SubsystemBase {
         motor.getPosition().setUpdateFrequency(Constants.dtMs);
         motor.getSupplyCurrent().setUpdateFrequency(Constants.dtMs);
 
-        motor.getConfigurator().apply(config);
-        motor.getConfigurator().apply(position);
-    }
+    Slot1Configs position = new Slot1Configs();
+    position.GravityType = GravityTypeValue.Arm_Cosine;
+    position.kP = 9.3;
+    position.kI = 3.2;
+    position.kG = 1.5;  
 
     private void configRoller(TalonFX motor, NeutralModeValue neutralMode, InvertedValue direction) {
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -88,7 +89,15 @@ public class Slapdown extends SubsystemBase {
         currentLimitsConfigs.StatorCurrentLimitEnable = true;
         config.MotorOutput.NeutralMode = neutralMode;
 
-        config.CurrentLimits = currentLimitsConfigs;
+
+    motor.getConfigurator().apply(config);
+    motor.getConfigurator().apply(position);
+    motor.getStatorCurrent().setUpdateFrequency(50);
+    motor.getPosition().setUpdateFrequency(50);
+    motor.getSupplyCurrent().setUpdateFrequency(50);
+    motor.getVelocity().setUpdateFrequency(50);
+    motor.optimizeBusUtilization(); 
+  }
 
         Slot1Configs position = new Slot1Configs();
         position.kP = 2.4;
@@ -100,16 +109,27 @@ public class Slapdown extends SubsystemBase {
         motor.getStatorCurrent().setUpdateFrequency(Constants.dtMs);
         motor.getVelocity().setUpdateFrequency(Constants.dtMs);
 
-        motor.getConfigurator().apply(config);
-        motor.getConfigurator().apply(position);
-    }
+    Slot1Configs position = new Slot1Configs();
+    position.kP = 8.2;
+    position.kG = 1.7;
+    position.kD = 0.5;
+    motor.getSupplyCurrent().setUpdateFrequency(50);
+    motor.getStatorCurrent().setUpdateFrequency(50);
+    motor.getVelocity().setUpdateFrequency(50);
 
     public enum PivotState {
         UP(0),
         HOLD(0.06), //TODO Test if we actually need this or if we can just use UP state instead - ie UP doesnt push the ball out
         DOWN(0.8125);
 
-        private double position;
+    motor.getConfigurator().apply(config);
+    motor.getConfigurator().apply(position);
+  }
+;
+  public enum PivotState{
+    UP(0.04),
+    HOLD(0.06),
+    DOWN(0.8125);
 
         private PivotState(double position) {
             this.position = position;
@@ -161,10 +181,10 @@ public class Slapdown extends SubsystemBase {
         return roller.getVelocity().getValueAsDouble();
     }
 
-    @AutoLogOutput(key = "Slapdown/Roller/SupplyCurrent")
-    public double getRollerSupplyCurrent() {
-        return roller.getSupplyCurrent().getValueAsDouble();
-    }
+  public void stopPivot(){
+    leader.set(0);
+    follower.set(0);
+  }
 
     @AutoLogOutput(key = "Slapdown/Roller/StatorCurrent")
     public double getRollerStatorCurrent() {
@@ -183,39 +203,64 @@ public class Slapdown extends SubsystemBase {
         );
     }
 
-    /**
-     * Break Pivot at the specified state. Use Position Voltage to maintain state
-     *
-     * @param state State to maintain.
-     */
-    public void brakePivot(PivotState state) {
-        leader.setControl(
-                new PositionVoltage(state.getPosition())
-                        .withLimitForwardMotion(true)
-                        .withEnableFOC(true)
-                        .withSlot(1)
-        );
-    }
+  public double getPivotVelocity(){
+    return leader.getVelocity().getValueAsDouble();
+  }
 
-    public void setPivotSpeed(double speed) {
-        leader.set(speed);
-    }
+  public void brakePivot(){
+    leader.setControl(
+      new PositionVoltage(leader.getPosition().getValueAsDouble())
+      .withLimitForwardMotion(true)
+      .withEnableFOC(true)
+      .withSlot(1)
+      );
+      follower.setControl(
+      new PositionVoltage(leader.getPosition().getValueAsDouble())
+      .withLimitForwardMotion(true)
+      .withEnableFOC(true)
+      .withSlot(1)
+      );
+  }
 
-    public void zeroPivotPosition() {
-        leader.setPosition(0);
-    }
+  public void brakePivot(PivotState state){
+    leader.setControl(
+      new PositionVoltage(state.getPosition())
+      .withLimitForwardMotion(true)
+      .withEnableFOC(true)
+      .withSlot(1)
+      );
+      follower.setControl(
+      new PositionVoltage(state.getPosition())
+      .withLimitForwardMotion(true)
+      .withEnableFOC(true)
+      .withSlot(1)
+      );
+      
+  }
 
-    public void setPivotVoltage(double voltage) {
-        leader.setControl(new VoltageOut(voltage));
-    }
+  public void setPivotSpeed(double speed){
+    leader.set(speed);
+    follower.set(speed);
+  }
 
-    public void stopPivot() {
-        leader.set(0);
-    }
+  public void setPivotPosition(PivotState state){
+    leader.setControl(new PositionVoltage(state.getPosition()).withSlot(1));
+    follower.setControl(new PositionVoltage(state.getPosition()).withSlot(1));
+  }
 
-    public void stopRoller() {
-        roller.set(0);
-    }
+  public double getSupplyCurrent(){
+    return roller.getSupplyCurrent().getValueAsDouble();
+  }
+  
+  public void resetPivotPosition(){
+    leader.setPosition(0);
+    follower.setPosition(0);
+  }
+
+  public void setPivotVoltage(double voltage){
+    leader.setControl(new VoltageOut(voltage));
+    follower.setControl(new VoltageOut(voltage));
+  }
 
     public void stop() {
         stopPivot();

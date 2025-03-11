@@ -9,12 +9,20 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Funnel extends SubsystemBase {
-    private static Funnel instance;
+  /** Creates a new Funnel. */
+  private static Funnel instance;
+  
+  private TalonFX roller;
+  private DigitalInput beam;
+  
+  private FunnelState state;
 
     private TalonFX roller;
 
@@ -27,18 +35,13 @@ public class Funnel extends SubsystemBase {
         return instance;
     }
 
-    public enum FunnelState {
-        INTAKE(0.5),
-        OFF(0);
-        private double speed;
-
-        private FunnelState(double speed) {
-            this.speed = speed;
-        }
-
-        private double getSpeed() {
-            return speed;
-        }
+  public enum FunnelState{
+    INTAKING(0.254),
+    EJECT(-0.3),
+    OFF(0);
+    private double rollerSpeed;
+    private FunnelState(double rollerSpeed){
+      this.rollerSpeed = rollerSpeed;
     }
 
 
@@ -50,8 +53,11 @@ public class Funnel extends SubsystemBase {
     public void configMotor(InvertedValue direction, NeutralModeValue neutralMode) {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        config.MotorOutput.NeutralMode = neutralMode;
-        config.MotorOutput.Inverted = direction;
+  public Funnel() {
+    beam = new DigitalInput(Constants.HardwarePorts.funnelBeamPort);
+    roller = new TalonFX(Constants.HardwarePorts.funnelID);
+    configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
+  }
 
         roller.optimizeBusUtilization();
         roller.getVelocity().setUpdateFrequency(Constants.dtMs);
@@ -73,7 +79,18 @@ public class Funnel extends SubsystemBase {
         return roller.getVelocity().getValueAsDouble();
     }
 
-    @Override
-    public void periodic() {
-    }
+  public boolean getBeamResult(){
+    return beam.get();
+  }
+
+  public void setState(FunnelState desiredState){
+    state = desiredState;
+    roller.set(state.getRollerSpeed());
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("funnel beam", getBeamResult());
+  }
 }
