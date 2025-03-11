@@ -5,87 +5,85 @@
 package frc.robot.commands.CommandFactory;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Subsystems.Slapdown.PivotState;
-import frc.robot.Constants.FieldConstants.ReefConstants;
 import frc.robot.Subsystems.Elevator;
+import frc.robot.Subsystems.EndEffector;
+import frc.robot.Subsystems.Funnel;
+import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.Elevator.ElevatorState;
-import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.CancelableCommand;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
-import frc.robot.commands.Elevator.AltSetElevator;
-import frc.robot.commands.Pivot.SetSlapdownPivot;
-import frc.robot.commands.Pivot.SmartIntake;
+import frc.robot.commands.Elevator.SetElevator;
+import frc.robot.commands.Elevator.ZeroElevator;
+import frc.robot.commands.Funnel.SetFunnelState;
+import frc.robot.commands.Funnel.SmartFunnel;
+import frc.robot.commands.Slapdown.Pivot.SetPivotState;
+import frc.robot.commands.Slapdown.Roller.SmartRoller;
+import frc.robot.commands.Slapdown.Pivot.ZeroPivot;
 import frc.robot.commands.SwerveCommands.DriveToPose;
-import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.Constants.FieldConstants.ReefConstants.SourceNumber;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefNumber;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
-import frc.robot.RobotState.RobotState;
 
-/** Add your docs here. */
 public class CommandFactory {
 
-    //add all mechanism off functions as they are tested; currently only pivot
     public static Command OffEverything() {
         return new ParallelCommandGroup(
-            new SetSlapdownPivot(PivotState.UP),
-            new InstantCommand(()-> Slapdown.getInstance().setRollerSpeed(0))
+                new InstantCommand(() -> Slapdown.getInstance().stop()), // Stop roller and pivot motors
+                new InstantCommand(() -> Elevator.getInstance().stop()), // Stop elevator motors
+                new SetFunnelState(Funnel.FunnelState.OFF), // Stop funnel motor
+                new InstantCommand(() -> EndEffector.getInstance().stop()) // stop algae and coral motors
+                // TODO add climb stop when implemented
+
+        );
+    }
+
+    public static Command ZeroAll() {
+        return new ParallelCommandGroup(
+                new ZeroElevator(),
+                new ZeroPivot() // Do we need to zero pivot, i really dont wanna have to make certain that it stays up at start of match
         );
     }
 
     public static Command autoCommand() {
         return new ParallelCommandGroup(
-            new FollowChoreoTrajectory("1meter")
+                new FollowChoreoTrajectory("1meter")
         );
     }
 
-    public static Command Lift() {
-       return new ParallelCommandGroup(
-                new SetSlapdownPivot(PivotState.UP),
-                new InstantCommand(()-> Slapdown.getInstance().brakeRoller())
-            );
-    }
-
-    public static Command smartAlgeaIntake() {
+    public static Command SmartAlgaeIntake() {
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                new SetSlapdownPivot(PivotState.DOWN),
-                new SmartIntake()
-            ),
-            new SetSlapdownPivot(PivotState.HOLD)
+                new ParallelCommandGroup(
+                        new SetPivotState(PivotState.DOWN),
+                        new SmartRoller()
+                ),
+                new SetPivotState(PivotState.HOLD) // see if we can use UP instead of HOLD
         );
-            
+
     }
 
-    public static Command algeaOuttake() {
-        return new SequentialCommandGroup(
-            new InstantCommand()
-         );
-     }
-
-    public static Command AutoScoreCoral(ElevatorState level, ReefPoleSide side, CommandXboxController controller){
+    public static Command SmartCoralIntake() {
         return new ParallelCommandGroup(
-            new AltSetElevator(level),
-            new DriveToPose(side)
+                new SmartFunnel(),
+                new SetElevator(ElevatorState.SOURCE)
+        );
+    }
+
+    public static Command AutoScoreCoral(ElevatorState level, ReefPoleSide side, CommandXboxController controller) {
+        return new ParallelCommandGroup(
+                new SetElevator(level),
+                new DriveToPose(side)
         ).raceWith(new CancelableCommand(controller));
     }
 
-    public static Command Outtake() {
-        return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
-    }
-
-
-    public static Command AutoScorefromSource(ReefPoleLevel level, SourceNumber source, ReefNumber reef){
+    public static Command AutoScorefromSource(ReefPoleLevel level, SourceNumber source, ReefNumber reef) {
         return new ParallelCommandGroup(
-            
+
         );
     }
 }

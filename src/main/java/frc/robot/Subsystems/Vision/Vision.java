@@ -1,14 +1,10 @@
 package frc.robot.Subsystems.Vision;    
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
 
 // import org.littletonrobotics.junction.Logger;
-import org.opencv.photo.Photo;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -19,8 +15,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -32,7 +26,6 @@ import frc.lib.MultiTagOutput;
 import frc.lib.VisionOutput;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants.VisionLimits;
-import frc.robot.LimelightHelpers;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 
@@ -42,7 +35,7 @@ public class Vision extends SubsystemBase {
     private static PhotonCamera FRCamera;
     private static PhotonCamera elevatorCamera;
 
-    private static List<PhotonPipelineResult> cameraResult;
+    private static List<PhotonPipelineResult> cameraResults;
 
     private double lastProcessedTimestamp = -1;
 
@@ -50,11 +43,8 @@ public class Vision extends SubsystemBase {
     LimelightSubsystem s_Lime;
     RobotState robotState;
     
-    public double floorDistance;
-
-    private Transform3d cameraToRobotTransform = new Transform3d(
-        //center cam
-        new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-13.5), Units.inchesToMeters(-1.5)),
+    private Transform3d cameraToRobotTransform = new Transform3d( // put in constants
+        new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
         new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0),Units.degreesToRadians(0)));
 
         public static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // This is the field type that will be in PNW events
@@ -86,27 +76,25 @@ public class Vision extends SubsystemBase {
         unreadResults.addAll(elevatorCamera.getAllUnreadResults());
         
         if (!unreadResults.isEmpty()){
-            cameraResult = unreadResults; // assuming first index is the latest result
+            cameraResults = unreadResults; // assuming first index is the latest result
         }
         // Zero yaw is robot facing red alliance wall - our code should be doing this.
     }
 
-    public boolean validateTarget(PhotonPipelineResult camera) {
-        PhotonTrackedTarget target = camera.getBestTarget();
+    public boolean validateTarget(PhotonPipelineResult result) {
+        PhotonTrackedTarget target = result.getBestTarget();
         
-        if(camera.hasTargets()
-        && target.getFiducialId() >= 1
-        && target.getFiducialId() <= Constants.VisionConstants.aprilTagMax
-        && target.getPoseAmbiguity() < 0.2 && target.getPoseAmbiguity() > -1)
-            return true;
 
-        return false;
+        return result.hasTargets()
+                && target.getFiducialId() >= 1
+                && target.getFiducialId() <= Constants.VisionConstants.aprilTagMax
+                && target.getPoseAmbiguity() < VisionLimits.ambiguityLimit && target.getPoseAmbiguity() > -1;
     }
 
     private List<MultiTagOutput> updateMultiTag() {
         List<MultiTagOutput> multitags = new ArrayList<>();
 
-        for (PhotonPipelineResult photonPipelineResult : cameraResult) {
+        for (PhotonPipelineResult photonPipelineResult : cameraResults) {
             if(photonPipelineResult.getMultiTagResult().isPresent() && multitagChecks(photonPipelineResult.getMultiTagResult().get())) {
                 multitags.add(new MultiTagOutput(photonPipelineResult.getMultiTagResult().get(), photonPipelineResult.getTimestampSeconds(), photonPipelineResult.getBestTarget()));
             }
@@ -117,24 +105,20 @@ public class Vision extends SubsystemBase {
 
     private Boolean multitagChecks(MultiTargetPNPResult multiTagResult) {
 
-        if(multiTagResult.estimatedPose.bestReprojErr > VisionLimits.k_reprojectionLimit) {
-            SmartDashboard.putString("Multitag updates", "high error");
-            // Logger.recordOutput("Vision/MultiTag updates", "high error");
+        if(multiTagResult.estimatedPose.bestReprojErr > VisionLimits.reprojectionLimit) {
+             Logger.recordOutput("Vision/MultiTag updates", "high error");
             return false;
         }
         if(multiTagResult.fiducialIDsUsed.size() < 2 || multiTagResult.fiducialIDsUsed.isEmpty()) {
-            SmartDashboard.putString("Multitag updates", "insufficient ids");
-            // Logger.recordOutput("Vision/MultiTag updates", "insufficient ids");
+             Logger.recordOutput("Vision/MultiTag updates", "insufficient ids");
             return false;
         } 
-        if(multiTagResult.estimatedPose.best.getTranslation().getNorm() < VisionLimits.k_normThreshold) {
-            SmartDashboard.putString("Multitag updates", "norm check failed");
-            // Logger.recordOutput("Vision/MultiTag updates", "norm check failed");
+        if(multiTagResult.estimatedPose.best.getTranslation().getNorm() < VisionLimits.normThreshold) {
+             Logger.recordOutput("Vision/MultiTag updates", "norm check failed");
             return false;
         } 
-        if(multiTagResult.estimatedPose.ambiguity > VisionLimits.k_ambiguityLimit) {
-            SmartDashboard.putString("Multitag updates", "high ambiguity");
-            // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
+        if(multiTagResult.estimatedPose.ambiguity > VisionLimits.ambiguityLimit) {
+             Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
             return false;
         }
 
@@ -174,7 +158,7 @@ public class Vision extends SubsystemBase {
                 robotState.visionUpdate(newPose);    
             }
         } else { // if no multitags, use other tag data
-            for (PhotonPipelineResult photonPipelineResult : cameraResult) {
+            for (PhotonPipelineResult photonPipelineResult : cameraResults) {
                 if(validateTarget(photonPipelineResult)) {
                     VisionOutput newPose = new VisionOutput(photonPoseEstimator.update(photonPipelineResult).get());
                     robotState.visionUpdate(newPose); 

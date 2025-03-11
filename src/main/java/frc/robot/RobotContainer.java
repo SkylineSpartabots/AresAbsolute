@@ -5,57 +5,29 @@
 package frc.robot;
 
 
-import static frc.robot.Constants.LimelightConstants.roll;
-
-import java.time.Instant;
-
-import org.opencv.core.Point;
-
 // import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
+        import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+        import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
-import frc.robot.commands.CancelableCommand;
-import frc.robot.commands.VisionKalmanTest;
-import frc.robot.commands.indexCoral;
-import frc.robot.commands.outtakeCoral;
-import frc.robot.commands.Autos.FollowChoreoTrajectory;
-import frc.robot.commands.CommandFactory.CommandFactory;
-import frc.robot.commands.CommandFactory.CommandFactory.*;
-import frc.robot.commands.Elevator.AltSetElevator;
-import frc.robot.commands.Elevator.ElevatorTest;
 import frc.robot.commands.Elevator.SetElevator;
-import frc.robot.commands.Elevator.ZeroElevator;
-import frc.robot.commands.Funnel.SetFunnel;
-import frc.robot.commands.Pivot.SetSlapdownPivot;
-import frc.robot.commands.Pivot.SmartIntake;
-import frc.robot.commands.Slapdown.setRoller;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
-import frc.robot.RobotState.RobotState;
-import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.commands.EndEffector.IndexCoral;
+import frc.robot.commands.EndEffector.OuttakeCoral;
+        import frc.robot.commands.CommandFactory.CommandFactory;
+        import frc.robot.commands.Funnel.SetFunnelState;
+import frc.robot.commands.Slapdown.Pivot.SetPivotState;
+import frc.robot.commands.Slapdown.Roller.SetRollerState;
+        import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.Funnel.FunnelState;
-import frc.robot.Subsystems.Slapdown.PivotState;
-import frc.robot.Subsystems.Slapdown.RollerState;
+        import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Slapdown;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class RobotContainer {
 
@@ -129,8 +101,6 @@ public class RobotContainer {
     //bindings
     
     driver.leftTrigger().onTrue(CommandFactory.OffEverything());
-    // driver.a().onTrue(new InstantCommand(()->intake.testUnbrake()));
-    // driver.b().onTrue(new InstantCommand(()->intake.testBrake()));
 
     // driver.a().onTrue(new SetIntakePivot(PivotState.UP));
     // driver.b().onTrue(new SetIntakePivot(PivotState.DOWN));
@@ -145,7 +115,7 @@ public class RobotContainer {
     // driverDpadDown.onTrue(new InstantCommand(()->intake.brakeRoller()));
     
     // driver.y().onTrue(new InstantCommand(() -> intake.stopPivot()));
-    // driver.start().onTrue(new InstantCommand(()-> intake.resetPivotPosition()));
+    // driver.start().onTrue(new InstantCommand(()-> intake.zeroPivotPosition()));
     // driver.b().onTrue(new InstantCommand(()-> endEffector.setAlgaeSpeed(-0.5)));
     // driver.a().onTrue(new InstantCommand(()-> endEffector.setAlgaeSpeed(0)));
     // driver.x().onTrue(new InstantCommand(()-> endEffector.setAlgaeSpeed(0.5)));
@@ -161,7 +131,7 @@ public class RobotContainer {
     // driver.x().onTrue(new InstantCommand(()-> elevator.setTorqueOutput(0)));
     // driver.x().onTrue(new InstantCommand(()-> elevator.setSpeed(0.1)));
     // driver.b().onTrue(new InstantCommand(()-> elevator.setSpeed(-0.1)));
-    // driver.a().onTrue(new InstantCommand(()-> elevator.stop()));
+    // driver.a().onTrue(new InstantCommand(()-> elevator.stopPivot()));
 
 
     // driver.x().onTrue(new FollowChoreoTrajectory("halfmeter"));
@@ -172,8 +142,8 @@ public class RobotContainer {
 
 
 
-    // driver.a().onTrue(new SetSlapdownPivot(PivotState.UP));
-    // driver.b().onTrue(new SetSlapdownPivot(PivotState.DOWN));
+     driver.a().onTrue(new SetPivotState(Slapdown.PivotState.UP));
+     driver.b().onTrue(new SetPivotState(Slapdown.PivotState.DOWN));
 
 
     // driver.a().onTrue(CommandFactory.AutoScoreCoral(reefPoleLevel, ReefPoleSide.LEFT, driver));
@@ -183,7 +153,7 @@ public class RobotContainer {
 
     // driver.x().onTrue(CommandFactory.AutoScoreCoral(reefPoleLevel, ReefPoleSide.LEFT, driver));
     // driver.b().onTrue(CommandFactory.AutoScoreCoral(reefPoleLevel, ReefPoleSide.RIGHT, driver));
-    // driver.povDown().onTrue(CommandFactory.smartAlgeaIntake());
+    // driver.povDown().onTrue(CommandFactory.SmartAlgaeIntake());
     // operatorLeftBumper.onTrue(new InstantCommand(()-> operatorPoleLevel = operatorPoleLevel.raiseLevel()));
 
     // final binds (not really)
@@ -193,23 +163,24 @@ public class RobotContainer {
     // driver.leftBumper().onTrue(new InstantCommand(() -> reefPoleLevel = reefPoleLevel.decreaseLevel()));
 
     // driver.a().onTrue(new AltSetElevator(reefPoleLevel));
-    driver.x().onTrue(new SetFunnel(FunnelState.OFF));
-    driver.b().onTrue(new SetFunnel(FunnelState.INTAKING));
-    driver.a().onTrue(new outtakeCoral());
-    driver.y().onTrue(new indexCoral());
-    driverStart.onTrue(new InstantCommand(()-> intake.resetPivotPosition()));
+    driver.leftTrigger().onTrue(new SetFunnelState(FunnelState.OFF));
+    driver.leftBumper().onTrue(new SetFunnelState(FunnelState.INTAKE));
+    driver.rightTrigger().onTrue(new OuttakeCoral());
+    driver.rightBumper().onTrue(new IndexCoral());
+    driverRightTrigger.onTrue(CommandFactory.ZeroAll());
+    //wtf is this why r there two righttriggers
 
-    // driver.povCenter().onTrue(new ZeroElevator());
-    // driver.povDown().onTrue(new AltSetElevator(ElevatorState.L4));
-    // driver.povRight().onTrue(new AltSetElevator(ElevatorState.L1));
-    // driver.povUp().onTrue(new AltSetElevator(ElevatorState.L3));
-    // driver.povLeft().onTrue(new AltSetElevator(ElevatorState.L2));
+    driver.povDown().onTrue(new SetElevator(ElevatorState.L1));
+    driver.povRight().onTrue(new SetElevator(ElevatorState.L2));
+    driver.povLeft().onTrue(new SetElevator(ElevatorState.L3));
+    driver.povUp().onTrue(new SetElevator(ElevatorState.L4));
+
+    
 
 
-
-    driver.povUp().onTrue(CommandFactory.smartAlgeaIntake());
-    driver.povLeft().onTrue(new setRoller(RollerState.OUTTAKE));
-    driver.povRight().onTrue(new setRoller(RollerState.OFF));
+//    driver.a().onTrue(CommandFactory.SmartAlgaeIntake());
+//    driver.b().onTrue(new SetRollerState(RollerState.OUTTAKE));
+//    driver.x().onTrue(new SetRollerState(RollerState.OFF));
 
   }
 
