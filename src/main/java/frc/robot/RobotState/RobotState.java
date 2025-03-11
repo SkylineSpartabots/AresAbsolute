@@ -103,13 +103,14 @@ public class RobotState { //will estimate pose with odometry and correct drift w
             IChassisSpeeds OdomVelocity =
             getInterpolatedValue(odometryPoses, prevOdomTimestamp.get(), IPose2d.identity())
             .getVelocityBetween(new IPose2d(state.Pose), timestamp - prevOdomTimestamp.get());
+
             
             robotOdomVelocity.put(new IDouble(timestamp), OdomVelocity);
             odometryPoses.put(new IDouble(timestamp), new IPose2d(state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation()));
     
         // Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
-        // Logger.recordOutput("Robot State/ODO velocity", OdomVelocity.toMagnitude());
-        // Logger.recordOutput("Kinematics/Swerve/DT velocity", robotVelocityVector());
+        Logger.recordOutput("Robot State/ODO velocity", OdomVelocity.toMagnitude());
+        Logger.recordOutput("Kinematics/Swerve/DT velocity", robotVelocityVector());
         // Logger.recordOutput("Kinematics/Swerve/DT angular velocity", robotAngularMagnitude.toDouble());
         // Logger.recordOutput("Kinematics/Swerve/DT acceleration", robotAcceleration.toMagnitude());
         }

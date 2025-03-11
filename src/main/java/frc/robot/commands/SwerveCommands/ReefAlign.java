@@ -72,9 +72,9 @@ public class ReefAlign extends Command {
         this.robotState = RobotState.getInstance();
 
         if(Constants.alliance == Alliance.Blue)
-                this.targetReefSide = ReefSidePositions.values()[(int) Math.ceil(pole.get().ordinal() / 2)];
+                this.targetReefSide = ReefSidePositions.values()[(int)(pole.get().ordinal() / 2)];
         else 
-                this.targetReefSide = ReefSidePositions.values()[6 + (int) Math.ceil(pole.get().ordinal() / 2)];
+                this.targetReefSide = ReefSidePositions.values()[5 + (int)(pole.get().ordinal() / 2)];
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
