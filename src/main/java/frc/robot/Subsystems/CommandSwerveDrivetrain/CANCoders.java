@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class CANCoders extends SubsystemBase {
   private CANcoder frontLeftEncoder;
@@ -34,10 +35,9 @@ public class CANCoders extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    SmartDashboard.putNumber("front left cancoder position", frontLeftEncoder.getAbsolutePosition().getValueAsDouble());
-    SmartDashboard.putNumber("front right cancoder position", frontRightEncoder.getAbsolutePosition().getValueAsDouble());
-    SmartDashboard.putNumber("back left cancoder position", backLeftEncoder.getAbsolutePosition().getValueAsDouble());
-    SmartDashboard.putNumber("back right cancoder position", backRightEncoder.getAbsolutePosition().getValueAsDouble());
+    Logger.recordOutput("FL CANCoder Position", frontLeftEncoder.getAbsolutePosition().getValueAsDouble());
+    Logger.recordOutput("FR CANCoder Position", frontRightEncoder.getAbsolutePosition().getValueAsDouble());
+    Logger.recordOutput("BL CANCoder Position", backLeftEncoder.getAbsolutePosition().getValueAsDouble());
+    Logger.recordOutput("BR CANCoder Position", backRightEncoder.getAbsolutePosition().getValueAsDouble());
   }
 }

@@ -17,29 +17,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants;
+import org.littletonrobotics.junction.Logger;
 
 import static edu.wpi.first.units.Units.Radians;
 
 import javax.xml.stream.events.DTD;
 
-// import org.littletonrobotics.junction.Logger;
-
-// import frc.robot.RobotState.RobotState;
-
 public class DriveControlSystems {
 
     private boolean slipControlOn = false;
     private boolean headingControl = false;
-    private boolean shooterMode = false;
     private boolean aligning = false;
     private double lastHeading = 0;
-    private boolean homing = false;
 
-    private PIDController homingController = new PIDController(0, 0, 0);
 
     // Can tune
     private double deadbandFactor = 0.8; // higher is more linear joystick controls
-
 
     CommandSwerveDrivetrain drivetrain;
     // RobotState robotState;
@@ -60,15 +53,6 @@ public class DriveControlSystems {
         drivetrain = CommandSwerveDrivetrain.getInstance();
     }
 
-    private double homingL1(){
-        double homingSetpoint = 0; //TODO: finish calculation for homing angle setpoint
-        double RX = homingController.calculate(drivetrain.getHeading(), homingSetpoint);
-        return RX; 
-    }
-
-
-    
-
     //interface with modules
     public SwerveModule getModule(int index) {
       return drivetrain.getModule(index);
@@ -80,13 +64,10 @@ public class DriveControlSystems {
         driverLY = scaledDeadBand(driverLY) * Constants.MaxSpeed;
         driverRX = scaledDeadBand(driverRX) * Constants.MaxAngularRate;
 
+        Logger.recordOutput("DriveControlSystems/Requested X Vel", driverLX);
+        Logger.recordOutput("DriveControlSystems/Requested Y Vel", driverLY);
 
-        SmartDashboard.putNumber("requested velocity x", driverLX);
-        SmartDashboard.putNumber("requested velocity y", driverLY);
 
-        if(homing == true){
-            driverRX = homingL1();
-        }
 
         return new SwerveRequest.FieldCentric().withVelocityX(driverLY).withVelocityY(-driverLX).withRotationalRate(driverRX);
         // return new SwerveRequest.FieldCentricFacingAngle()

@@ -4,78 +4,85 @@
 
 package frc.robot.commands.Elevator;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleLevel;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import org.littletonrobotics.junction.Logger;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SetElevator extends Command {
-  private Elevator s_Elevator;
-  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0.17, 0.112, 0);
-  private PIDController controller = new PIDController(0.0000000001, 0, 0.2);
-  private double goalPosition;
-  private TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration));
-  private Timer timer;
-  private State initialState;
-  private State setpoint;
-  private State goal;
-  private double error;
+    private TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(Constants.elevatorMaxVelocity, Constants.elevatorMaxAcceleration);
+    private double goalPosition;
+    private double error;
+    private double pidoutput;
+    private State initialState;
+    private State setpoint;
+    private Timer timer;
+    private TrapezoidProfile profile = new TrapezoidProfile(constraints);
+    private PIDController controller = new PIDController(1.5, 0.5, 0.04);
+    private Elevator s_Elevator;
 
-  public SetElevator(ElevatorState state) {
-    this(state.getEncoderPosition());
-  }
+    public SetElevator(ElevatorState state) {
+        this(state.getEncoderPosition());
+        Logger.recordOutput("Elevator/TargetState", state.toString());
+    }
 
-  public SetElevator(ReefPoleLevel state) {
-    this(ElevatorState.values()[state.ordinal() + 1].getEncoderPosition()); //ReefPoleLevel is doesint include ground
-  }
+    public SetElevator(double goalPosition) {
+        this.goalPosition = goalPosition;
+        timer = new Timer();
 
-  public SetElevator(double goalPosition){
-    this.goalPosition = goalPosition;
-    timer = new Timer();
-    goal = new State(goalPosition, 0.0);
-    s_Elevator = Elevator.getInstance();
-    addRequirements(s_Elevator);
-  }
+        s_Elevator = Elevator.getInstance();
+        addRequirements(s_Elevator);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    timer.restart();
-    initialState = new State(s_Elevator.getPosition(), s_Elevator.getVelocity());
-  }
+    @Override
+    public void initialize() {
+        timer.restart();
+        controller.disableContinuousInput();
+        initialState = new State(s_Elevator.getPosition(), s_Elevator.getVelocity());
+        
+        
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    setpoint = profile.calculate(timer.get(), initialState, goal);
-    s_Elevator.setVoltage(feedforward.calculate(setpoint.velocity)); // used to tune feedforward
-    // s_Elevator.setVoltage(controller.calculate(s_Elevator.getPosition(), setpoint.position) + feedforward.calculate(setpoint.velocity));
-    SmartDashboard.putNumber("elevator follower voltage", s_Elevator.getFollowerVoltage());
-    error = Math.abs(s_Elevator.getPosition() - setpoint.position);
-    // System.out.println(s_Elevator.getFollowerVoltage());
-    System.out.println("current setpoint error " + error);
-  }
+    @Override
+    public void execute() {
+        setpoint = profile.calculate(timer.get(), initialState, new State(goalPosition, 0));
+        pidoutput = controller.calculate(s_Elevator.getPosition(), setpoint.position);
+        s_Elevator.setVoltage(pidoutput); // used to tune feedforward
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    s_Elevator.stop();
-    System.out.println("eta: " +  profile.totalTime());
-    System.out.println("actual time " + timer.get());
-  }
+        error = s_Elevator.getPosition() - setpoint.position;
+        Logger.recordOutput("Elevator/Error", error);
+        Logger.recordOutput("Elevator/PIDOutputVoltage", pidoutput);
+        Logger.recordOutput("Elevator/TrapezoidSetpoint", setpoint.position);
+        Logger.recordOutput("Elevator/PIDSetpoint", controller.getSetpoint());
+        Logger.recordOutput("Elevator/Running", true);
+        
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return profile.isFinished(timer.get()) || Math.abs(s_Elevator.getPosition() - goalPosition) < 0.5;
-  }
+    @Override
+    public void end(boolean interrupted) {
+        timer.stop();
+        s_Elevator.stop();
+                
+        System.out.println("Elevator Stats");
+        System.out.println("Total Time: " + timer.get());
+        System.out.println("Expected Time: " + profile.totalTime());
+        System.out.println("Final Error: " + (Math.abs(goalPosition - s_Elevator.getPosition())));
+
+Logger.recordOutput("Elevator/TotalTime", Math.round(timer.get() * 10.0) / 10.0);
+Logger.recordOutput("Elevator/ExpectedTime", Math.round(profile.totalTime() * 10.0) / 10.0);
+        Logger.recordOutput("Elevator/FinalError", Math.abs(goalPosition - s_Elevator.getPosition()));
+
+        System.out.println("SetElevator Ended");
+        Logger.recordOutput("Elevator/Running", false);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.1;
+    }
 }

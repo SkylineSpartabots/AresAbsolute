@@ -11,61 +11,69 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Funnel extends SubsystemBase {
-  /** Creates a new Funnel. */
-  private static Funnel instance;
-  
-  private TalonFX roller;
-  
-  private FunnelState state;
+    private static Funnel instance;
 
-  public static Funnel getInstance(){
-    if(instance == null){
-      instance = new Funnel();
+    private TalonFX roller;
+
+    private FunnelState state;
+
+    public static Funnel getInstance() {
+        if (instance == null) {
+            instance = new Funnel();
+        }
+        return instance;
     }
-    return instance;
-  }
 
-  public enum FunnelState{
-    INTAKING(0.5),
-    OFF(0);
-    private double rollerSpeed;
-    private FunnelState(double rollerSpeed){
-      this.rollerSpeed = rollerSpeed;
+    public enum FunnelState {
+        INTAKE(0.5),
+        OFF(0);
+        private double speed;
+
+        private FunnelState(double speed) {
+            this.speed = speed;
+        }
+
+        private double getSpeed() {
+            return speed;
+        }
     }
-    private double getRollerSpeed(){
-      return rollerSpeed;
+
+
+    public Funnel() {
+        roller = new TalonFX(Constants.HardwarePorts.funnelID, "mechbus");
+        configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
     }
-  }
 
+    public void configMotor(InvertedValue direction, NeutralModeValue neutralMode) {
+        TalonFXConfiguration config = new TalonFXConfiguration();
 
-  public Funnel() {
-    roller = new TalonFX(Constants.HardwarePorts.funnelID, "mechbus");
-    configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
-  }
+        config.MotorOutput.NeutralMode = neutralMode;
+        config.MotorOutput.Inverted = direction;
 
-  public void configMotor(InvertedValue direction, NeutralModeValue neutralMode){
-    TalonFXConfiguration config = new TalonFXConfiguration();
+        roller.optimizeBusUtilization();
+        roller.getVelocity().setUpdateFrequency(Constants.dtMs);
+    
+        roller.getConfigurator().apply(config);
+    }
 
-    config.MotorOutput.NeutralMode = neutralMode;
-    config.MotorOutput.Inverted = direction;
+    public void setSpeed(double speed) {
+        roller.set(speed);
+    }
 
-    roller.getConfigurator().apply(config);
-    roller.optimizeBusUtilization();
-  }
+    public void setState(FunnelState desiredState) {
+        state = desiredState;
+        roller.set(state.getSpeed());
+    }
 
-  public void setSpeed(double speed){
-    roller.set(speed);
-  }
+    @AutoLogOutput(key = "Funnel/Velocity")
+    public double getVelocity() {
+        return roller.getVelocity().getValueAsDouble();
+    }
 
-  public void setState(FunnelState desiredState){
-    state = desiredState;
-    roller.set(state.getRollerSpeed());
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    @Override
+    public void periodic() {
+    }
 }
