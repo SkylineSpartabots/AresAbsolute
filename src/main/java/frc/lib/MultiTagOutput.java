@@ -1,21 +1,23 @@
 package frc.lib;
 
-import java.util.List;
-
 import org.photonvision.proto.Photon;
 import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class MultiTagOutput {
-    private MultiTargetPNPResult multitag;
-    private PhotonTrackedTarget bestTarget;
+public class MultiTagOutput extends MultiTargetPNPResult {
     private double timestamp;
+    private PhotonTrackedTarget bestTarget;
+    private MultiTargetPNPResult multitag;
 
     public MultiTagOutput(MultiTargetPNPResult multitag, double timestamp, PhotonTrackedTarget bestTarget) {
-        this.multitag = multitag;
         this.timestamp = timestamp;
         this.bestTarget = bestTarget;
+    }
+
+    public MultiTagOutput(MultiTagOutput multiTagOutput, PhotonPipelineResult pipelineResult) {
+        this.timestamp = pipelineResult.getTimestampSeconds();
+        this.bestTarget = pipelineResult.getBestTarget();
     }
 
     public double getTimestamp() {

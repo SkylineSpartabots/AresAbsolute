@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.interpolation.Interpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -65,48 +64,12 @@ public class DriveControlSystems {
         driverLY = scaledDeadBand(driverLY) * Constants.MaxSpeed;
         driverRX = scaledDeadBand(driverRX) * Constants.MaxAngularRate;
 
-        if(Constants.alliance == Alliance.Red){
-            driverLY = driverLY * -1;
-            driverLX = driverLX * -1;
-        }
+        Logger.recordOutput("DriveControlSystems/Requested X Vel", driverLX);
+        Logger.recordOutput("DriveControlSystems/Requested Y Vel", driverLY);
 
 
-        SmartDashboard.putNumber("requested velocity x", driverLX);
-        SmartDashboard.putNumber("requested velocity y", driverLY);
 
-
-        return new SwerveRequest.FieldCentric()
-        .withVelocityX(driverLY)
-        .withVelocityY(driverLX)
-        .withRotationalRate(driverRX);
-        // return new SwerveRequest.FieldCentricFacingAngle()
-        // .withVelocityX(driverLY)
-        // .withVelocityY(-driverLX)
-        // .withTargetRateFeedforward(driverRX)
-        // .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance)
-        // .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.Velocity)
-        // .withSteerRequestType(com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo)
-        // .withDesaturateWheelSpeeds(true);
-    }
-
-    public SwerveRequest robotCentricDrive(double xVel, double yVel, double rot){
-        SmartDashboard.putNumber("requested velocity x", xVel);
-        SmartDashboard.putNumber("requested velocity y", yVel);
-
-        
-
-        return new SwerveRequest.RobotCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(rot);
-    }
-    public SwerveRequest autoDrive(double xVel, double yVel, double rot){
-        
-
-
-        SmartDashboard.putNumber("requested velocity x", xVel);
-        SmartDashboard.putNumber("requested velocity y", yVel);
-
-        
-
-        return new SwerveRequest.FieldCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(rot);
+        return new SwerveRequest.FieldCentric().withVelocityX(driverLY).withVelocityY(-driverLX).withRotationalRate(driverRX);
         // return new SwerveRequest.FieldCentricFacingAngle()
         // .withVelocityX(driverLY)
         // .withVelocityY(-driverLX)

@@ -27,10 +27,10 @@ public class CANCoders extends SubsystemBase {
   }
 
   public CANCoders() {
-    frontLeftEncoder = new CANcoder(3, "drivetrain");
-    frontRightEncoder = new CANcoder(4, "drivetrain");
-    backLeftEncoder = new CANcoder(5, "drivetrain");
-    backRightEncoder = new CANcoder(6, "drivetrain");
+    frontLeftEncoder = new CANcoder(3);
+    frontRightEncoder = new CANcoder(4);
+    backLeftEncoder = new CANcoder(5);
+    backRightEncoder = new CANcoder(6);
   }
 
   @Override

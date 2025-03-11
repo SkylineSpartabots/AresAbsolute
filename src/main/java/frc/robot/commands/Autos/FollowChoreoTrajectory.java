@@ -14,7 +14,6 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,15 +30,13 @@ public class FollowChoreoTrajectory extends Command {
   private Timer timer;
   private DriveControlSystems controlSystems;
   private RobotState robotState;
-  private PIDController xController = new PIDController(3.6, 0, 0.02);
-  private PIDController yController = new PIDController(3.6, 0, 0.02);
-  private PIDController thetaController = new PIDController(1.4, 0, 0.02);
+  private PIDController xController = new PIDController(1.1, 0, 0);
+  private PIDController yController = new PIDController(1.1, 0, 0);
+  private PIDController thetaController = new PIDController(0, 0, 0);
 
   public FollowChoreoTrajectory(String name) {
     if (Choreo.loadTrajectory(name).isPresent()) {
       trajectory = Choreo.loadTrajectory(name).get();
-    } else{
-      System.out.println("AUTO BROKEN");
     }
     s_Swerve = CommandSwerveDrivetrain.getInstance();
     alliance = DriverStation.getAlliance();
@@ -58,7 +55,6 @@ public class FollowChoreoTrajectory extends Command {
       startPose = trajectory.getInitialPose(alliance.get() == DriverStation.Alliance.Red);
       s_Swerve.resetOdo(startPose.get());
     }
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
     
     
   }
@@ -77,23 +73,17 @@ public class FollowChoreoTrajectory extends Command {
   public void end(boolean interrupted) {
     System.out.println("final time: " + timer.get());
     System.out.println("expected time: " + trajectory.getTotalTime());
-    s_Swerve.setControl(controlSystems.autoDrive(0, 0, 0));
-    timer.stop();
-    Pose2d pose = s_Swerve.getPose();
-    Optional<Pose2d> goal = trajectory.getFinalPose(alliance.get() == DriverStation.Alliance.Red);
-    System.out.println("x error: " + (pose.getX() - goal.get().getX()));
-    System.out.println("y error: " + (pose.getY() - goal.get().getY()));
-    System.out.println("rot error: " + (pose.getRotation().getDegrees() - goal.get().getRotation().getDegrees()));
+
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return trajectory != null ? timer.hasElapsed(trajectory.getTotalTime()+ 0.2) : true;
+    return trajectory != null ? timer.get() >= trajectory.getTotalTime() : true;
   }
 
   private void followAutoTrajectory(SwerveSample sample){
-        Pose2d currPose = s_Swerve.getPose();
+        Pose2d currPose = robotState.getCurrentPose2d();
 
         System.out.println("forward velocity: " + sample.vx);
         
@@ -108,17 +98,14 @@ public class FollowChoreoTrajectory extends Command {
     //   )
     // );
 
-       s_Swerve.setControl(
-        controlSystems.autoDrive(
-          sample.vx + xController.calculate(currPose.getX(), sample.x),
-          sample.vy + yController.calculate(currPose.getY(), sample.y),
-          sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
-        )
-       );
-       System.out.println("x error: " + (currPose.getX() - sample.x));
-       System.out.println("y error: " + (currPose.getY() - sample.y));
-       System.out.println("rot error: " + Units.radiansToDegrees((currPose.getRotation().getRadians() - sample.heading)));
-    
+      //  s_Swerve.setControl(
+      //   // controlSystems.autoDrive(
+      //   //   sample.vx + xController.calculate(currPose.getX(), sample.x),
+      //   //   sample.vy + yController.calculate(currPose.getY(), sample.y),
+      //   //   sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
+      //   // )
+      //  )
+       System.out.println("current error: " + (currPose.getX() - sample.x));
         // .withVelocityX(sample.vx + xController.calculate(currPose.getX(), sample.x))
         // .withVelocityY(sample.vy + yController.calculate(currPose.getY(), sample.y))
         // .withRotationalRate(sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading))

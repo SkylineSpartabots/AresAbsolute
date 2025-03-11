@@ -9,10 +9,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.VisionConstants.AprilTags;
-import frc.robot.RobotState.RobotState;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -30,18 +26,16 @@ import com.pathplanner.lib.config.RobotConfig;
  */
 public final class Constants {
 
+    public static double intakePivotCurrentThreshold = 70;
     public static double MaxSpeed = 6; //can be lowered during testing
-    public static double MaxAcceleration = 3; //can be lowered during testing
+    public static double MaxAcceleration = 4; //can be lowered during testing
     public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
-    public static double MaxAngularVelocity = 2 * Math.PI;
-
-    //all these are outdated but we are not using them anymore so its fine tbh
+    public static double MaxAngularVelocity = 3 * Math.PI;
     public static double robotMass = 58.9; //kg
     public static double MOI = 0.14782; //sum of kg * m^2 to center of rotation
     public static double CoF = 1; // coefficient of friction TODO get better one
     public static double wheelRadiusInches = 1.9125; //inches
 
-    public static double intakePivotCurrentThreshold = 70;
 
     public static DCMotor motorConfig = new DCMotor(
             Constants.KrakenConstants.nominalVoltageVolts,
@@ -147,8 +141,6 @@ public final class Constants {
         public static final int elevatorContinuousCurrentLimit = 60;
         public static final int elevatorPeakCurrentLimit = 120;
     }
-    
-    public static Alliance alliance;
 
 
     public static Mode deployMode = Mode.REAL;
@@ -185,9 +177,9 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
+        public static final String FRCamera = "Camera_0";
+        public static final String FLCamera = "Camera_1";
         public static final String elevatorCamera = "Camera_2";
-        public static final String FRCamera = "Camera_1";
-        public static final String FLCamera = "Camera_0";
         public static final int aprilTagMax = 22;
         public static final double aprilTagHeight = 0.122; //bottom of each april tag is 122cm above carpet | unnecessary, we have photonvision's field layout import
         public static final double cameraRollOffset = Units.degreesToRadians(0);
@@ -200,13 +192,10 @@ public final class Constants {
         public static final double centerCameraPitch = Units.degreesToRadians(15);
 
         public static final class VisionLimits {
-        public static final double k_rotationLimit = Math.PI;
-        public static final double k_velocityLimit = 6;
-        public static final double k_reprojectionLimit = 0.3;
-        public static final double k_normThreshold = 0.1;
-        public static final double k_ambiguityLimit = 0.35;
-        public static final double k_areaMinimum = 0.35; //TODO
-        public static final double k_skewLimit = 0.35; //TODO
+            public static final double rotationLimit = Math.PI;
+            public static final double reprojectionLimit = 0.1;
+            public static final double normThreshold = 0.1;
+            public static final double ambiguityLimit = 0.6;
         }
 
         public static final class AprilTags {
@@ -239,8 +228,7 @@ public final class Constants {
 
     public static final class HardwarePorts {
         // motor id
-        public static final int endEffectorBeamPort = 9;
-        public static final int funnelBeamPort = 7;
+        public static final int beamPort = 0;
 
         public static final int outtakeID = 21;
         public static final int algaeID = 22;
@@ -254,8 +242,6 @@ public final class Constants {
         public static final int slapdownFollowerID = 42;
 
         public static final int funnelID = 51;
-
-        public static final int climbID = 61;
     }
 
     //change for next game
@@ -275,77 +261,46 @@ public final class Constants {
             public static final Pose2d BlueCage3 = new Pose2d(0, 0, new Rotation2d(0));
         }
 
-        static double temp = 100;
+        static double temp = 0.25;
 
         public static final class ReefConstants {
 
-            public enum ReefSidePositions {
-                //blue 
-                POLE_1AB(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
-                POLE_2CD(new Pose2d(3.7057, 2.6695, Rotation2d.fromRadians(1.0472))), //
-                POLE_3EF(new Pose2d(5.27304,2.6685, Rotation2d.fromRadians(2.0944))), //
-                POLE_4GH(new Pose2d(6.0602, 4.0236, Rotation2d.fromRadians(3.14159))),  //
-                POLE_5IJ(new Pose2d(5.274,5.3828, Rotation2d.fromRadians(-2.0944))), //
-                POLE_6KL(new Pose2d(3.7057, 5.3828, Rotation2d.fromRadians(-1.0472))), //
+            public enum ReefPoleSide {
 
-                //red
-                POLE_GH(new Pose2d(8.57 + 6.0602, 4.0236, Rotation2d.fromRadians(3.14159))),  //
-                POLE_IJ(new Pose2d(8.57 + 5.274,5.3828, Rotation2d.fromRadians(-2.0944))), //
-                POLE_KL(new Pose2d(8.57 + 3.7057, 5.3828, Rotation2d.fromRadians(-1.0472))), //
-                POLE_AB(new Pose2d(8.57 + 2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
-                POLE_CD(new Pose2d(8.57 + 3.7057, 2.6695, Rotation2d.fromRadians(1.0472))), //
-                POLE_EF(new Pose2d(8.57 + 5.27304,2.6685, Rotation2d.fromRadians(2.0944))); //
+                //BLUE SIDE
+                LEFT(new Pose2d[]{ //these are wrong obvi
+                        new Pose2d(3.61677, 2.5978, Rotation2d.fromRadians(1.0483)), // Point A
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point C
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point E
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point G
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point I
+                        new Pose2d(temp, temp, new Rotation2d(0.0))  // Point K
+                }),
 
-                private final Pose2d waypoints;
+                RIGHT(new Pose2d[]{
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point B
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point D
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point F
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point H
+                        new Pose2d(temp, temp, new Rotation2d(0.0)), // Point J
+                        new Pose2d(temp, temp, new Rotation2d(0.0))  // Point L
+                });
 
-                ReefSidePositions(Pose2d poses) {
+                private final Pose2d[] waypoints;
+
+                ReefPoleSide(Pose2d[] poses) {
                     this.waypoints = poses;
                 }
 
-                public Pose2d getPose() {
-                    return this.waypoints;
-                }
-            }
-
-            public enum     ReefPoleScoringPoses {
-                //Now 4.2545 cm offset (to the right)
-
-                //blue
-                POLE_1A(new Pose2d(3.23, 4.232, Rotation2d.fromRadians(0.0))), //
-                POLE_2B(new Pose2d(3.23, 3.90219, Rotation2d.fromRadians(0.0))), //
-                POLE_3C(new Pose2d(3.667, 3.019, Rotation2d.fromRadians(1.0472))), //
-                POLE_4D(new Pose2d(3.951, 2.854, Rotation2d.fromRadians(1.0472))), //
-                POLE_5E(new Pose2d(4.951,2.811, Rotation2d.fromRadians(2.0944))), //
-                POLE_6F(new Pose2d(5.235, 2.975, Rotation2d.fromRadians(2.0944))), //
-                POLE_7G(new Pose2d(5.774, 3.818, Rotation2d.fromRadians(3.14159))), //
-                POLE_8H(new Pose2d(5.774, 4.147, Rotation2d.fromRadians(3.14159))), //
-                POLE_9I(new Pose2d(5.311, 5.036, Rotation2d.fromRadians(-2.0944))), // 
-                POLE_10J(new Pose2d(4.989, 5.2215, Rotation2d.fromRadians(-2.0944))), //
-                POLE_11K(new Pose2d(4.026, 5.241, Rotation2d.fromRadians(-1.0472))), //
-                POLE_12L(new Pose2d(3.74, 5.076, Rotation2d.fromRadians(-1.0472))),  //
-
-                //red
-                POLE_A(new Pose2d(5.774 + 8.57, 3.818, Rotation2d.fromRadians(3.14159))), //
-                POLE_B(new Pose2d(5.774 + 8.57, 4.147, Rotation2d.fromRadians(3.14159))), //
-                POLE_C(new Pose2d(5.311 + 8.57, 5.036, Rotation2d.fromRadians(-2.0944))), // 
-                POLE_D(new Pose2d(4.989 + 8.57, 5.2215, Rotation2d.fromRadians(-2.0944))), //
-                POLE_E(new Pose2d(4.026 + 8.57, 5.241, Rotation2d.fromRadians(-1.0472))), //
-                POLE_F(new Pose2d(3.74 + 8.57, 5.076, Rotation2d.fromRadians(-1.0472))),  //
-                POLE_G(new Pose2d(3.23 + 8.57, 4.232, Rotation2d.fromRadians(0.0))), //
-                POLE_H(new Pose2d(3.23 + 8.57, 3.90219, Rotation2d.fromRadians(0.0))), //
-                POLE_I(new Pose2d(3.667 + 8.57, 3.019, Rotation2d.fromRadians(1.0472))), //
-                POLE_J(new Pose2d(3.951 + 8.57, 2.854, Rotation2d.fromRadians(1.0472))), //
-                POLE_K(new Pose2d(4.951 + 8.57,2.811, Rotation2d.fromRadians(2.0944))), //
-                POLE_L(new Pose2d(5.235 + 8.57, 2.975, Rotation2d.fromRadians(2.0944))); //
-                
-                private final Pose2d waypoints;
-
-                ReefPoleScoringPoses(Pose2d poses) {
-                    this.waypoints = poses;
+                public Pose2d[] getPoints(ReefPoleSide side) {
+                    return side.waypoints;
                 }
 
-                public Pose2d getPose() {
-                    return this.waypoints;
+                public Pose2d getClosestPoint(Pose2d robotPose) {
+                    return Arrays.stream(this.waypoints)
+                            .min(Comparator.comparingDouble(
+                                    point -> point.getTranslation().getDistance(robotPose.getTranslation())))
+                            .orElse(null);
                 }
             }
 
@@ -358,6 +313,40 @@ public final class Constants {
                     this.name = name;
                 }
             }
+
+            public enum ReefNumber {
+                R1,
+                R2,
+                R3,
+                R4,
+                R5,
+                R6,
+                R7,
+                R8,
+                R9,
+                R10,
+                R11,
+                R12
+            }
+
+
+            public enum ReefPoleLevel { // Unused
+                L1(0.0),
+                L2(0.0),
+                L3(0.0),
+                L4(0.0);
+
+                private final double elevatorLevel;
+
+                ReefPoleLevel(double height) {
+                    this.elevatorLevel = height;
+                }
+
+                public double getElevatorLevel() {
+                    return this.elevatorLevel;
+                }
+            }
+
         }
 
 

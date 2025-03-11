@@ -1,90 +1,63 @@
 package frc.robot.commands.SwerveCommands;
 
 import java.awt.Robot;
-import java.util.Vector;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefSidePositions;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.RobotState.RobotState;
-import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
-import frc.robot.Subsystems.Elevator.ElevatorState;
-import frc.robot.commands.CommandFactory;
-import frc.robot.commands.Elevator.SetElevator;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Drives to a specified pose.
  */
-public class ReefAlign extends Command {
-        
+public class DriveToPose extends Command {
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            3.75, 0.09, 0.003, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            4.5, 0.1, 0.015, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            3, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
-
+            1.25, 0.1, 0.03, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
     private CommandSwerveDrivetrain s_Swerve;
-
-    private ReefSidePositions targetReefSide; 
-
-    private Alliance alliance;
-
     private Pose2d targetPose;
     private RobotState robotState;
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
-    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
+    private double ffMinRadius = 0.2, ffMaxRadius = 1.2;
 
-    public ReefAlign(ReefSidePositions side) {
+    public DriveToPose(Supplier<Pose2d> targetPose) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
-        
-        this.targetReefSide = side;
-
-        alliance = DriverStation.getAlliance().get();
+        this.targetPose = targetPose.get();
 
         addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
     }
-
-    public ReefAlign(Supplier<ReefPoleScoringPoses> pole) {
+    
+    public DriveToPose(ReefPoleSide side) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
 
-        if(Constants.alliance == Alliance.Blue)
-                this.targetReefSide = ReefSidePositions.values()[(int) Math.ceil(pole.get().ordinal() / 2)];
-        else 
-                this.targetReefSide = ReefSidePositions.values()[6 + (int) Math.ceil(pole.get().ordinal() / 2)];
-
         addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+        this.targetPose = side.getClosestPoint(s_Swerve.getPose());
     }
 
     @Override
     public void initialize() {
-        targetPose = targetReefSide.getPose();
-
-        Pose2d currentPose = s_Swerve.getPose();
+        Pose2d currentPose = robotState.getCurrentPose2d();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
                 currentPose.getTranslation().getDistance(targetPose.getTranslation()),
@@ -94,24 +67,20 @@ public class ReefAlign extends Command {
                                 .rotateBy(
                                         targetPose
                                                 .getTranslation()
-                                                .minus(s_Swerve.getPose().getTranslation())
+                                                .minus(robotState.getCurrentPose2d().getTranslation())
                                                 .getAngle()
                                                 .unaryMinus())
                                 .getX())); // Distance between current and target pose
 
-        thetaController.reset(s_Swerve.getHeading(),
+        thetaController.reset(currentPose.getRotation().getRadians(),
                 robotState.getLatestFilteredVelocity().getOmega());
-        
-        thetaController.setTolerance(0.1047); //6 degrees
-        driveController.setTolerance(0.1, 0.1);
                 
-        lastSetpointTranslation = s_Swerve.getPose().getTranslation();
+        lastSetpointTranslation = robotState.getCurrentPose2d().getTranslation();
     }
 
     @Override
     public void execute() {
-
-        Pose2d currentPose = s_Swerve.getPose();
+        Pose2d currentPose = robotState.getCurrentPose2d();
 
         double currentDistance = currentPose.getTranslation().getDistance(targetPose.getTranslation()); //error between poses
 
@@ -130,17 +99,20 @@ public class ReefAlign extends Command {
 
         if (currentDistance < driveController.getPositionTolerance())
             driveVelocityScalar = 0.0;
-            lastSetpointTranslation = new Pose2d(
+        lastSetpointTranslation = new Pose2d(
                 targetPose.getTranslation(),
                 currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
                 .transformBy(
                         new Transform2d(new Translation2d(driveController.getSetpoint().position, 0.0), new Rotation2d()))
                 .getTranslation();
 
+        //while farther away we prioritize drive over turning
+        double distanceFactor = MathUtil.clamp(1 - (driveErrorAbs / ffMaxRadius), 0.2, 1.0); // Reduce rotation influence when far
         // Calculate theta speed
         double thetaVelocity = thetaController.getSetpoint().velocity * ffScaler
                 + thetaController.calculate(
-                        currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+                        currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians())
+                        * distanceFactor;
         thetaErrorAbs = Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
         if (thetaErrorAbs < thetaController.getPositionTolerance())
             thetaVelocity = 0.0;
@@ -149,15 +121,8 @@ public class ReefAlign extends Command {
         var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
                 .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
                 .getTranslation();
-                s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
-
-        //prints
-        // System.out.println("Theta error: " + thetaErrorAbs);
-        // System.out.println("drive error: " + driveErrorAbs);
-        // System.out.println("Position Drivetrain error: " + driveController.getPositionError());
-        // System.out.println("Drivetrain error: " + driveController.getPositionError());
-        // System.out.println("Position Theta error: " + thetaController.getPositionError());
-        // System.out.println("Drive velocity: " + driveVelocityScalar);
+                s_Swerve.applyFieldSpeeds((ChassisSpeeds.fromFieldRelativeSpeeds(
+                        driveVelocity.getX(), driveVelocity.getY(), thetaVelocity, currentPose.getRotation())));
     }
 
     @Override

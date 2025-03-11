@@ -41,7 +41,6 @@ import choreo.util.ChoreoAllianceFlipUtil.Flipper;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -54,7 +53,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -71,7 +69,7 @@ import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleSide;
 import frc.robot.Constants.robotPIDs.HeadingControlPID;
 import frc.robot.RobotState.RobotState;
 // import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
@@ -89,6 +87,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double lastTimeReset = -1;
 
     RobotState robotState;
+    Field2d field = new Field2d();
+    
+
+    private Pose2d autoStartPose = new Pose2d(2.0, 2.0, new Rotation2d());
+    
+
+
     // private DriveControlSystems controlSystem  = new DriveControlSystems(); //only for trajectory following
 
 
@@ -188,15 +193,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+
+
     public static CommandSwerveDrivetrain getInstance(){
         if(s_Swerve == null){
-            s_Swerve = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants,
-             250,
-             VecBuilder.fill(0.025, 0.025, 0.025),
-             VecBuilder.fill(0.04, 0.04, 0.04),
-            TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);  
+            s_Swerve = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants, 250, TunerConstants.FrontLeft,
+            TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);  
         }
-        
         return s_Swerve;
     }
     
@@ -263,7 +266,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      *                                  and radians
      * @param modules                   Constants for each specific module
      */
-
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
@@ -282,7 +284,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void applyFieldSpeeds(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
-        
+        System.out.println(speeds.toString());
+
         setControl(
         new SwerveRequest.ApplyFieldSpeeds()
         .withSpeeds(speeds)
@@ -291,6 +294,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void applyFieldSpeeds(ChassisSpeeds speeds) {
+        System.out.println(speeds.toString());
+
         setControl(
         new SwerveRequest.ApplyFieldSpeeds()
         .withSpeeds(speeds));
@@ -314,13 +319,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void resetOdo(){ //not being used, drivetrain.seedFieldRelative() instead for field centric driving
         s_Swerve.seedFieldCentric();
         robotState.reset(0.02, IPose2d.identity());
+        robotState.resetUKF(IPose2d.identity());
     }
 
     public void resetOdo(Pose2d pose){
         resetOdoUtil(pose);
         robotState.reset(0.02, new IPose2d(pose));
+        robotState.resetUKF(new IPose2d(pose));
     }
-
+    
     public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
         s_Swerve.resetPose(pose);
     }
@@ -359,13 +366,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public ChassisSpeeds getRobotRelativeSpeeds(){
+        System.out.println(s_Swerve.getState().Speeds.toString());
         return s_Swerve.getState().Speeds;
     }
-
-    public double getHeading() {
-        return getPose().getRotation().getRadians();
-    }
-
+    
     /**
      * Returns the current x and y velocities from the wheel encoders
      * 
@@ -394,32 +398,38 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         return velocity/4;
     }
+    
 
-    private Pose2d autoStartPose = new Pose2d(2.0, 2.0, new Rotation2d());
 
     @Override
     public void periodic() {
-
-        Pose2d currentPose = getPose();
-
         if(robotState != null){
              robotState.odometryUpdate(this.getState(), Timer.getFPGATimestamp());
+
+            ITranslation2d currFilteredPose = robotState.getLatestFilteredPose();
+
+            Logger.recordOutput("RobotState/FilteredPose X", currFilteredPose.getX());
+            Logger.recordOutput("RobotState/FilteredPose Y", currFilteredPose.getY());
+            
         }else{
             robotState = RobotState.getInstance();
         }
 
-        SmartDashboard.putNumber("ODO X", currentPose.getX());
-        SmartDashboard.putNumber("ODO Y", currentPose.getY());
-        SmartDashboard.putNumber("ODO ROT", currentPose.getRotation().getRadians());
+        field.setRobotPose(robotState.getCurrentPose2d()); 
+        SmartDashboard.putData("RobotState/Field2d", field); // cant this be done in logger?
+        
+        Pose2d currentPose = getPose();
+        Logger.recordOutput("Swerve/Odometry X", currentPose.getX());
+        Logger.recordOutput("Swerve/Odometry Y", currentPose.getY());
+        Logger.recordOutput("Swerve/Odometry ROT", currentPose.getRotation().getRadians());
+        
+        // SmartDashboard.putNumber("AUTO INIT X", autoStartPose.getX());
+        // SmartDashboard.putNumber("AUTO INIT Y", autoStartPose.getY());
 
-        SwerveModuleState[] states = new SwerveModuleState[] {
-            s_Swerve.getModule(0).getCurrentState(),
-            s_Swerve.getModule(1).getCurrentState(),
-            s_Swerve.getModule(2).getCurrentState(),
-            s_Swerve.getModule(3).getCurrentState()
-        };
-        // StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-        publisher.set(states);
+        // SmartDashboard.putNumber("DT Vel", robotAbsoluteVelocity());
+        
+        // Allows driver to see if resetting worked
+        Logger.recordOutput("Swerve/Odo Reset (last 5 sec)", lastTimeReset != -1 && Timer.getFPGATimestamp() - lastTimeReset < 5);
     }
 
 }

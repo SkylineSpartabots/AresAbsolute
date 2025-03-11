@@ -1,7 +1,7 @@
 
  //LimelightHelpers v1.10 (REQUIRES LLOS 2024.9.1 OR LATER)
 
- package frc.lib;
+ package frc.robot;
 
  import edu.wpi.first.networktables.DoubleArrayEntry;
  import edu.wpi.first.networktables.NetworkTable;

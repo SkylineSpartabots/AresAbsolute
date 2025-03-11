@@ -13,10 +13,6 @@ public class IDouble implements Interpolable<IDouble>, InverseInterpolable<IDoub
         value = val;
     }
 
-    public double toDouble() {
-        return value.doubleValue();
-    }
-
     @Override
     public IDouble interpolate(IDouble other, double x) {
         Double dydx = other.value - value;

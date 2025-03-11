@@ -2,7 +2,6 @@ package frc.robot.RobotState;
 
 import java.util.Optional;
 
-import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
@@ -21,8 +20,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.SensorUtils;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
@@ -34,8 +31,6 @@ import frc.lib.Interpolating.IDouble;
 import frc.lib.Interpolating.InterpolatingTreeMap;
 import frc.lib.VisionOutput;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
-import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -60,16 +55,15 @@ public class RobotState { //will estimate pose with odometry and correct drift w
     private InterpolatingTreeMap<IDouble, ITranslation2d> filteredPoses;
     private InterpolatingTreeMap<IDouble, ITwist2d> robotIMUVelocity;
     private InterpolatingTreeMap<IDouble, IChassisSpeeds> robotOdomVelocity;
-    private InterpolatingTreeMap<IDouble, IDouble> robotIMUAngularVelocity;
-    private InterpolatingTreeMap<IDouble, IDouble> robotOdomAngularVelocity;
+    private InterpolatingTreeMap<IDouble, IDouble> robotAngularVelocity;
     private InterpolatingTreeMap<IDouble, ITwist2d> robotAccelerations;
     private InterpolatingTreeMap<IDouble, IChassisSpeeds> filteredRobotVelocities;
 
-    // Matrix<N2, N2> initialCovariance = MatBuilder.fill(Nat.N2(), Nat.N2(),
-    // 0.001, 0.0,
-    // 0.0, 0.001 );
+    Matrix<N2, N2> initialCovariance = MatBuilder.fill(Nat.N2(), Nat.N2(),
+            0.01, 0.0,
+            0.0, 0.01);
 
-    // private UnscentedKalmanFilter<N2, N2, N2> UKF;
+    private UnscentedKalmanFilter<N2, N2, N2> UKF;
 
     private static final double dt = 0.020;
     private static final int observationSize = 50; //how many poses we keep our tree
@@ -80,152 +74,181 @@ public class RobotState { //will estimate pose with odometry and correct drift w
     private boolean inAuto = false; //need to configure with auto but we dont have an auto yet (lol)
 
     public RobotState() {
-
-        reefPoleLevel = ElevatorState.L1; //default state (needs to be L1 - L4)
-        
-        if(Constants.alliance.equals(Alliance.Blue)) {
-            reefPole = ReefPoleScoringPoses.POLE_1A;
-        } else {
-            reefPole = ReefPoleScoringPoses.POLE_A;
-        }
-
         drivetrain = CommandSwerveDrivetrain.getInstance();
         pigeon = drivetrain.getPigeon2();  //getting the already constructed pigeon in swerve
         reset(0.02, IPose2d.identity()); //init
     }
 
+    public synchronized void visionUpdate(VisionOutput updatePose) {
+
+        double timestamp = updatePose.timestampSeconds;
+
+        IChassisSpeeds filteredVelocity = getInterpolatedValue(filteredRobotVelocities, timestamp, IChassisSpeeds.identity());
+
+        //calculate std of vision estimate for UKF
+        Vector<N2> stdevs = VecBuilder.fill(Math.pow(updatePose.standardDev, 2), Math.pow(updatePose.standardDev, 2));
+
+        UKF.correct(
+                VecBuilder.fill(filteredVelocity.getVx(), filteredVelocity.getVy()),
+                VecBuilder.fill(
+                        updatePose.estimatedPose.getX(),
+                        updatePose.estimatedPose.getY()),
+                StateSpaceUtil.makeCovarianceMatrix(Nat.N2(), stdevs));
+
+        filteredPoses.put(
+                new IDouble(timestamp),
+                new ITranslation2d(UKF.getXhat(0), UKF.getXhat(1)));
+        
+        Logger.recordOutput("RobotState/Vision Standard Deviation", updatePose.standardDev);
+    }
+
+    //if you dont understand ask iggy
     public void odometryUpdate(SwerveDriveState state, double timestamp) {
 
         updateSensors();
 
-        Pose2d currentPose = state.Pose;
+        if (prevOdomTimestamp.isEmpty()) { // First time initialization of state
+            initKalman();
+            UKF.setXhat(VecBuilder.fill(state.Pose.getX(), state.Pose.getY()));
+        } else {
 
-        if(!prevOdomTimestamp.isEmpty()) {
             //merge our velocities
-            IChassisSpeeds OdomVelocity =
-            getInterpolatedValue(odometryPoses, prevOdomTimestamp.get(), IPose2d.identity())
-            .getVelocityBetween(new IPose2d(state.Pose), timestamp - prevOdomTimestamp.get());
-            
+            IChassisSpeeds OdomVelocity = new IChassisSpeeds(state.Speeds).complimentaryFilter(
+                    getInterpolatedValue(odometryPoses, prevOdomTimestamp.get(), IPose2d.identity())
+                            .getVelocityBetween(new IPose2d(state.Pose), timestamp - prevOdomTimestamp.get()),
+                    0.75);
+
             robotOdomVelocity.put(new IDouble(timestamp), OdomVelocity);
-            odometryPoses.put(new IDouble(timestamp), new IPose2d(state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation()));
-    
-        // Logger.recordOutput("Accel", robotAcceleration.toMagnitude());
-        // Logger.recordOutput("Robot State/ODO velocity", OdomVelocity.toMagnitude());
-        // Logger.recordOutput("Kinematics/Swerve/DT velocity", robotVelocityVector());
-        // Logger.recordOutput("Kinematics/Swerve/DT angular velocity", robotAngularMagnitude.toDouble());
-        // Logger.recordOutput("Kinematics/Swerve/DT acceleration", robotAcceleration.toMagnitude());
+
+            IDouble robotAngularMagnitude = getInterpolatedValue(robotAngularVelocity, timestamp, new IDouble(0.0));
+            ITwist2d robotAcceleration = getInterpolatedValue(robotAccelerations, timestamp, ITwist2d.identity());
+
+
+            Logger.recordOutput("RobotState/Robot Angular Magnitude", robotAngularMagnitude.value);
+            Logger.recordOutput("RobotState/Robot Acceleration", robotAcceleration.toMagnitude());
+            Logger.recordOutput("RobotState/Robot Velocity", OdomVelocity.toMagnitude());
+            
+            //We use velocity because its more accurate than our acceleration
+            if (OdomVelocity.toMagnitude() > 0) { //manually increase P (our predicted error in position)
+                Matrix<N2, N2> P = UKF.getP();
+
+                //please look in desmos before changing these
+                //https://www.desmos.com/3d/xs2grgugoj
+
+                double kv = 0.000004; //velocity weight
+                double ka = 0.000005; //acceleration weight
+                double ktheta = 0.0000025; //angular velocity weight
+
+                double acceleration = Math.max(robotAcceleration.toMagnitude(), Constants.MaxAcceleration);
+                double velocity = Math.max(OdomVelocity.toMagnitude(), Constants.MaxSpeed);
+
+                double error = kv * Math.pow(velocity, 2) * (1 - Math.exp(-acceleration))
+                        + ka * Math.pow(acceleration, 2) * (1 + Math.exp(-velocity))
+                        + ktheta * robotAngularMagnitude.value * acceleration;
+
+                Logger.recordOutput("P Matrix Increment", error);
+
+                double newP = P.get(0, 0) + error;
+
+                P.set(0, 0, newP);
+                P.set(1, 1, newP);
+                UKF.setP(P);
+            }
+
+            //predict next state using our control input (velocity)
+            try {
+                UKF.predict(VecBuilder.fill(OdomVelocity.getVx(), OdomVelocity.getVy()), dt);
+                filteredRobotVelocities.put(new IDouble(timestamp), OdomVelocity);
+            } catch (Exception e) {
+                DriverStation.reportError("QR Decomposition failed: ", e.getStackTrace());
+            }
         }
 
+        odometryPoses.put(new IDouble(timestamp), new IPose2d(state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation()));
+
+        filteredPoses.put(new IDouble(timestamp), new ITranslation2d(UKF.getXhat(0), UKF.getXhat(1)));
+
         prevOdomTimestamp = Optional.of(timestamp);
+
+        Logger.recordOutput("RobotState/P Matrix", UKF.getP().get(0, 0));
+        
+    }
+
+
+    /*  ExtendedKalmanFilter​(Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs,
+    BiFunction<Matrix<States,​N1>,​Matrix<Inputs,​N1>,​Matrix<States,​N1>> f,
+    BiFunction<Matrix<States,​N1>,​Matrix<Inputs,​N1>,​Matrix<Outputs,​N1>> h,
+    Matrix<States,​N1> stateStdDevs, Matrix<Outputs,​N1> measurementStdDevs,
+    double dtSeconds) */
+    public void initKalman() {
+
+        Matrix<N2, N1> stateStdDevsQ = VecBuilder.fill(
+                Math.pow(1e-15, 1), // Variance in position x
+                Math.pow(1e-15, 1)  // Variance in position y
+        );
+
+        Matrix<N2, N1> measurementStdDevsR = VecBuilder.fill(
+                Math.pow(0.03, 2), // Variance in measurement x
+                Math.pow(0.03, 2)   // Variance in measurement y
+        );
+
+        // states - A Nat representing the number of states.
+        // outputs - A Nat representing the number of outputs.
+        // f - A vector-valued function of x and u that returns the derivative of the state vector.
+        // h - A vector-valued function of x and u that returns the measurement vector.
+        // stateStdDevs - Standard deviations of model states.
+        // measurementStdDevs - Standard deviations of measurements.
+        // nominalDtSeconds - Nominal discretization timestep.
+        UKF = new UnscentedKalmanFilter<>(Nat.N2(), Nat.N2(),
+                (x, u) -> u,
+                (x, u) -> x,
+                stateStdDevsQ,
+                measurementStdDevsR,
+                dt);
+
+        // Set initial state and covariance
+        UKF.setP(initialCovariance);
     }
 
     public void reset(double time, IPose2d initial_Pose2d) { //init the robot state
         odometryPoses = new InterpolatingTreeMap<>(observationSize);
         odometryPoses.put(new IDouble(time), initial_Pose2d);
+        filteredPoses = new InterpolatingTreeMap<>(observationSize);
+        filteredPoses.put(new IDouble(time), getInitialFieldToOdom());
         robotIMUVelocity = new InterpolatingTreeMap<>(observationSize);
-        robotIMUVelocity.put(new IDouble(time), ITwist2d.identity());    
+        robotIMUVelocity.put(new IDouble(time), ITwist2d.identity());
         robotOdomVelocity = new InterpolatingTreeMap<>(observationSize);
-        robotOdomVelocity.put(new IDouble(time), IChassisSpeeds.identity());          
+        robotOdomVelocity.put(new IDouble(time), IChassisSpeeds.identity());
         robotAccelerations = new InterpolatingTreeMap<>(observationSize);
         robotAccelerations.put(new IDouble(time), ITwist2d.identity());
-        robotOdomAngularVelocity = new InterpolatingTreeMap<>(observationSize);
-        robotOdomAngularVelocity.put(new IDouble(time), new IDouble(0.0));
-        robotIMUAngularVelocity = new InterpolatingTreeMap<>(observationSize);
-        robotIMUAngularVelocity.put(new IDouble(time), new IDouble(0.0));
+        robotAngularVelocity = new InterpolatingTreeMap<>(observationSize);
+        robotAngularVelocity.put(new IDouble(time), new IDouble(0.0));
         filteredRobotVelocities = new InterpolatingTreeMap<>(observationSize);
         filteredRobotVelocities.put(new IDouble(time), IChassisSpeeds.identity());
     }
 
-    // Automation state methods
-
-  private ElevatorState reefPoleLevel;
-  private ReefPoleScoringPoses reefPole;
-
-    public void reefPoleSet7() {
-        reefPole = ReefPoleScoringPoses.POLE_7G;
+    public void resetUKF(IPose2d initial_Pose2d) {
+        UKF.reset();
+        UKF.setXhat(MatBuilder.fill(Nat.N2(), Nat.N1(), initial_Pose2d.getX(), initial_Pose2d.getY()));
+        UKF.setP(initialCovariance);
     }
 
-    public void reefPoleSet1() {
-        reefPole = ReefPoleScoringPoses.POLE_1A;
+    public synchronized ITranslation2d getInitialFieldToOdom() {
+        if (initialFieldToOdo.isEmpty()) { return ITranslation2d.identity(); }
+        return initialFieldToOdo.get();
     }
 
-    public void navigateReefPoleUp() {
-        System.out.println("up ordinal" + reefPole.ordinal());
+    // =======---===[ ⚙ Getters ]===---========
 
-        if(Constants.alliance == Alliance.Blue) {
-
-            if(reefPole.ordinal() == 11) {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_1A.name());
-                reefPole = ReefPoleScoringPoses.POLE_1A;
-            } else {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
-                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
-            }
-
-        } else {
-
-            if(reefPole.ordinal() == 23) {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_A.name());
-                reefPole = ReefPoleScoringPoses.POLE_A;
-            } else {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() + 1].name());
-                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() + 1];
-            }
-        }
-    }
-
-    public void navigateReefPoleDown() {
-        System.out.println("down ordinal" + reefPole.ordinal());
-
-        if(Constants.alliance == Alliance.Blue) {
-
-            if(reefPole.ordinal() == 0) {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.POLE_12L.name());
-                reefPole = ReefPoleScoringPoses.POLE_12L;
-            } else {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
-                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
-            }
-
-        } else {
-
-            if(reefPole.ordinal() == 12) {
-                SmartDashboard.putString
-                ("Selected Pole", ReefPoleScoringPoses.POLE_L.name());
-                reefPole = ReefPoleScoringPoses.POLE_L;
-            } else {
-                SmartDashboard.putString("Selected Pole", ReefPoleScoringPoses.values()[reefPole.ordinal() - 1].name());
-                reefPole = ReefPoleScoringPoses.values()[reefPole.ordinal() - 1];
-            }
-
-        }
-    }
-
-    public ReefPoleScoringPoses getSelectedReefPole() {
-        return reefPole;
-    }
-
-    public void raisePoleLevel() {
-        if(!(reefPoleLevel.ordinal() == 3)) {
-        SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() + 1].name());
-        reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() + 1];
-        System.out.println(reefPoleLevel.name());
-        }
-    }
-
-    public void lowerPoleLevel() {
-        if(!(reefPoleLevel.ordinal() == 0)) {
-        SmartDashboard.putString("Selected Pole Level", ElevatorState.values()[reefPoleLevel.ordinal() - 1].name());
-        reefPoleLevel = ElevatorState.values()[reefPoleLevel.ordinal() - 1];
-        }
-    }
-
-    public ElevatorState getSelectedElevatorLevel() {
-        return reefPoleLevel;
-    }
-    
-
-        public synchronized <T extends Interpolable<T>> T getInterpolatedValue(InterpolatingTreeMap<IDouble, T> map, Double timestamp, T identity) {
+    /**
+     * Gets value from map at timestamp. Linearly interpolates between gaps.
+     *
+     * @param map       Map to look in
+     * @param timestamp Timestamp to look up
+     * @param identity  Identity of the value
+     * @return Interpolated value at timestep
+     */
+    public synchronized <T extends Interpolable<T>> T getInterpolatedValue(InterpolatingTreeMap<IDouble, T> map, Double timestamp, T identity) {
 
         if (map.isEmpty())
             return identity;
@@ -266,20 +289,38 @@ public class RobotState { //will estimate pose with odometry and correct drift w
     }
 
 
-        //// =======---===[ ⚙ Pigeon2.0  ]===---========
+    /**
+     * Gets signed velocity from integrated acceleration from filtered velocities
+     *
+     * @return double VelocityVector
+     */
+    public synchronized double robotVelocityVector() {
+        IChassisSpeeds latestVelocity = getLatestFilteredVelocity();
+        return Math.signum(Math.atan2(latestVelocity.getVy(), latestVelocity.getVx())) * latestVelocity.toMagnitude();
+    }
 
-        public void updateSensors() {
-            double[] newAccel = accelFilter.filterAcceleration(rawRobotAcceleration());
-            double[] newAngularVelocity = angularVelocityFilter.filterAngularVelocity(robotAngularVelocityMagnitude());
-            robotIMUAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
-            robotAccelerations.put(new IDouble(newAccel[2]), new ITwist2d(newAccel[0], newAccel[1]));
-        }
+    @AutoLogOutput(key = "RobotState/CurrentFilteredPose2d")
+    public Pose2d getCurrentPose2d() {
+        return new Pose2d(getLatestFilteredPose().getX(), getLatestFilteredPose().getY(), drivetrain.getRotation3d().toRotation2d());
+    }
 
-        public void updateSensors(double[] wheelVelocity) {
-            double[] newAccel = accelFilter.filterAcceleration(rawRobotAcceleration());
-            double[] newAngularVelocity = robotAngularVelocityMagnitude();
-            robotIMUAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
-            robotAccelerations.put(new IDouble(newAccel[2]), new ITwist2d(newAccel[0], newAccel[1]));
+    // / =======---===[⚙ Pigeon2.0]===---========
+
+    public void updateSensors() {
+        double[] newAccel = accelFilter.filterAcceleration(rawRobotAcceleration());
+        double[] newAngularVelocity = angularVelocityFilter.filterAngularVelocity(robotAngularVelocityMagnitude());
+        robotAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
+        robotAccelerations.put(new IDouble(newAccel[2]), new ITwist2d(newAccel[0], newAccel[1]));
+
+         Logger.recordOutput("RobotState/Raw Accel X", newAccel[0]);
+         Logger.recordOutput("RobotState/Raw Accel Y", newAccel[1]);
+    }
+
+    public void updateSensors(double[] wheelVelocity) {
+        double[] newAccel = accelFilter.filterAcceleration(rawRobotAcceleration());
+        double[] newAngularVelocity = robotAngularVelocityMagnitude();
+        robotAngularVelocity.put(new IDouble(newAngularVelocity[1]), new IDouble(newAngularVelocity[0]));
+        robotAccelerations.put(new IDouble(newAccel[2]), new ITwist2d(newAccel[0], newAccel[1]));
 
          Logger.recordOutput("RobotState/Raw Accel X", newAccel[0]);
          Logger.recordOutput("RobotState/Raw Accel Y", newAccel[1]);

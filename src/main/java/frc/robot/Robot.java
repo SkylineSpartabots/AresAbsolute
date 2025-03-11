@@ -6,8 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -17,13 +15,11 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import au.grapplerobotics.CanBridge;
 import choreo.Choreo;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,28 +27,17 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.SensorUtils;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
-import frc.robot.Subsystems.Climb;
+import frc.robot.Subsystems.LEDs.LEDs;
 import frc.robot.Subsystems.Elevator;
-import frc.robot.Subsystems.EndEffector;
-import frc.robot.Subsystems.Funnel;
-import frc.robot.Subsystems.Elevator.ElevatorState;
-import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown;
-import frc.robot.Subsystems.CommandSwerveDrivetrain.CANCoders;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Vision.Vision;
-import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Autos.AutoCommand;
 import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
-import frc.robot.commands.Autos.ForwardAuto;
-import frc.robot.commands.Elevator.SetElevator;
-import frc.robot.commands.Elevator.ZeroElevator;
-import frc.robot.commands.Slapdown.SetPivot;
-import frc.robot.commands.Slapdown.ZeroSlapdown;
+import frc.robot.commands.CommandFactory.CommandFactory;
 
 public class Robot extends LoggedRobot {
   private SequentialCommandGroup m_autonomousCommand;
@@ -67,15 +52,26 @@ public class Robot extends LoggedRobot {
   private AutoCommand thirdSavedChoice;
   private AutoCommand fourthSavedChoice;
   private AutoCommand fifthSavedChoice;
+  
+
+  private RobotContainer m_robotContainer;
+
+  private final Vision vision;
+
+  private CommandSwerveDrivetrain drivetrain;
+  private Elevator elevator;
+  private RobotState robotState;
+
+  private LEDs leds;
+
+  private Slapdown intake;
+  private DriveControlSystems controlSystems;
 
  
     public Robot() { 
 
       // oops just realized logging needs to be in the constructor lol
       // facebookdata
-      SignalLogger.setPath("/media/sda/ctre-logs/");
-
-      DataLogManager.start();
       Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
       Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
       Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
@@ -127,24 +123,17 @@ public class Robot extends LoggedRobot {
 
       // Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
       
-      if(DriverStation.getAlliance() != null){
-        Constants.alliance = DriverStation.getAlliance().get();
-      }
+      elevator = Elevator.getInstance();
+      drivetrain = CommandSwerveDrivetrain.getInstance();
+      robotState = RobotState.getInstance();
+      vision = Vision.getInstance();
 
-      //Init all subsystems
-      Vision.getInstance();
-      Elevator.getInstance();
-      CommandSwerveDrivetrain.getInstance();
-      RobotState.getInstance();
-      Slapdown.getInstance();
-      DriveControlSystems.getInstance();
-      Funnel.getInstance();
-      Slapdown.getInstance();
-      EndEffector.getInstance();
-      RobotContainer.getInstance();
-      CANCoders.getInstance();
-      Climb.getInstance();
 
+      leds = LEDs.getInstance();
+      leds.initLEDs();
+      
+      intake = Slapdown.getInstance();
+      controlSystems = DriveControlSystems.getInstance();
       // CanBridge.runTCP();
 
     }
@@ -157,13 +146,9 @@ public class Robot extends LoggedRobot {
     firstAuto.addOption(AutoCommand.meter2().name, AutoCommand.meter2());
     firstAuto.addOption(AutoCommand.meter3().name, AutoCommand.meter3());
     firstAuto.addOption(AutoCommand.backandforth().name, AutoCommand.backandforth());
-    firstAuto.addOption(AutoCommand.B1R3().name, AutoCommand.B1R3());
-    firstAuto.addOption(AutoCommand.B2R8().name, AutoCommand.B2R8());
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
     // AutoCommand.loadAutos(); TODO ethan fix this
     SmartDashboard.putData("first auto", firstAuto);
-
-    
 
     if(isReal()){
       Logger.addDataReceiver(new WPILOGWriter()); // should be savig to usb
@@ -175,8 +160,7 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     //start the logger here
-    SmartDashboard.putString("Selected Pole", "First pole");
-    SmartDashboard.putString("Selected Pole Level", ElevatorState.L1.name());
+    m_robotContainer = new RobotContainer();
   }
 
   @Override
@@ -196,7 +180,6 @@ public class Robot extends LoggedRobot {
     }
     if(secondAuto.getSelected() != secondSavedChoice){
       secondSavedChoice = secondAuto.getSelected();
-      updateThirdAuto();
       // m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
     }
     if(thirdAuto.getSelected() != thirdSavedChoice){
@@ -210,30 +193,13 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
-    // m_autonomousCommand = new SequentialCommandGroup();
-    // new SequentialCommandGroup(
-    //   new ZeroSlapdown(),
-    //   new ZeroElevator(),
-    //   new ForwardAuto()
-    // ).schedule();
-
-    new SequentialCommandGroup(
-      new ZeroSlapdown(),
-      new ZeroElevator(),
-      new SetElevator(()->ElevatorState.L4),
-      new ForwardAuto()
-
-    ).schedule();
+    m_autonomousCommand = new SequentialCommandGroup();
+    if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+    }
     
-    
-    // if(firstSavedChoice != null) m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
-    
-    // if(secondSavedChoice != null) m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
-    // if(thirdSavedChoice != null) m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
-    // if (m_autonomousCommand != null) {
-    //   m_autonomousCommand.schedule();
-    // }
-    
+    // CommandFactory.autoCommand().schedule();
   }
 
   @Override
@@ -249,8 +215,6 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    new ZeroSlapdown().schedule();
-    // Constants.alliance = DriverStation.getAlliance().get();
   }
 
   @Override
@@ -283,21 +247,6 @@ public class Robot extends LoggedRobot {
         AutoCommand.getPotentialContinuations().get(i));
       }
       SmartDashboard.putData("second auto", secondAuto);
-  }
-
-  private void updateThirdAuto(){
-    if(thirdAuto != null){
-      thirdAuto.close();
-    }
-    thirdAuto = new SendableChooser<AutoCommand>();
-    secondSavedChoice = secondAuto.getSelected();
-    AutoCommand.clearContinuations();
-    AutoCommand.fillAutosList(secondSavedChoice);
-      for(int i = 0; i < AutoCommand.getPotentialContinuations().size(); i++){
-        thirdAuto.addOption(AutoCommand.getPotentialContinuations().get(i).name, 
-        AutoCommand.getPotentialContinuations().get(i));
-      }
-      SmartDashboard.putData("third auto", thirdAuto);
   }
 
 }
