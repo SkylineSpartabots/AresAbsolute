@@ -166,6 +166,13 @@ public class CommandFactory {
         ).raceWith(new CancelableCommand(controller));
     }
 
+    public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+        return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work
+            new PoleAlign(level, pole),
+            new SetOuttake(level)
+        ).raceWith(new CancelableCommand(controller));
+    }
+
     // public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
     //     return new SequentialCommandGroup(
     //         new AutomatedAlgaeAction(level)

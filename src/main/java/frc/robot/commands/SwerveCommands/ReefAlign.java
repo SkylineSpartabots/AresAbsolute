@@ -38,9 +38,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class ReefAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            3.75, 0.09, 0.003, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            4, 0.12, 0, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            3, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
+            3.6, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
 
@@ -61,7 +61,7 @@ public class ReefAlign extends Command {
         
         this.targetReefSide = side;
 
-        alliance = DriverStation.getAlliance().get();
+        this.driveController.setTolerance(0.05, 0.1);
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
@@ -75,6 +75,9 @@ public class ReefAlign extends Command {
                 this.targetReefSide = ReefSidePositions.values()[(int)(pole.get().ordinal() / 2)];
         else 
                 this.targetReefSide = ReefSidePositions.values()[5 + (int)(pole.get().ordinal() / 2)];
+
+        thetaController.setTolerance(0.1047); //6 degrees
+        driveController.setTolerance(0.2);
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
@@ -102,8 +105,7 @@ public class ReefAlign extends Command {
         thetaController.reset(s_Swerve.getHeading(),
                 robotState.getLatestFilteredVelocity().getOmega());
         
-        thetaController.setTolerance(0.1047); //6 degrees
-        driveController.setTolerance(0.1, 0.1);
+
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
     }
@@ -152,21 +154,24 @@ public class ReefAlign extends Command {
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
         //prints
-        // System.out.println("Theta error: " + thetaErrorAbs);
-        // System.out.println("drive error: " + driveErrorAbs);
+        // System.out.println("Theta error: " + thetaErrorAbs);()
+        // System.out.println("theta error: " + thetaController.getPositionError() + (Math.abs(thetaController.getPositionError()) < 0.1));
         // System.out.println("Position Drivetrain error: " + driveController.getPositionError());
         // System.out.println("Drivetrain error: " + driveController.getPositionError());
         // System.out.println("Position Theta error: " + thetaController.getPositionError());
         // System.out.println("Drive velocity: " + driveVelocityScalar);
+
+        
     }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("Reef align done tbh");
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 
     @Override
     public boolean isFinished() {
-        return targetPose.equals(null) || (driveController.atGoal() && thetaController.atGoal());
+        return targetPose.equals(null) || Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance();
     }
 }

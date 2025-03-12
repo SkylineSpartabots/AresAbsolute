@@ -29,8 +29,11 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -56,11 +59,11 @@ public class Vision extends SubsystemBase {
     private static List<PhotonPipelineResult> elevatorCameraResult;
 
     private Transform3d FLcameraToRobotTransform = new Transform3d(
-        new Translation3d(Units.inchesToMeters(12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
+        new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
         new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
 
     private Transform3d FRcameraToRobotTransform = new Transform3d(
-        new Translation3d(Units.inchesToMeters(12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
+        new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
         new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
 
     private Transform3d elevatorCameraToRobotTransform = new Transform3d(
@@ -93,9 +96,9 @@ public class Vision extends SubsystemBase {
         LiberalLCam = new PhotonCamera(Constants.VisionConstants.FLCamera);
         GretchenRCam = new PhotonCamera(Constants.VisionConstants.FRCamera);
 
-        FLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
-        FRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
-        elevatorPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
+        FLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        FRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        elevatorPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
         updateAprilTagResults();
     }
@@ -223,16 +226,32 @@ public class Vision extends SubsystemBase {
 
                     if(FLphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
 
-                        // System.out.println("FL pose " + FLphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
-                        VisionOutput newPose = new VisionOutput(FLphotonPoseEstimator.update(photonPipelineResult).get(),
-                        robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
+                        VisionOutput newPose = new VisionOutput(
+                            PhotonUtils.estimateFieldToRobotAprilTag(
+                            photonPipelineResult.getBestTarget().bestCameraToTarget,
+                                aprilTagFieldLayout.getTagPose(photonPipelineResult.getBestTarget().fiducialId).get(),
+                                FLcameraToRobotTransform),
+                            photonPipelineResult.getTimestampSeconds(),
+                            photonPipelineResult.getBestTarget(),
+                            robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
+
+                            // System.out.println("FL pose: " + newPose.estimatedPose.toString());
+
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
 
                     } else if (FRphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
 
-                        // System.out.println("FR pose " + FRphotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
-                        VisionOutput newPose = new VisionOutput(FRphotonPoseEstimator.update(photonPipelineResult).get(),
-                        robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
+                        VisionOutput newPose = new VisionOutput(
+                            PhotonUtils.estimateFieldToRobotAprilTag(
+                            photonPipelineResult.getBestTarget().bestCameraToTarget,
+                                aprilTagFieldLayout.getTagPose(photonPipelineResult.getBestTarget().fiducialId).get(),
+                                FRcameraToRobotTransform),
+                            photonPipelineResult.getTimestampSeconds(),
+                            photonPipelineResult.getBestTarget(),
+                            robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
+
+                            // System.out.println("FR pose: " + newPose.estimatedPose.toString());
+
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
 
                     } else if (elevatorPhotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {

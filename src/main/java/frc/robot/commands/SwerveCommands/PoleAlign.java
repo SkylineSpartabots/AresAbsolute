@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class PoleAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            2, 0.1, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            2.23, 0.2, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
@@ -56,7 +56,7 @@ public class PoleAlign extends Command {
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
-    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 0.5, dealgeaDistanceThreshold = 0.75;
+    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
 
     public PoleAlign(Supplier<ElevatorState> elevatorLevel, Supplier<ReefPoleScoringPoses> pole) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
@@ -65,6 +65,9 @@ public class PoleAlign extends Command {
         
         this.targetReefPole = pole;
         this.elevatorLevel = elevatorLevel;
+
+        thetaController.setTolerance(0.04); //less than 3 degrees
+        driveController.setTolerance(0.06, 0.1);
 
         alliance = DriverStation.getAlliance().get();
 
@@ -95,7 +98,6 @@ public class PoleAlign extends Command {
         thetaController.reset(s_Swerve.getHeading(),
                 robotState.getLatestFilteredVelocity().getOmega());
         
-        thetaController.setTolerance(0.05235); //3 degrees
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
 
@@ -161,11 +163,12 @@ public class PoleAlign extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("Pole align done ngl");
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 
     @Override
     public boolean isFinished() {
-        return targetPose.equals(null) || (driveController.atGoal() && thetaController.atGoal());
+        return targetPose.equals(null) || Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance();
     }
 }
