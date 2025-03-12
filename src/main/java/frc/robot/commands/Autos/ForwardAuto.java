@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
@@ -30,7 +31,7 @@ public class ForwardAuto extends Command {
   private DriveControlSystems controlSystems;
   double timebeforeextension = 0.3;
   double drivetime = 8;
-
+  private double rotSetpoint;
   boolean extended = false;
 
   Timer timer;
@@ -52,20 +53,25 @@ public class ForwardAuto extends Command {
     alliance = DriverStation.getAlliance().get();
     timer.reset();
     timer.start();
-    dt.resetPose(new Pose2d(0, 0, new Rotation2d(0)));
-    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, 0));
+    if(alliance == Alliance.Blue){
+      dt.resetPose(new Pose2d(7.15, 4.147455243850708, Rotation2d.fromDegrees(180)));
+    } else dt.resetPose(new Pose2d(10.3994361114502, 3.903835117012024, Rotation2d.fromDegrees(0)));
     
+    
+    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, 0));
+    Constants.usingVision = false;
     
     SmartDashboard.putBoolean("auto running", true);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
     
+    rotSetpoint = dt.getPose().getRotation().getRadians();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     Pose2d currPose = dt.getPose();
-    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), 0)));
+    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), rotSetpoint)));
     }
     
     
@@ -79,8 +85,9 @@ public class ForwardAuto extends Command {
     dt.setControl(
       controlSystems.autoDrive(0, 0, 0)
     );
-    new SetOuttake(OuttakeState.SCORE).schedule();
+    // new SetOuttake(OuttakeState.SCORE).schedule();
     SmartDashboard.putBoolean("auto running", false);
+    Constants.usingVision = true;
   }
 
   // Returns true when the command should end.

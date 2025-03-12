@@ -94,6 +94,14 @@ public class Autos {
 
   public static Command forwardDealgaeLeft(){
     return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new ForwardAuto(),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.7),
+          new SetElevator(()->ElevatorState.L4)
+        )
+      ),
+      new SetOuttake(OuttakeState.SCORE),
       new ForwardAuto(),
       new InstantCommand(()->ee.setAlgaeSpeed(0.8)),
       new ParallelCommandGroup(
