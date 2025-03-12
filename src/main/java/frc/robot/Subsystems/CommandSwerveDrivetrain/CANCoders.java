@@ -34,19 +34,20 @@ public class CANCoders extends SubsystemBase {
     backRightEncoder = new CANcoder(6, "drivetrain");
   }
 
-  public void getOffsets(){
-    SmartDashboard.putNumber("front left cancoder offset", (Constants.frontLeftEncoderOffset + frontLeftEncoder.getAbsolutePosition().getValueAsDouble()));
-    System.out.println("front left cancoder offset: " + (Constants.frontLeftEncoderOffset + frontLeftEncoder.getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("front right cancoder offset", (Constants.frontRightEncoderOffset + frontRightEncoder.getAbsolutePosition().getValueAsDouble()));
-    System.out.println("front right cancoder offset: " + (Constants.frontRightEncoderOffset + frontRightEncoder.getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("back left cancoder offset", (Constants.backLeftEncoderOffset + backLeftEncoder.getAbsolutePosition().getValueAsDouble()));
-    System.out.println("back left cancoder offset: " + (Constants.backLeftEncoderOffset + backLeftEncoder.getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("back right cancoder offset", (Constants.backRightEncoderOffset + backRightEncoder.getAbsolutePosition().getValueAsDouble()));
-    System.out.println("back right cancoder offset: " + (Constants.backRightEncoderOffset + backRightEncoder.getAbsolutePosition().getValueAsDouble()));
+  public void getNewOffsets(){
+    SmartDashboard.putNumber("front left cancoder offset", (Constants.frontLeftEncoderOffset - frontLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    // System.out.println("front left cancoder offset: " + (Constants.frontLeftEncoderOffset + frontLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    SmartDashboard.putNumber("front right cancoder offset", (Constants.frontRightEncoderOffset - frontRightEncoder.getAbsolutePosition().getValueAsDouble()));
+    // System.out.println("front right cancoder offset: " + (Constants.frontRightEncoderOffset + frontRightEncoder.getAbsolutePosition().getValueAsDouble()));
+    SmartDashboard.putNumber("back left cancoder offset", (Constants.backLeftEncoderOffset - backLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    // System.out.println("back left cancoder offset: " + (Constants.backLeftEncoderOffset + backLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    SmartDashboard.putNumber("back right cancoder offset", (Constants.backRightEncoderOffset - backRightEncoder.getAbsolutePosition().getValueAsDouble()));
+    // System.out.println("back right cancoder offset: " + (Constants.backRightEncoderOffset + backRightEncoder.getAbsolutePosition().getValueAsDouble()));
   }
 
   @Override
   public void periodic() {
+    getNewOffsets();
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("front left cancoder position", frontLeftEncoder.getAbsolutePosition().getValueAsDouble());
     SmartDashboard.putNumber("front right cancoder position", frontRightEncoder.getAbsolutePosition().getValueAsDouble());

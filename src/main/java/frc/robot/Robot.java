@@ -146,7 +146,7 @@ public class Robot extends LoggedRobot {
       RobotContainer.getInstance();
       CANCoders.getInstance();
       Climb.getInstance();
-
+      
       // CanBridge.runTCP();
     }
 
@@ -209,6 +209,7 @@ public class Robot extends LoggedRobot {
     //   thirdSavedChoice = thirdAuto.getSelected();
     //   // m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
     // }
+    // CANCoders.getInstance().getOffsets();
 
   }
 
