@@ -55,7 +55,10 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
 
 public class Robot extends LoggedRobot {
-  private SequentialCommandGroup m_autonomousCommand;
+  private Command m_autonomousCommand;
+
+  SendableChooser<Command> chosenAuto = new SendableChooser<Command>();
+
   SendableChooser<AutoCommand> firstAuto = new SendableChooser<AutoCommand>();
   SendableChooser<AutoCommand> secondAuto = new SendableChooser<AutoCommand>();
   SendableChooser<AutoCommand> thirdAuto = new SendableChooser<AutoCommand>();
@@ -157,6 +160,11 @@ public class Robot extends LoggedRobot {
     firstAuto.addOption(AutoCommand.backandforth().name, AutoCommand.backandforth());
     firstAuto.addOption(AutoCommand.B1R3().name, AutoCommand.B1R3());
     firstAuto.addOption(AutoCommand.B2R8().name, AutoCommand.B2R8());
+
+    chosenAuto.addOption("forward + dealgae left", Autos.forwardDealgaeLeft());
+    chosenAuto.addOption("forward + dealgae right", Autos.forwardDealgaeRight());
+    chosenAuto.addOption("1 + 1 left", Autos.twoCoralLeft());
+    chosenAuto.addOption("1 + 1 right", Autos.twoCoralRight());
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
     // AutoCommand.loadAutos(); TODO ethan fix this
     SmartDashboard.putData("first auto", firstAuto);
@@ -215,12 +223,12 @@ public class Robot extends LoggedRobot {
     //   new ZeroElevator(),
     //   new ForwardAuto()
     // ).schedule();
+    m_autonomousCommand = chosenAuto.getSelected();
 
     new SequentialCommandGroup(
       new ZeroSlapdown(),
       new ZeroElevator(),
-      new SetElevator(()->ElevatorState.L4),
-      new ForwardAuto()
+      m_autonomousCommand
 
     ).schedule();
     
