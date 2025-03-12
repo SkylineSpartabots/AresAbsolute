@@ -166,6 +166,6 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
 
     SmartDashboard.putNumber("elevator position", getPosition());
-    SmartDashboard.putNumber("elevator stator current", getCurrent());
+    // SmartDashboard.putNumber("elevator stator current", getCurrent());
   }
 }

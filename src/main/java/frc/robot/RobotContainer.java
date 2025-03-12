@@ -209,8 +209,8 @@ public class RobotContainer {
     driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
     driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
 
-    driver.povLeft().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
-    driver.povRight().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
+    driver.povRight().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
+    driver.povLeft().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
     // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
 

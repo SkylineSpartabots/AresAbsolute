@@ -38,15 +38,13 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class ReefAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            4, 0.12, 0, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            4, 0.12, 0, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             3.6, 1.5, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
 
     private ReefSidePositions targetReefSide; 
-
-    private Alliance alliance;
 
     private Pose2d targetPose;
     private RobotState robotState;
@@ -61,7 +59,8 @@ public class ReefAlign extends Command {
         
         this.targetReefSide = side;
 
-        this.driveController.setTolerance(0.05, 0.1);
+        thetaController.setTolerance(0.1047); //6 degrees
+        driveController.setTolerance(0.2);
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
@@ -166,7 +165,6 @@ public class ReefAlign extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("Reef align done tbh");
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 

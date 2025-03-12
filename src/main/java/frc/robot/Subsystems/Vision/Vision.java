@@ -52,11 +52,11 @@ public class Vision extends SubsystemBase {
 
     private static PhotonCamera LiberalLCam;
     private static PhotonCamera GretchenRCam;
-    private static PhotonCamera elevatorCamera;
+    // private static PhotonCamera elevatorCamera;
 
     private static List<PhotonPipelineResult> FLcameraResult;
     private static List<PhotonPipelineResult> FRcameraResult;
-    private static List<PhotonPipelineResult> elevatorCameraResult;
+    // private static List<PhotonPipelineResult> elevatorCameraResult;
 
     private Transform3d FLcameraToRobotTransform = new Transform3d(
         new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
@@ -66,13 +66,13 @@ public class Vision extends SubsystemBase {
         new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
         new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
 
-    private Transform3d elevatorCameraToRobotTransform = new Transform3d(
-        new Translation3d(Units.inchesToMeters(2.5), Units.inchesToMeters(2.215), Units.inchesToMeters(-40.322)), // need this
-        new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0),Units.degreesToRadians(180)));
+    // private Transform3d elevatorCameraToRobotTransform = new Transform3d(
+    //     new Translation3d(Units.inchesToMeters(2.5), Units.inchesToMeters(2.215), Units.inchesToMeters(-40.322)), // need this
+    //     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0),Units.degreesToRadians(180)));
 
     PhotonPoseEstimator FLphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FLcameraToRobotTransform);
     PhotonPoseEstimator FRphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FRcameraToRobotTransform);
-    PhotonPoseEstimator elevatorPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, elevatorCameraToRobotTransform);
+    // PhotonPoseEstimator elevatorPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, elevatorCameraToRobotTransform);
 
     CommandSwerveDrivetrain s_Swerve;
     LimelightSubsystem s_Lime;
@@ -98,7 +98,7 @@ public class Vision extends SubsystemBase {
 
         FLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         FRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-        elevatorPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        // elevatorPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
         updateAprilTagResults();
     }
@@ -214,9 +214,8 @@ public class Vision extends SubsystemBase {
                 VisionOutput newPose = new VisionOutput(robotPose,
                     multiTagOutput.getTimestamp(),
                     multiTagOutput.getBestTarget(),
-                    robotState.getOdomRobotVelocity(multiTagOutput.getTimestamp()));
+                    robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(multiTagOutput.getTimestamp())), true);
                 
-                    System.out.println("multitagged");
                 s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds));
             }
         
@@ -233,9 +232,9 @@ public class Vision extends SubsystemBase {
                                 FLcameraToRobotTransform),
                             photonPipelineResult.getTimestampSeconds(),
                             photonPipelineResult.getBestTarget(),
-                            robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
+                            robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())), false);
 
-                            // System.out.println("FL pose: " + newPose.estimatedPose.toString());
+                            // System.out.println("FL pose: " + newPose.estimatedPose.toString() + " stddev: " + newPose.standardDev.toString());
 
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
 
@@ -248,18 +247,18 @@ public class Vision extends SubsystemBase {
                                 FRcameraToRobotTransform),
                             photonPipelineResult.getTimestampSeconds(),
                             photonPipelineResult.getBestTarget(),
-                            robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
+                            robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())) , false);
 
-                            // System.out.println("FR pose: " + newPose.estimatedPose.toString());
+                            // System.out.println("FR pose: " + newPose.estimatedPose.toString() + " stddev: " + newPose.standardDev.toString());
 
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
 
-                    } else if (elevatorPhotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
+                    // } else if (elevatorPhotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
                         
-                        // System.out.println("Elevator pose " + elevatorPhotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
-                        VisionOutput newPose = new VisionOutput(elevatorPhotonPoseEstimator.update(photonPipelineResult).get(),
-                        robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
+                    //     // System.out.println("Elevator pose " + elevatorPhotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
+                    //     VisionOutput newPose = new VisionOutput(elevatorPhotonPoseEstimator.update(photonPipelineResult).get(),
+                    //     robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
+                    //     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
 
                     } else {
                         System.out.println("Vision is borked");

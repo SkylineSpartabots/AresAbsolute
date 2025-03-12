@@ -244,6 +244,6 @@ public class Slapdown extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("intake pivot position", getPosition());
+    // SmartDashboard.putNumber("intake pivot position", getPosition());
   }
 }

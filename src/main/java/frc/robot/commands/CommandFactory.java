@@ -161,15 +161,13 @@ public class CommandFactory {
     public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
             new ReefAlign(pole),
-            new PoleAlign(level, pole),
-            new SetOuttake(level)
+            new PoleAlign(level, pole)
         ).raceWith(new CancelableCommand(controller));
     }
 
     public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work
-            new PoleAlign(level, pole),
-            new SetOuttake(level)
+            new PoleAlign(level, pole)
         ).raceWith(new CancelableCommand(controller));
     }
 

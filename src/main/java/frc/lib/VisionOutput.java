@@ -39,11 +39,14 @@ public class VisionOutput {
 
     public final Matrix<N3,N1> standardDev;
 
-    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed, IChassisSpeeds speedSnapshot)  {
+    private final boolean multitag;
+
+    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, List<PhotonTrackedTarget> targetsUsed, IChassisSpeeds speedSnapshot, boolean multitag)  {
         this.estimatedPose = estimatedPose;
         this.timestampSeconds = timestampSeconds;
         this.targetsUsed = targetsUsed;
-        this.standardDev = getStandardDeviation(targetsUsed, speedSnapshot);
+        this.multitag = multitag;
+        this.standardDev = getStandardDeviation(targetsUsed, speedSnapshot, multitag);
     }
 
     // public VisionOutput(Pose2d estimatedPose, double timestampSeconds, Matrix<N3,N1> standardDev)  {
@@ -53,15 +56,16 @@ public class VisionOutput {
     //     this.standardDev = standardDev;
     // }
 
-    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, PhotonTrackedTarget targetsUsed, IChassisSpeeds speedSnapshot)  {
+    public VisionOutput(Pose3d estimatedPose, double timestampSeconds, PhotonTrackedTarget targetsUsed, IChassisSpeeds speedSnapshot, boolean multitag)  {
         this.estimatedPose = estimatedPose;
         this.timestampSeconds = timestampSeconds;
         this.targetsUsed = Collections.singletonList(targetsUsed);
-        this.standardDev = getStandardDeviation(this.targetsUsed, speedSnapshot);
+        this.multitag = multitag;
+        this.standardDev = getStandardDeviation(this.targetsUsed, speedSnapshot, multitag);
     }
 
-    public VisionOutput(EstimatedRobotPose pose, IChassisSpeeds speedSnapshot)  {
-        this(pose.estimatedPose, pose.timestampSeconds, pose.targetsUsed, speedSnapshot);
+    public VisionOutput(EstimatedRobotPose pose, IChassisSpeeds speedSnapshot, boolean multitag)  {
+        this(pose.estimatedPose, pose.timestampSeconds, pose.targetsUsed, speedSnapshot, multitag);
     }
     
     // public VisionOutput(PoseEstimate poseEstimate){
@@ -72,32 +76,33 @@ public class VisionOutput {
         return VecBuilder.fill(0, 0, 0); //If we are not using limelight im not going to do this one
     }
 
-    private static Matrix<N3,N1> getStandardDeviation(List<PhotonTrackedTarget> targets, IChassisSpeeds speedSnapshot) {
-        if (targets.isEmpty()) return VecBuilder.fill(0.05, 0.05, 0.05); // Set default closer to known real-world values
+    private static Matrix<N3,N1> getStandardDeviation(List<PhotonTrackedTarget> targets, IChassisSpeeds speedSnapshot, boolean multitag) {
+        if (targets.isEmpty()) return VecBuilder.fill(0.07, 0.07, 0.1); // Set default closer to known real-world values
     
-        double stddevX = 0.04
-            + (0.025 * speedSnapshot.getVx() / 6) 
+        double stddevX = (0.025
+            + (0.025 * speedSnapshot.getVx() / 6)
             + 0.06 * Math.pow((speedSnapshot.getOmega() / (Math.PI / 2)), 1.5) 
-            + 0.08 * ((speedSnapshot.getVx() / 6) * (speedSnapshot.getOmega() / (Math.PI / 2)));
+            + 0.08 * ((speedSnapshot.getVx() / 6) * (speedSnapshot.getOmega() / (Math.PI / 2)))) / 2.75;
 
-        double stddevY = 0.04
+        double stddevY = (0.025
             + (0.025 * speedSnapshot.getVy() / 6) 
             + 0.06 * Math.pow((speedSnapshot.getOmega() / (Math.PI / 2)), 1.5) 
-            + 0.08 * ((speedSnapshot.getVy() / 6) * (speedSnapshot.getOmega() / (Math.PI / 2)));
+            + 0.08 * ((speedSnapshot.getVy() / 6) * (speedSnapshot.getOmega() / (Math.PI / 2)))) / 2.75;
 
-        double stddevTheta = 0.035
-            + (0.025 * speedSnapshot.toMagnitude() / 6) 
-            + 0.06 * Math.pow((speedSnapshot.getOmega() / (Math.PI / 2)), 1.5) 
-            + 0.08 * ((speedSnapshot.toMagnitude() / 6) * (speedSnapshot.getOmega() / (Math.PI / 2)));
+        double stddevTheta = (0.025
+            + (0.025 * speedSnapshot.toMagnitude() / 6)
+            + 0.06 * Math.pow((speedSnapshot.getOmega() / (Math.PI / 2)), 1.5)
+            + 0.08 * ((speedSnapshot.toMagnitude() / 6) * (speedSnapshot.getOmega() / (Math.PI / 2)))) / 2.75;
 
-        if(targets.size() >= 2)
-            stddevX /= 1.75;
-            stddevY /= 1.75;
-            stddevTheta /= 1.75;
+        if(multitag) {
+            stddevX /= 3;
+            stddevY /= 3;
+            stddevTheta /= 3;
+        }
         
         return VecBuilder.fill(stddevX, stddevY, stddevTheta);
     }
-    
+
 
     public ITranslation2d getInterpolatableTransform2d() {
         return new ITranslation2d(estimatedPose.getTranslation().toTranslation2d().getX(), estimatedPose.getTranslation().toTranslation2d().getY());

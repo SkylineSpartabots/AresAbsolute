@@ -29,7 +29,6 @@ import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Drives to a specified pose.
@@ -49,8 +48,6 @@ public class PoleAlign extends Command {
 
     private Double elevatorGoalPos = Double.POSITIVE_INFINITY;
 
-    private Alliance alliance;
-
     private Pose2d targetPose;
     private RobotState robotState;
     private Translation2d lastSetpointTranslation;
@@ -67,9 +64,8 @@ public class PoleAlign extends Command {
         this.elevatorLevel = elevatorLevel;
 
         thetaController.setTolerance(0.04); //less than 3 degrees
-        driveController.setTolerance(0.06, 0.1);
+        driveController.setTolerance(0.03, 0.1);
 
-        alliance = DriverStation.getAlliance().get();
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       

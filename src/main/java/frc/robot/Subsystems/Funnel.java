@@ -31,7 +31,7 @@ public class Funnel extends SubsystemBase {
   }
 
   public enum FunnelState{
-    INTAKING(0.254),
+    INTAKING(0.4254),
     EJECT(-0.3),
     OFF(0);
     private double rollerSpeed;
@@ -76,6 +76,6 @@ public class Funnel extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putBoolean("funnel beam", getBeamResult());
+    // SmartDashboard.putBoolean("funnel beam", getBeamResult());
   }
 }
