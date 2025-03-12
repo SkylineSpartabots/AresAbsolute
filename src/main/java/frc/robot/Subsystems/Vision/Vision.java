@@ -47,8 +47,8 @@ import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 public class Vision extends SubsystemBase {
     private static Vision instance;
 
-    private static PhotonCamera FLCamera;
-    private static PhotonCamera FRCamera;
+    private static PhotonCamera LiberalLCam;
+    private static PhotonCamera GretchenRCam;
     private static PhotonCamera elevatorCamera;
 
     private static List<PhotonPipelineResult> FLcameraResult;
@@ -90,9 +90,8 @@ public class Vision extends SubsystemBase {
         s_Swerve = CommandSwerveDrivetrain.getInstance();
         robotState = RobotState.getInstance();
 
-        FLCamera = new PhotonCamera(Constants.VisionConstants.FLCamera);
-        FRCamera = new PhotonCamera(Constants.VisionConstants.FRCamera);
-        elevatorCamera = new PhotonCamera(Constants.VisionConstants.elevatorCamera);
+        LiberalLCam = new PhotonCamera(Constants.VisionConstants.FLCamera);
+        GretchenRCam = new PhotonCamera(Constants.VisionConstants.FRCamera);
 
         FLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
         FRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
@@ -102,8 +101,8 @@ public class Vision extends SubsystemBase {
     }
 
     public void updateAprilTagResults() {
-        FLcameraResult = FLCamera.getAllUnreadResults();
-        FRcameraResult = FRCamera.getAllUnreadResults();
+        FLcameraResult = LiberalLCam.getAllUnreadResults();
+        FRcameraResult = GretchenRCam.getAllUnreadResults();
         elevatorCameraResult = elevatorCamera.getAllUnreadResults();
     }
 

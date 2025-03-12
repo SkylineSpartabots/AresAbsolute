@@ -180,9 +180,8 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String elevatorCamera = "Camera_2";
-        public static final String FRCamera = "Camera_1";
-        public static final String FLCamera = "Camera_0";
+        public static final String FRCamera = "Liberal";
+        public static final String FLCamera = "Gretchen";
         public static final int aprilTagMax = 22;
         public static final double aprilTagHeight = 0.122; //bottom of each april tag is 122cm above carpet | unnecessary, we have photonvision's field layout import
         public static final double cameraRollOffset = Units.degreesToRadians(0);
