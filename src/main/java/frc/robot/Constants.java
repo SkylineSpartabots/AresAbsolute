@@ -35,6 +35,8 @@ import com.pathplanner.lib.config.RobotConfig;
  */
 public final class Constants {
 
+    public static boolean usingVision = true;
+
     public static double frontLeftEncoderOffset = 0.1240234375;
     public static double frontRightEncoderOffset = 0.263916;
     public static double backLeftEncoderOffset = -0.423583984;

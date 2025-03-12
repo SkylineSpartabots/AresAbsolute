@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState.RobotState;
+import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
@@ -39,6 +40,7 @@ public class Autos {
 
     private static CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
     private static RobotState robotState = RobotState.getInstance();
+    private static EndEffector ee = EndEffector.getInstance();
     // private static final PIDController thetaController = new PIDController(0, 0, 0); //tune?
     // private static final PIDController xController = new PIDController(0, 0, 0);
     // private static final PIDController yController = new PIDController(0, 0, 0);
@@ -88,6 +90,142 @@ public class Autos {
         new SetOuttake(OuttakeState.SCORE)
       );
      
+  }
+
+  public static Command forwardDealgaeLeft(){
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new ForwardAuto(),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.7),
+          new SetElevator(()->ElevatorState.L4)
+        )
+      ),
+      new SetOuttake(OuttakeState.SCORE),
+      new ForwardAuto(),
+      new InstantCommand(()->ee.setAlgaeSpeed(0.8)),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("R5A4"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.3),
+          new SetElevator(()->ElevatorState.A1)
+        )
+      ),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("A4A3"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.4),
+          new SetElevator(()->ElevatorState.A2)
+        )
+      ),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("A3A2"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.4),
+          new SetElevator(()->ElevatorState.A1)
+        )
+      ),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("A2A1"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.4),
+          new SetElevator(()->ElevatorState.A2)
+        )
+      )
+
+    );
+  }
+
+  public static Command twoCoralLeft(){
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("B1R3"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(1.1),
+          new SetElevator(()->ElevatorState.L4)
+        )
+      ),
+      new SetOuttake(OuttakeState.SCORE),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.2),
+          CommandFactory.FullCoralIntake()
+        ),
+        new FollowChoreoTrajectory("R3S1")
+      ),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(1.4),
+          new SetElevator(()->ElevatorState.L4)
+        ),
+        new FollowChoreoTrajectory("S1R1")
+      ),
+      new SetOuttake(OuttakeState.SCORE)
+    );
+  }
+
+  public static Command twoCoralRight(){
+    return new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("B2R8"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(1.1),
+          new SetElevator(()->ElevatorState.L4)
+        )
+      ),
+      new SetOuttake(OuttakeState.SCORE),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.2),
+          CommandFactory.FullCoralIntake()
+        ),
+        new FollowChoreoTrajectory("R8S2")
+      ),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(1.4),
+          new SetElevator(()->ElevatorState.L4)
+        ),
+        new FollowChoreoTrajectory("S2R9")
+      ),
+      new SetOuttake(OuttakeState.SCORE)
+    );
+  }
+
+  public static Command forwardDealgaeRight(){
+    return new SequentialCommandGroup(
+      new ForwardAuto(),
+      new InstantCommand(()->ee.setAlgaeSpeed(0.8)),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("R5A4"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.3),
+          new SetElevator(()->ElevatorState.A1)
+        )
+      ),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("A4A5"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.4),
+          new SetElevator(()->ElevatorState.A2)
+        )
+      ),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("A5A6"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.4),
+          new SetElevator(()->ElevatorState.A1)
+        )
+      ),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("A6A1"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.4),
+          new SetElevator(()->ElevatorState.A2)
+        )
+      )
+
+    );
   }
 
   public static Command S1R1(){
