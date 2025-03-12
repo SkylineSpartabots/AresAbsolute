@@ -103,7 +103,7 @@ public class Vision extends SubsystemBase {
     public void updateAprilTagResults() {
         FLcameraResult = LiberalLCam.getAllUnreadResults();
         FRcameraResult = GretchenRCam.getAllUnreadResults();
-        elevatorCameraResult = elevatorCamera.getAllUnreadResults();
+        // elevatorCameraResult = elevatorCamera.getAllUnreadResults();
     }
 
     public boolean validateTarget(PhotonPipelineResult camera) {
@@ -263,8 +263,8 @@ public class Vision extends SubsystemBase {
             if(!FRcameraResult.isEmpty()) 
                 updateVision(FRcameraResult, FRcameraToRobotTransform);
     
-            if(!elevatorCameraResult.isEmpty()) 
-                updateVision(elevatorCameraResult, elevatorCameraToRobotTransform);
+            // if(!elevatorCameraResult.isEmpty()) 
+            //     updateVision(elevatorCameraResult, elevatorCameraToRobotTransform);
     
             } catch (Exception e){}
     }

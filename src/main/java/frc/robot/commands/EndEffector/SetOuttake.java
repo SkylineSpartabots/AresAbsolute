@@ -35,11 +35,9 @@ public class SetOuttake extends Command {
   public void initialize() {
     timer.restart();
     
-    if(elevator.getPosition() < (ElevatorState.L3.getEncoderPosition() - 5)) {
-      s_EndEffector.setOuttakeSpeed(0.2);
-    } else {
+  
       s_EndEffector.setOuttakeSpeed(state);
-    }
+    
 
   }
 

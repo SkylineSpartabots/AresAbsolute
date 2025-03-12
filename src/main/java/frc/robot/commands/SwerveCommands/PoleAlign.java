@@ -37,9 +37,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class PoleAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            2.9, 0.1, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            2, 0.1, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            3, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
+            2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
     private EndEffector s_EndEffector;

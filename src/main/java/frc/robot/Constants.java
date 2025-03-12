@@ -301,7 +301,7 @@ public final class Constants {
                 }
             }
 
-            public enum     ReefPoleScoringPoses {
+            public enum ReefPoleScoringPoses {
                 //Now 4.2545 cm offset (to the right)
 
                 //blue

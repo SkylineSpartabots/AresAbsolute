@@ -51,7 +51,7 @@ public class EndEffector extends SubsystemBase {
     configLaser();
     // config(roller, InvertedValue.Clockwise_Positive, NeutralModeValue.Brake);
     algae = new TalonFX(Constants.HardwarePorts.algaeID);
-    config(coral, NeutralModeValue.Brake, InvertedValue.Clockwise_Positive);
+    config(coral, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
     config(algae, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
 
   }
