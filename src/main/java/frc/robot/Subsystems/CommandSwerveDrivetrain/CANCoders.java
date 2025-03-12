@@ -9,6 +9,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 
 public class CANCoders extends SubsystemBase {
   private CANcoder frontLeftEncoder;
@@ -30,6 +32,17 @@ public class CANCoders extends SubsystemBase {
     frontRightEncoder = new CANcoder(4, "drivetrain");
     backLeftEncoder = new CANcoder(5, "drivetrain");
     backRightEncoder = new CANcoder(6, "drivetrain");
+  }
+
+  public void getOffsets(){
+    SmartDashboard.putNumber("front left cancoder offset", (Constants.frontLeftEncoderOffset + frontLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    System.out.println("front left cancoder offset: " + (Constants.frontLeftEncoderOffset + frontLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    SmartDashboard.putNumber("front right cancoder offset", (Constants.frontRightEncoderOffset + frontRightEncoder.getAbsolutePosition().getValueAsDouble()));
+    System.out.println("front right cancoder offset: " + (Constants.frontRightEncoderOffset + frontRightEncoder.getAbsolutePosition().getValueAsDouble()));
+    SmartDashboard.putNumber("back left cancoder offset", (Constants.backLeftEncoderOffset + backLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    System.out.println("back left cancoder offset: " + (Constants.backLeftEncoderOffset + backLeftEncoder.getAbsolutePosition().getValueAsDouble()));
+    SmartDashboard.putNumber("back right cancoder offset", (Constants.backRightEncoderOffset + backRightEncoder.getAbsolutePosition().getValueAsDouble()));
+    System.out.println("back right cancoder offset: " + (Constants.backRightEncoderOffset + backRightEncoder.getAbsolutePosition().getValueAsDouble()));
   }
 
   @Override

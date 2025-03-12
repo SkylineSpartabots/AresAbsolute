@@ -96,6 +96,7 @@ public class EndEffector extends SubsystemBase {
     currentLimitsConfigs.StatorCurrentLimit = Constants.CurrentLimits.outtakePeakCurrentLimit;
     currentLimitsConfigs.StatorCurrentLimitEnable = true;
     motor.optimizeBusUtilization();
+    motor.getConfigurator().apply(config);
     // config.CurrentLimits = currentLimitsConfigs;
     // // motor.optimizeBusUtilization();
   }

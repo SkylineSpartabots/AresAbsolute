@@ -35,6 +35,11 @@ import com.pathplanner.lib.config.RobotConfig;
  */
 public final class Constants {
 
+    public static double frontLeftEncoderOffset = 0.1240234375;
+    public static double frontRightEncoderOffset = 0.263916;
+    public static double backLeftEncoderOffset = -0.423583984;
+    public static double backRightEncoderOffset = -0.32104492187;
+
     public static double MaxSpeed = 6; //can be lowered during testing
     public static double MaxAcceleration = 3; //can be lowered during testing
     public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity

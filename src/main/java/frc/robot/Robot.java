@@ -187,20 +187,21 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledPeriodic() {
-    if(firstAuto.getSelected() != firstSavedChoice){ //Note: might be able to use the onchange() method in sendable chooser
-      firstSavedChoice = firstAuto.getSelected();
-      // m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
-      updateSecondAuto();
-    }
-    if(secondAuto.getSelected() != secondSavedChoice){
-      secondSavedChoice = secondAuto.getSelected();
-      updateThirdAuto();
-      // m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
-    }
-    if(thirdAuto.getSelected() != thirdSavedChoice){
-      thirdSavedChoice = thirdAuto.getSelected();
-      // m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
-    }
+    // if(firstAuto.getSelected() != firstSavedChoice){ //Note: might be able to use the onchange() method in sendable chooser
+    //   firstSavedChoice = firstAuto.getSelected();
+    //   // m_autonomousCommand.addCommands(firstSavedChoice.getCommand());
+    //   updateSecondAuto();
+    // }
+    // if(secondAuto.getSelected() != secondSavedChoice){
+    //   secondSavedChoice = secondAuto.getSelected();
+    //   updateThirdAuto();
+    //   // m_autonomousCommand.addCommands(secondSavedChoice.getCommand());
+    // }
+    // if(thirdAuto.getSelected() != thirdSavedChoice){
+    //   thirdSavedChoice = thirdAuto.getSelected();
+    //   // m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
+    // }
+
   }
 
   @Override

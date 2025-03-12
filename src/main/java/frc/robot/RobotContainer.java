@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Subsystems.CommandSwerveDrivetrain.CANCoders;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
@@ -74,6 +75,7 @@ public class RobotContainer {
   private final EndEffector endEffector = EndEffector.getInstance();
   private final Funnel funnel = Funnel.getInstance();
   private final Climb climb = Climb.getInstance();
+  private final CANCoders cancoders = CANCoders.getInstance();
 
   /* Driver Buttons */
   private final Trigger driverBack = driver.back();
@@ -197,7 +199,7 @@ public class RobotContainer {
     // driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
 
-    driver.start().whileTrue(new RunClimb(-0.9));
+    driver.start().onTrue(new ZeroElevator());
     driverLeftTrigger.whileTrue(new SlowDrive());
     driverRightTrigger.onTrue(CommandFactory.ShootCoral());
 
@@ -240,7 +242,7 @@ public class RobotContainer {
     // operatorDpadUp.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
     operatorDpadDown.whileTrue(new AdjustElevator(-0.05));
     // operatorDpadDown.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
-
+    operatorRightTrigger.onTrue(new InstantCommand(()-> cancoders.getOffsets()));
     operator.a().onTrue(new SetPivot(PivotState.HOLD));
     // operator.rightTrigger().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2)));
 
