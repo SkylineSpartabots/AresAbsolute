@@ -137,7 +137,7 @@ public final class Constants {
     }
 
 
-    public static final double stickDeadband = 0.09;
+    public static final double stickDeadband = 0.075;
     public static final double triggerDeadzone = 0.2;
 
 
