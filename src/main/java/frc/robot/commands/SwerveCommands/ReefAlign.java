@@ -46,6 +46,7 @@ public class ReefAlign extends Command {
 
     private ReefSidePositions targetReefSide; 
 
+    private Supplier<ReefPoleScoringPoses> pole;
     private Pose2d targetPose;
     private RobotState robotState;
     private Translation2d lastSetpointTranslation;
@@ -71,10 +72,7 @@ public class ReefAlign extends Command {
         this.robotState = RobotState.getInstance();
         System.out.println("my o dinal: " + (int) pole.get().ordinal() / 2);
 
-        if(Constants.alliance == Alliance.Blue)
-                this.targetReefSide = ReefSidePositions.values()[(int) (pole.get().ordinal() / 2)];
-        else 
-                this.targetReefSide = ReefSidePositions.values()[5 + (int)(pole.get().ordinal() / 2)];
+        this.pole = pole;
 
         thetaController.setTolerance(0.1); //less than 6 degrees
         driveController.setTolerance(0.2);
@@ -85,6 +83,11 @@ public class ReefAlign extends Command {
 
     @Override
     public void initialize() {
+        if(Constants.alliance == Alliance.Blue)
+                this.targetReefSide = ReefSidePositions.values()[(int) (pole.get().ordinal() / 2)];
+        else 
+                this.targetReefSide = ReefSidePositions.values()[5 + (int)(pole.get().ordinal() / 2)];
+
         targetPose = targetReefSide.getPose();
 
         Pose2d currentPose = s_Swerve.getPose();

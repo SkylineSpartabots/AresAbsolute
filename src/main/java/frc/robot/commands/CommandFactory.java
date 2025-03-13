@@ -62,7 +62,7 @@ public class CommandFactory {
                 new SetElevator(() -> state),
                 new InstantCommand(()->ee.setAlgaeSpeed(0.5))
             ),
-            Commands.waitSeconds(0.6),
+            Commands.waitSeconds(4.8254),
             new InstantCommand(()->ee.setAlgaeSpeed(0))
         );
     }

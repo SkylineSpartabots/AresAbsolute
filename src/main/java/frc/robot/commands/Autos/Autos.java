@@ -71,7 +71,7 @@ public class Autos {
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("B1R3"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.7),
+          Commands.waitSeconds(0.3),
           new SetElevator(()->ElevatorState.L4))
         ),
         new SetOuttake(OuttakeState.SCORE)
@@ -84,7 +84,7 @@ public class Autos {
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("B2R8"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.7),
+          Commands.waitSeconds(0.3),
           new SetElevator(()->ElevatorState.L4))
         ),
         new SetOuttake(OuttakeState.SCORE)
@@ -95,9 +95,9 @@ public class Autos {
   public static Command forwardDealgaeLeft(){
     return new SequentialCommandGroup(
       new ParallelCommandGroup(
-        new ForwardAuto(),
+        new FollowChoreoTrajectory("B3R5"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.7),
+          Commands.waitSeconds(0.45),
           new SetElevator(()->ElevatorState.L4)
         )
       ),
@@ -141,21 +141,21 @@ public class Autos {
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("B1R3"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.1),
+          Commands.waitSeconds(0.75),
           new SetElevator(()->ElevatorState.L4)
         )
       ),
       new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.2),
+          Commands.waitSeconds(0.1),
           CommandFactory.FullCoralIntake()
         ),
         new FollowChoreoTrajectory("R3S1")
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.4),
+          Commands.waitSeconds(0.8),
           new SetElevator(()->ElevatorState.L4)
         ),
         new FollowChoreoTrajectory("S1R1")
@@ -169,21 +169,21 @@ public class Autos {
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("B2R8"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.1),
+          Commands.waitSeconds(0.75),
           new SetElevator(()->ElevatorState.L4)
         )
       ),
       new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.2),
+          Commands.waitSeconds(0.1),
           CommandFactory.FullCoralIntake()
         ),
         new FollowChoreoTrajectory("R8S2")
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.4),
+          Commands.waitSeconds(0.8),
           new SetElevator(()->ElevatorState.L4)
         ),
         new FollowChoreoTrajectory("S2R9")
@@ -194,8 +194,8 @@ public class Autos {
 
   public static Command forwardDealgaeRight(){
     return new SequentialCommandGroup(
-      new ForwardAuto(),
-      new InstantCommand(()->ee.setAlgaeSpeed(0.8)),
+      new FollowChoreoTrajectory("B3R5"),
+      new InstantCommand(()->ee.setAlgaeSpeed(0.45)),
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("R5A4"),
         new SequentialCommandGroup(

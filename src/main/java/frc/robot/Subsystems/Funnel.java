@@ -57,6 +57,7 @@ public class Funnel extends SubsystemBase {
     config.MotorOutput.Inverted = direction;
 
     roller.getConfigurator().apply(config);
+    roller.getSupplyCurrent().setUpdateFrequency(50);
     roller.optimizeBusUtilization();
   }
 
@@ -75,6 +76,7 @@ public class Funnel extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("funnel current", roller.getSupplyCurrent().getValueAsDouble());
     // This method will be called once per scheduler run
     // SmartDashboard.putBoolean("funnel beam", getBeamResult());
   }

@@ -198,7 +198,7 @@ public class RobotContainer {
     // driver.back().whileTrue(new RunClimb(0.9));
     // driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
-
+    // driver.back().onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     driver.start().onTrue(new ZeroElevator());
     driverLeftTrigger.whileTrue(new SlowDrive());
     driverRightTrigger.onTrue(CommandFactory.ShootCoral());
@@ -214,8 +214,8 @@ public class RobotContainer {
     // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
 
-    driverDpadUp.whileTrue(new RunClimb(-0.9));
-    driverDpadDown.whileTrue(new RunClimb(0.9));
+    driverDpadUp.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
+    driverDpadDown.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
 
     // driverDpadDown.onTrue(CommandFactory.SmartAlgeaIntake());
     // driverDpadUp.onTrue(new SetRoller(RollerState.OUTTAKE));
