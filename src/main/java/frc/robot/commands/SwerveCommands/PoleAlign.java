@@ -144,6 +144,7 @@ public class PoleAlign extends Command {
 
         // other actions
         if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
+                System.out.println(elevatorGoalPos);
                 new SetElevator(elevatorGoalPos).schedule();
                 elevatorGoalPos = Double.POSITIVE_INFINITY;
         }
