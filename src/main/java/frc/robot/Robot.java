@@ -165,6 +165,8 @@ public class Robot extends LoggedRobot {
     chosenAuto.addOption("forward + dealgae right", Autos.forwardDealgaeRight());
     chosenAuto.addOption("1 + 1 left", Autos.twoCoralLeft());
     chosenAuto.addOption("1 + 1 right", Autos.twoCoralRight());
+    chosenAuto.addOption("1 + 2 left", Autos.threeCoralLeft());
+    chosenAuto.addOption("1 + 2 right", Autos.threeCoralRight());
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
     // AutoCommand.loadAutos(); TODO ethan fix this
     SmartDashboard.putData("first auto", firstAuto);
