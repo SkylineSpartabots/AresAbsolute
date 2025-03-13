@@ -228,7 +228,7 @@ public class Robot extends LoggedRobot {
     m_autonomousCommand = chosenAuto.getSelected();
 
     new SequentialCommandGroup(
-      new ZeroSlapdown(),
+      // new ZeroSlapdown(),
       new ZeroElevator(),
       m_autonomousCommand
 

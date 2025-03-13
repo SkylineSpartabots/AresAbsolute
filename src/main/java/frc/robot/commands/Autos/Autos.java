@@ -186,7 +186,7 @@ public class Autos {
           Commands.waitSeconds(0.8),
           new SetElevator(()->ElevatorState.L4)
         ),
-        new FollowChoreoTrajectory("S2R9")
+        new FollowChoreoTrajectory("S2R10")
       ),
       new SetOuttake(OuttakeState.SCORE)
     );

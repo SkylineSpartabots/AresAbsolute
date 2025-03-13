@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class PoleAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            2.23, 0.2, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            2.63, 0.2, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
@@ -146,7 +146,7 @@ public class PoleAlign extends Command {
         // other actions
         if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
                 System.out.println(elevatorGoalPos);
-                new SetElevator(elevatorGoalPos-1).schedule();
+                // new SetElevator(elevatorGoalPos-1).schedule();
                 elevatorGoalPos = Double.POSITIVE_INFINITY;
         }
 

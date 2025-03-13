@@ -237,7 +237,7 @@ public class RobotContainer {
 
     // ----------====# Operator bindings #====----------
     operator.start().whileTrue(new ZeroElevator());
-    operator.back().onTrue(new ZeroSlapdown());
+    // operator.back().onTrue(new ZeroSlapdown());
 
     operator.y().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
 
@@ -248,10 +248,10 @@ public class RobotContainer {
     operatorDpadDown.whileTrue(new AdjustElevator(-0.05));
     // operatorDpadDown.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
     operatorRightTrigger.onTrue(new InstantCommand(()-> cancoders.getNewOffsets()));
-    operator.a().onTrue(new SetPivot(PivotState.HOLD));
+    // operator.a().onTrue(new SetPivot(PivotState.HOLD));
     // operator.rightTrigger().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2)));
 
-    operator.b().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.1)));
+    operator.b().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.15)));
     operator.b().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
 
