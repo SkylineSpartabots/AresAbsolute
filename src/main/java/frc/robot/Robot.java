@@ -168,6 +168,7 @@ public class Robot extends LoggedRobot {
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
     // AutoCommand.loadAutos(); TODO ethan fix this
     SmartDashboard.putData("first auto", firstAuto);
+    SmartDashboard.putData("autochoices", chosenAuto);
 
     
 
@@ -258,7 +259,7 @@ public class Robot extends LoggedRobot {
       m_autonomousCommand.cancel();
     }
     new ZeroSlapdown().schedule();
-    // Constants.alliance = DriverStation.getAlliance().get();
+    Constants.alliance = DriverStation.getAlliance().get();
   }
 
   @Override

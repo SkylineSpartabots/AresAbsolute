@@ -74,6 +74,7 @@ public class PoleAlign extends Command {
     @Override
     public void initialize() {
         elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
+        System.out.println(elevatorGoalPos + "bo");
         targetPose = targetReefPole.get().getPose();
 
         Pose2d currentPose = s_Swerve.getPose();
@@ -145,7 +146,7 @@ public class PoleAlign extends Command {
         // other actions
         if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
                 System.out.println(elevatorGoalPos);
-                new SetElevator(elevatorGoalPos).schedule();
+                new SetElevator(elevatorGoalPos-1).schedule();
                 elevatorGoalPos = Double.POSITIVE_INFINITY;
         }
 

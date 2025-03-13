@@ -29,8 +29,8 @@ public class ForwardAuto extends Command {
   
   private CommandSwerveDrivetrain dt;
   private DriveControlSystems controlSystems;
-  double timebeforeextension = 0.3;
-  double drivetime = 8;
+  double timebeforeextension = 0.1;
+  double drivetime = 1.6;
   private double rotSetpoint;
   boolean extended = false;
 
@@ -58,8 +58,8 @@ public class ForwardAuto extends Command {
     } else dt.resetPose(new Pose2d(10.3994361114502, 3.903835117012024, Rotation2d.fromDegrees(0)));
     
     
-    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, 0));
-    Constants.usingVision = false;
+    dt.setControl(controlSystems.robotCentricDrive(1.5, 0, 0));
+    // Constants.usingVision = false;
     
     SmartDashboard.putBoolean("auto running", true);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -71,7 +71,7 @@ public class ForwardAuto extends Command {
   @Override
   public void execute() {
     Pose2d currPose = dt.getPose();
-    dt.setControl(controlSystems.robotCentricDrive(0.8, 0, thetaController.calculate(currPose.getRotation().getRadians(), rotSetpoint)));
+    dt.setControl(controlSystems.robotCentricDrive(1.5, 0, thetaController.calculate(currPose.getRotation().getRadians(), rotSetpoint)));
     }
     
     
