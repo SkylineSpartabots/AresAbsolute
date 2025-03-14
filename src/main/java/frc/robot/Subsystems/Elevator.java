@@ -157,6 +157,12 @@ public class Elevator extends SubsystemBase {
     return leader.getAcceleration().getValueAsDouble();
   }
 
+  public void brake(){
+    leader.setControl(new PositionVoltage(leader.getPosition().getValueAsDouble()).withEnableFOC(true).withSlot(0));
+    follower.setControl(new PositionVoltage(follower.getPosition().getValueAsDouble()).withEnableFOC(true).withSlot(0));
+
+  }
+
   public void zeroPosition() {
     leader.setPosition(0);
     follower.setPosition(0);

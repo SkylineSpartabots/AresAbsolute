@@ -54,18 +54,18 @@ public class ReefAlign extends Command {
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
 
-    public ReefAlign(ReefSidePositions side) {
-        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
-        this.robotState = RobotState.getInstance();
+//     public ReefAlign(ReefSidePositions side) {
+//         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
+//         this.robotState = RobotState.getInstance();
         
-        this.targetReefSide = side;
+//         this.targetReefSide = side;
 
-        thetaController.setTolerance(0.1047); //6 degrees
-        driveController.setTolerance(0.2);
+//         thetaController.setTolerance(0.1047); //6 degrees
+//         driveController.setTolerance(0.2);
 
-        addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
-    }
+//         addRequirements(s_Swerve);
+//         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
+//     }
 
     public ReefAlign(Supplier<ReefPoleScoringPoses> pole) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
@@ -86,7 +86,7 @@ public class ReefAlign extends Command {
         if(Constants.alliance == Alliance.Blue)
                 this.targetReefSide = ReefSidePositions.values()[(int) (pole.get().ordinal() / 2)];
         else 
-                this.targetReefSide = ReefSidePositions.values()[5 + (int)(pole.get().ordinal() / 2)];
+                this.targetReefSide = ReefSidePositions.values()[6 + (int)((pole.get().ordinal() - 12) / 2)];
 
         targetPose = targetReefSide.getPose();
 

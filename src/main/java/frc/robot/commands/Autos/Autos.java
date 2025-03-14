@@ -142,10 +142,11 @@ public class Autos {
         new FollowChoreoTrajectory("B1R3"),
         new SequentialCommandGroup(
           Commands.waitSeconds(0.75),
-          new SetElevator(()->ElevatorState.L4)
+          new SetElevator(()->ElevatorState.L4),
+          Commands.waitSeconds(0.2),
+          new SetOuttake(OuttakeState.SCORE)
         )
       ),
-      new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -155,12 +156,13 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.8),
-          new SetElevator(()->ElevatorState.L4)
+          Commands.waitSeconds(1.15),
+          new SetElevator(()->ElevatorState.L4),
+          Commands.waitSeconds(0.2),
+          new SetOuttake(OuttakeState.SCORE)
         ),
         new FollowChoreoTrajectory("S1R1")
       ),
-      new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -170,12 +172,13 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.8),
-          new SetElevator(()->ElevatorState.L4)
+          Commands.waitSeconds(1.15),
+          new SetElevator(()->ElevatorState.L4),
+          Commands.waitSeconds(0.3),
+          new SetOuttake(OuttakeState.SCORE)
         ),
         new FollowChoreoTrajectory("S1R2")
-      ),
-      new SetOuttake(OuttakeState.SCORE)
+      )
     );
   }
 
@@ -185,10 +188,11 @@ public class Autos {
         new FollowChoreoTrajectory("B2R8"),
         new SequentialCommandGroup(
           Commands.waitSeconds(0.75),
-          new SetElevator(()->ElevatorState.L4)
+          new SetElevator(()->ElevatorState.L4),
+          Commands.waitSeconds(0.2),
+          new SetOuttake(OuttakeState.SCORE)
         )
       ),
-      new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -198,12 +202,13 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.8),
-          new SetElevator(()->ElevatorState.L4)
+          Commands.waitSeconds(1.15),
+          new SetElevator(()->ElevatorState.L4),
+          Commands.waitSeconds(0.2),
+          new SetOuttake(OuttakeState.SCORE)
         ),
         new FollowChoreoTrajectory("S2R9")
       ),
-      new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -213,12 +218,13 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.8),
-          new SetElevator(()->ElevatorState.L4)
+          Commands.waitSeconds(1.15),
+          new SetElevator(()->ElevatorState.L4),
+          Commands.waitSeconds(0.2),
+          new SetOuttake(OuttakeState.SCORE)
         ),
         new FollowChoreoTrajectory("S2R10")
-      ),
-      new SetOuttake(OuttakeState.SCORE)
+      )
     );
   }
 

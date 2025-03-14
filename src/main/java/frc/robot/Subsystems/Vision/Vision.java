@@ -216,7 +216,7 @@ public class Vision extends SubsystemBase {
                     multiTagOutput.getBestTarget(),
                     robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(multiTagOutput.getTimestamp())), true);
                 
-                s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds));
+                s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0075, 0.0075, 0.01));
             }
         
         } else { // if no multitags, use other tag data
@@ -236,7 +236,7 @@ public class Vision extends SubsystemBase {
 
                             // System.out.println("FL pose: " + newPose.estimatedPose.toString() + " stddev: " + newPose.standardDev.toString());
 
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
+                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08)); 
 
                     } else if (FRphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
 
@@ -251,7 +251,7 @@ public class Vision extends SubsystemBase {
 
                             // System.out.println("FR pose: " + newPose.estimatedPose.toString() + " stddev: " + newPose.standardDev.toString());
 
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
+                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08)); 
 
                     // } else if (elevatorPhotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
                         
