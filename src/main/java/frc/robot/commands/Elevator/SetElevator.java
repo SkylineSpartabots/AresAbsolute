@@ -91,7 +91,7 @@ public class SetElevator extends Command {
   
   @Override
   public void end(boolean interrupted) {
-    s_Elevator.setSpeed(0);
+    // s_Elevator.setSpeed(0);
     // s_Elevator.setPosition(s_Elevator.getPosition());
     System.out.println(s_Elevator.getPosition());
     System.out.println("final time: " + timer.get());
