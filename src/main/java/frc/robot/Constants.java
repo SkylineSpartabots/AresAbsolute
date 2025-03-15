@@ -37,10 +37,10 @@ public final class Constants {
 
     public static boolean usingVision = true;
 
-    public static double frontLeftEncoderOffset = 0.11572265625;
-    public static double frontRightEncoderOffset = 0.2668457;
-    public static double backLeftEncoderOffset = -0.4262695;
-    public static double backRightEncoderOffset = -0.343749999;
+    public static double frontLeftEncoderOffset = 0.12646484;
+    public static double frontRightEncoderOffset = 0.268554684;
+    public static double backLeftEncoderOffset = -0.41601559;
+    public static double backRightEncoderOffset = -0.335205077;
 
     public static double MaxSpeed = 6; //can be lowered during testing
     public static double MaxAcceleration = 3; //can be lowered during testing
