@@ -234,7 +234,7 @@ public class Vision extends SubsystemBase {
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())), false);
 
-                            // System.out.println("FL pose: " + newPose.estimatedPose.toString() + " stddev: " + newPose.standardDev.toString());
+                            System.out.println("FL pose: " + newPose.estimatedPose.toString());
 
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08)); 
 
@@ -249,7 +249,7 @@ public class Vision extends SubsystemBase {
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())) , false);
 
-                            // System.out.println("FR pose: " + newPose.estimatedPose.toString() + " stddev: " + newPose.standardDev.toString());
+                            System.out.println("FR pose: " + newPose.estimatedPose.toString());
 
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08)); 
 
