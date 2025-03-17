@@ -160,9 +160,14 @@ public class CommandFactory {
     //Automation commands
     public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
+            CommandFactory.FullCoralIntake(),
+
+            new SequentialCommandGroup(
             new ReefAlign(pole),
             new PoleAlign(level, pole)
-        ).raceWith(new CancelableCommand(controller));
+            ).raceWith(new CancelableCommand(controller)
+            
+        ));
     }
 
     public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
