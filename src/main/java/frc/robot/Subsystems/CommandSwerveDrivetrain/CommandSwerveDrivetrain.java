@@ -57,6 +57,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -295,6 +296,33 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         .withSpeeds(speeds));
     }
 
+
+
+    // automation
+
+    public Command followPathCommand(PathPlannerPath path, PIDConstants drive, PIDConstants theta) {
+        try{
+            return new FollowPathCommand(
+                    path,
+                    this::getPose, // Robot pose supplier
+                    this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                    this::applyFieldSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds, AND feedforwards
+                    new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                            drive, // Translation PID constants
+                            theta // Rotation PID constants
+                    ),
+                    Constants.config, // The robot configuration
+                    () -> {
+                    return DriverStation.getAlliance().map(a -> a == DriverStation.Alliance.Red).orElse(false);
+                    },
+                    this // Reference to this subsystem to set requirements
+            );
+        } catch (Exception e) {
+            DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+            return Commands.none();
+        }
+      }
+
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
@@ -326,6 +354,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Pose2d getPose(){
         return s_Swerve.getState().Pose;
+    }
+
+    public Supplier<Pose2d> getPoseSupplier(){
+        return() ->  s_Swerve.getState().Pose;
     }
 
     public SwerveModuleState getDesiredState(){
