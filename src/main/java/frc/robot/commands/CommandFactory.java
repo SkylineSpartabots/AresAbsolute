@@ -33,7 +33,6 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.SwerveCommands.PoleAlign;
 import frc.robot.commands.SwerveCommands.ReefAlign;
-import frc.robot.commands.TeleopAutomation.CreatePolePath;
 import frc.robot.commands.TeleopAutomation.PathToPole;
 import frc.robot.commands.TeleopAutomation.PathToReef;
 import frc.robot.Constants;
