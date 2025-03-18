@@ -25,8 +25,10 @@ import frc.robot.RobotContainer;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
+import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
@@ -41,6 +43,8 @@ public class Autos {
     private static CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
     private static RobotState robotState = RobotState.getInstance();
     private static EndEffector ee = EndEffector.getInstance();
+    private static Elevator elevator = Elevator.getInstance();
+    private static Funnel funnel = Funnel.getInstance();
     // private static final PIDController thetaController = new PIDController(0, 0, 0); //tune?
     // private static final PIDController xController = new PIDController(0, 0, 0);
     // private static final PIDController yController = new PIDController(0, 0, 0);
@@ -143,7 +147,7 @@ public class Autos {
         new SequentialCommandGroup(
           Commands.waitSeconds(0.75),
           new SetElevator(()->ElevatorState.L4),
-          Commands.waitSeconds(0.2),
+          Commands.waitSeconds(0.5),
           new SetOuttake(OuttakeState.SCORE)
         )
       ),
@@ -158,7 +162,7 @@ public class Autos {
         new SequentialCommandGroup(
           Commands.waitSeconds(1.15),
           new SetElevator(()->ElevatorState.L4),
-          Commands.waitSeconds(0.2),
+          Commands.waitSeconds(0.7),
           new SetOuttake(OuttakeState.SCORE)
         ),
         new FollowChoreoTrajectory("S1R1")
@@ -292,7 +296,7 @@ public class Autos {
         new FollowChoreoTrajectory("R5A4"),
         new SequentialCommandGroup(
           Commands.waitSeconds(0.3),
-          new SetElevator(()->ElevatorState.A1)
+          new SetElevator(()->ElevatorState.L4)
         )
       ),
       new ParallelCommandGroup(

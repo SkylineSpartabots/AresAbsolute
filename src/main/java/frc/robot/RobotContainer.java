@@ -256,7 +256,8 @@ public class RobotContainer {
 
     operator.b().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.15)));
     operator.b().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
-
+    operator.a().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(-0.15)));
+    operator.a().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
   }
 
