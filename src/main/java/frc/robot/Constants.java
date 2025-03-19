@@ -55,6 +55,16 @@ public final class Constants {
 
     public static double intakePivotCurrentThreshold = 70;
 
+    public static RobotConfig config = new RobotConfig(
+        Constants.robotMass,
+        Constants.MOI,
+        Constants.moduleConfig,
+        Constants.moduleLocations.FL,
+        Constants.moduleLocations.FR,
+        Constants.moduleLocations.BL,
+        Constants.moduleLocations.BR
+    );
+
     public static DCMotor motorConfig = new DCMotor(
         Constants.KrakenConstants.nominalVoltageVolts,
         Constants.KrakenConstants.stallTorqueNewtonMeters,
@@ -92,16 +102,6 @@ public final class Constants {
         );
 
     }
-    
-    public static RobotConfig config = new RobotConfig(
-        Constants.robotMass,
-        Constants.MOI,
-        Constants.moduleConfig,
-        Constants.moduleLocations.FL,
-        Constants.moduleLocations.FR,
-        Constants.moduleLocations.BL,
-        Constants.moduleLocations.BR
-    );
 
     public static final class moduleLocations {
         public static final Translation2d FL = new Translation2d(-13.5, 13.5);
@@ -111,10 +111,10 @@ public final class Constants {
     };
 
     public static final class KrakenConstants {
-        public static final double nominalVoltageVolts = 9; //website says up to 24 volts idk man
-        public static final double stallTorqueNewtonMeters = 7;
-        public static final double stallCurrentAmps = 366;
-        public static final double freeCurrentAmps = 2;
+        public static final double nominalVoltageVolts = 12; //website says up to 24 volts idk man
+        public static final double stallTorqueNewtonMeters = 4.21;
+        public static final double stallCurrentAmps = 233;
+        public static final double freeCurrentAmps = 2.32;
         public static final double freeSpeedRadPerSec = 5800;
         public static final double driveCurrentLimitAmps = 60;
         public static final double torqueLoss = 60;
@@ -136,10 +136,8 @@ public final class Constants {
         public static final double outtakeOffsetMillimeters = 0; //distance between center of robot and PVC center of mass after exiting outtake in mm
     }
 
-
     public static final double stickDeadband = 0.075;
     public static final double triggerDeadzone = 0.2;
-
 
     public static final class CurrentLimits{
         public static final int outtakeContinuousCurrentLimit = 35;

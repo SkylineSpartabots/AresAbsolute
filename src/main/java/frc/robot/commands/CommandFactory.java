@@ -31,10 +31,8 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.SwerveCommands.PoleAlign;
-import frc.robot.commands.SwerveCommands.ReefAlign;
-// import frc.robot.commands.TeleopAutomation.PathToPole;
 import frc.robot.commands.TeleopAutomation.PathToReef;
+import frc.robot.commands.TeleopAutomation.PoleAlign;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
@@ -173,19 +171,10 @@ public class CommandFactory {
     public static Command AutoPathReefFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
             CommandFactory.FullCoralIntake(), //Intake coral
-            new PathToReef(pole, controller)
-            // new PathToPole(pole, level)
+            new PathToReef(pole, controller),
+            new PoleAlign(level, pole)
             ).raceWith(new CancelableCommand(controller));
     }
-
-    public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
-        return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work
-            new ReefAlign(pole),
-            new PoleAlign(level, pole)
-        ).raceWith(new CancelableCommand(controller));
-    }
-
-    
 
     // public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
     //     return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work

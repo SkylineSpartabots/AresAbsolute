@@ -35,10 +35,6 @@ public class PathToReef extends Command {
 
         private Command pathFindingCommand;
 
-        PathConstraints fastConstraints = new PathConstraints(4.5, 3.0, 3.0, 2.0); // Max speed and accel
-        PIDConstants fastDrivePID = new PIDConstants(0, 0, 0);
-        PIDConstants fastThetaPID = new PIDConstants(0, 0, 0);
-
         public PathToReef(Supplier<ReefPoleScoringPoses> targetReefPole, CommandXboxController driver) {
                 this.s_Swerve = CommandSwerveDrivetrain.getInstance();
 
@@ -48,36 +44,34 @@ public class PathToReef extends Command {
 
         @Override
         public void initialize() {
+                if(Constants.alliance == Alliance.Blue)
+                        this.targetReefSide = ReefSidePositions.values()[(int) (targetReefPole.get().ordinal() / 2)];
+                else 
+                        this.targetReefSide = ReefSidePositions.values()[6 + (int)((targetReefPole.get().ordinal() - 12) / 2)];
 
-        if(Constants.alliance == Alliance.Blue)
-                this.targetReefSide = ReefSidePositions.values()[(int) (targetReefPole.get().ordinal() / 2)];
-        else 
-                this.targetReefSide = ReefSidePositions.values()[6 + (int)((targetReefPole.get().ordinal() - 12) / 2)];
-
-        pathFindingCommand = AutoBuilder.pathfindToPose(
-                targetReefSide.getPose(),
-                fastConstraints,
-                0.1
-        );
-
+                pathFindingCommand = AutoBuilder.pathfindToPose(
+                        targetReefSide.getPose(),
+                        fastConstraints,
+                        0.1
+                );
         }
 
         @Override
         public void execute() {
-                if(pathFindingCommand.isFinished()) {
-                        this.end(false); //if the path is at its end point end the command
-                }
+                if(pathFindingCommand.isScheduled) {
 
-                if(!pathFindingCommand.isScheduled()) { //allow for control to be taken
-                        if(Math.abs(driver.getLeftY()) < Constants.stickDeadband
-                        && Math.abs(driver.getLeftX()) < Constants.stickDeadband
-                        && Math.abs(driver.getRightX()) < Constants.stickDeadband)
-                                pathFindingCommand.schedule();
-                } else if(Math.abs(driver.getLeftY()) > Constants.stickDeadband //resume path if control is let go
-                || Math.abs(driver.getLeftX()) > Constants.stickDeadband
-                || Math.abs(driver.getRightX()) > Constants.stickDeadband) {
-                        pathFindingCommand.cancel();
-                }
+                        if(Math.abs(driver.getLeftY()) > Constants.stickDeadband //resume path if control is let go
+                        || Math.abs(driver.getLeftX()) > Constants.stickDeadband
+                        || Math.abs(driver.getRightX()) > Constants.stickDeadband) {
+                                pathFindingCommand.cancel(); }
+
+                        if(pathfindingCommand.isFinished()) {
+                                this.end(false); } //if the path is at its end point end the command
+
+                } else if (Math.abs(driver.getLeftY()) < Constants.stickDeadband
+                && Math.abs(driver.getLeftX()) < Constants.stickDeadband
+                && Math.abs(driver.getRightX()) < Constants.stickDeadband) {
+                        pathFindingCommand.schedule();
         }
 
         @Override
@@ -87,5 +81,8 @@ public class PathToReef extends Command {
 
         @Override
         public void end(boolean interrupted) {
+                if(pathfindingCommand.isScheduled) { //safeguard
+                        pathfindingCommand.cancel();
+                }
         }
 }
