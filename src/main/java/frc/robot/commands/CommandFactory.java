@@ -33,7 +33,7 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.SwerveCommands.PoleAlign;
 import frc.robot.commands.SwerveCommands.ReefAlign;
-import frc.robot.commands.TeleopAutomation.PathToPole;
+// import frc.robot.commands.TeleopAutomation.PathToPole;
 import frc.robot.commands.TeleopAutomation.PathToReef;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -170,20 +170,28 @@ public class CommandFactory {
     // }
 
 
-    //will make it adaptable to defenders but i want to test a normal version first
-    public static Command AutoPathScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+    public static Command AutoPathReefFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
             CommandFactory.FullCoralIntake(), //Intake coral
-            new PathToReef(pole, false),
-            new PathToPole(pole, level)
+            new PathToReef(pole, controller)
+            // new PathToPole(pole, level)
             ).raceWith(new CancelableCommand(controller));
     }
 
-    public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+    public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work
+            new ReefAlign(pole),
             new PoleAlign(level, pole)
         ).raceWith(new CancelableCommand(controller));
     }
+
+    
+
+    // public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+    //     return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work
+    //         new PoleAlign(level, pole)
+    //     ).raceWith(new CancelableCommand(controller));
+    // }
 
     // public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
     //     return new SequentialCommandGroup(

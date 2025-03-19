@@ -28,6 +28,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -272,6 +273,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
+        initAutoBuilder();
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -281,8 +283,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> setControl(requestSupplier.get()));
     }
 
-    public void applyFieldSpeeds(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
-        
+    public void applyFieldSpeedsFF(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
         setControl(
         new SwerveRequest.ApplyFieldSpeeds()
         .withSpeeds(speeds)
@@ -295,33 +296,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         new SwerveRequest.ApplyFieldSpeeds()
         .withSpeeds(speeds));
     }
-
-
-
-    // automation
-
-    public Command followPathCommand(PathPlannerPath path, PIDConstants drive, PIDConstants theta) {
-        try{
-            return new FollowPathCommand(
-                    path,
-                    this::getPose, // Robot pose supplier
-                    this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                    this::applyFieldSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds, AND feedforwards
-                    new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                            drive, // Translation PID constants
-                            theta // Rotation PID constants
-                    ),
-                    Constants.config, // The robot configuration
-                    () -> {
-                    return DriverStation.getAlliance().map(a -> a == DriverStation.Alliance.Red).orElse(false);
-                    },
-                    this // Reference to this subsystem to set requirements
-            );
-        } catch (Exception e) {
-            DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-            return Commands.none();
-        }
-      }
 
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
@@ -336,6 +310,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    public void initAutoBuilder() {
+        AutoBuilder.configure(
+            this::getPose,
+            this::resetOdo,
+            this::getRobotRelativeSpeeds,
+            this::applyFieldSpeedsFF,
+            new PPHolonomicDriveController(
+            new PIDConstants( 4, 0.12, 0.05),
+            new PIDConstants( 3.254, 2, 0)
+            ),
+            Constants.config,
+            () -> false, //we change poses ourselves so no need for flipping
+            this);
     }
 
     public void resetOdo(){ //not being used, drivetrain.seedFieldRelative() instead for field centric driving
@@ -354,10 +343,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Pose2d getPose(){
         return s_Swerve.getState().Pose;
-    }
-
-    public Supplier<Pose2d> getPoseSupplier(){
-        return() ->  s_Swerve.getState().Pose;
     }
 
     public SwerveModuleState getDesiredState(){

@@ -48,7 +48,7 @@ public final class Constants {
     public static double MaxAngularVelocity = 2 * Math.PI;
 
     //all these are outdated but we are not using them anymore so its fine tbh
-    public static double robotMass = 58.9; //kg
+    public static double robotMass = 45.35; //kg
     public static double MOI = 0.14782; //sum of kg * m^2 to center of rotation
     public static double CoF = 1; // coefficient of friction TODO get better one
     public static double wheelRadiusInches = 1.9125; //inches

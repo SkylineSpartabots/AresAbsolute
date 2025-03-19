@@ -1,6 +1,7 @@
 package frc.robot.commands.TeleopAutomation;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefSidePositions;
@@ -9,6 +10,8 @@ import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -28,19 +31,19 @@ public class PathToReef extends Command {
         private Supplier<ReefPoleScoringPoses> targetReefPole;
         private ReefSidePositions targetReefSide;
 
-        private final boolean opp;
+        private final CommandXboxController driver;
+
+        private Command pathFindingCommand;
 
         PathConstraints fastConstraints = new PathConstraints(4.5, 3.0, 3.0, 2.0); // Max speed and accel
         PIDConstants fastDrivePID = new PIDConstants(0, 0, 0);
         PIDConstants fastThetaPID = new PIDConstants(0, 0, 0);
 
-        public PathToReef(Supplier<ReefPoleScoringPoses> targetReefPole, boolean opp) {
+        public PathToReef(Supplier<ReefPoleScoringPoses> targetReefPole, CommandXboxController driver) {
                 this.s_Swerve = CommandSwerveDrivetrain.getInstance();
 
-                this.opp = opp;
                 this.targetReefPole = targetReefPole;
-                
-                addRequirements(s_Swerve);
+                this.driver = driver;
         }
 
         @Override
@@ -51,26 +54,35 @@ public class PathToReef extends Command {
         else 
                 this.targetReefSide = ReefSidePositions.values()[6 + (int)((targetReefPole.get().ordinal() - 12) / 2)];
 
-        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-                s_Swerve.getPose(),
-                targetReefSide.getPose()
+        pathFindingCommand = AutoBuilder.pathfindToPose(
+                targetReefSide.getPose(),
+                fastConstraints,
+                0.1
         );
 
-        PathPlannerPath path = new PathPlannerPath(
-                waypoints,
-                fastConstraints,
-        null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
-                new GoalEndState(0.35, (targetReefSide.getPose().getRotation()))
-        ); // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
+        }
 
-        path.preventFlipping = true;
+        @Override
+        public void execute() {
+                if(pathFindingCommand.isFinished()) {
+                        this.end(false); //if the path is at its end point end the command
+                }
 
-        s_Swerve.followPathCommand(path, fastDrivePID, fastThetaPID).schedule();
+                if(!pathFindingCommand.isScheduled()) { //allow for control to be taken
+                        if(Math.abs(driver.getLeftY()) < Constants.stickDeadband
+                        && Math.abs(driver.getLeftX()) < Constants.stickDeadband
+                        && Math.abs(driver.getRightX()) < Constants.stickDeadband)
+                                pathFindingCommand.schedule();
+                } else if(Math.abs(driver.getLeftY()) > Constants.stickDeadband //resume path if control is let go
+                || Math.abs(driver.getLeftX()) > Constants.stickDeadband
+                || Math.abs(driver.getRightX()) > Constants.stickDeadband) {
+                        pathFindingCommand.cancel();
+                }
         }
 
         @Override
         public boolean isFinished() {
-                return true;
+                return false;
         }
 
         @Override
