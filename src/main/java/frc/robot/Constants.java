@@ -302,38 +302,28 @@ public final class Constants {
                 }
             }
 
+            public enum ReefAlgaeRemovalPoses {
+
+                ALG_AB(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_CD(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_EF(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_GH(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_IJ(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_KL(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))); //
+
+                private final Pose2d waypoints;
+
+                ReefAlgaeRemovalPoses(Pose2d poses) {
+                    this.waypoints = poses;
+                }
+
+                public Pose2d getPose() {
+                    return this.waypoints;
+                }
+            }
+
             public enum ReefPoleScoringPoses {
                 //Now 4.2545 cm offset (to the right)
-
-                // //blue
-                // POLE_1A(new Pose2d(3.2808, 4.232, Rotation2d.fromRadians(0.0))), //
-                // POLE_2B(new Pose2d(3.2808, 3.90219, Rotation2d.fromRadians(0.0))), //
-                // POLE_3C(new Pose2d(3.6924, 3.06299, Rotation2d.fromRadians(1.0472))), //
-                // POLE_4D(new Pose2d(3.9764, 2.89799, Rotation2d.fromRadians(1.0472))), //
-                // POLE_5E(new Pose2d(4.9256, 2.85499, Rotation2d.fromRadians(2.0944))), //
-                // POLE_6F(new Pose2d(5.2096, 3.01899, Rotation2d.fromRadians(2.0944))), //
-                // POLE_7G(new Pose2d(5.7232, 3.818, Rotation2d.fromRadians(3.14159))), //
-                // POLE_8H(new Pose2d(5.7232, 4.147, Rotation2d.fromRadians(3.14159))), //
-                // POLE_9I(new Pose2d(5.2856, 4.992, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_10J(new Pose2d(4.9636, 5.1775, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_11K(new Pose2d(4.0514, 5.197, Rotation2d.fromRadians(-1.0472))), //
-                // POLE_12L(new Pose2d(3.7654, 5.032, Rotation2d.fromRadians(-1.0472))), //
-                
-                // // red
-                // POLE_A(new Pose2d(14.2932, 3.818, Rotation2d.fromRadians(3.14159))), //
-                // POLE_B(new Pose2d(14.2932, 4.147, Rotation2d.fromRadians(3.14159))), //
-                // POLE_C(new Pose2d(13.8556, 4.992, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_D(new Pose2d(13.5336, 5.1775, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_E(new Pose2d(12.6214, 5.197, Rotation2d.fromRadians(-1.0472))), //
-                // POLE_F(new Pose2d(12.3354, 5.032, Rotation2d.fromRadians(-1.0472))), //
-                // POLE_G(new Pose2d(11.8508, 4.232, Rotation2d.fromRadians(0.0))), //
-                // POLE_H(new Pose2d(11.8508, 3.90219, Rotation2d.fromRadians(0.0))), //
-                // POLE_I(new Pose2d(12.2624, 3.06299, Rotation2d.fromRadians(1.0472))), //
-                // POLE_J(new Pose2d(12.5464, 2.89799, Rotation2d.fromRadians(1.0472))), //
-                // POLE_K(new Pose2d(13.4956, 2.85499, Rotation2d.fromRadians(2.0944))), //
-                // POLE_L(new Pose2d(13.7776, 3.01899, Rotation2d.fromRadians(2.0944))); //
-
-
                 //quarter inch to the right poses
                 POLE_1A(new Pose2d(3.2808, 4.2257, Rotation2d.fromRadians(0.0))), //
                 POLE_2B(new Pose2d(3.2808, 3.89584, Rotation2d.fromRadians(0.0))), //
@@ -361,8 +351,6 @@ public final class Constants {
                 POLE_J(new Pose2d(12.55269, 2.89349, Rotation2d.fromRadians(1.0472))), //
                 POLE_K(new Pose2d(13.49909, 2.86057, Rotation2d.fromRadians(2.0944))), //
                 POLE_L(new Pose2d(13.78309, 3.02457, Rotation2d.fromRadians(2.0944))); //
-
-                
                 
                 private final Pose2d waypoints;
 

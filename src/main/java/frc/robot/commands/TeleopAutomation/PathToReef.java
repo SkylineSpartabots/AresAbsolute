@@ -22,6 +22,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
@@ -34,6 +35,13 @@ public class PathToReef extends Command {
         private final CommandXboxController driver;
 
         private Command pathFindingCommand;
+
+        private PathConstraints constraints = new PathConstraints(
+                Constants.MaxSpeed,
+                Constants.MaxAcceleration,
+                Constants.MaxAngularVelocity,
+                Constants.MaxAngularRate
+        );
 
         public PathToReef(Supplier<ReefPoleScoringPoses> targetReefPole, CommandXboxController driver) {
                 this.s_Swerve = CommandSwerveDrivetrain.getInstance();
@@ -51,27 +59,28 @@ public class PathToReef extends Command {
 
                 pathFindingCommand = AutoBuilder.pathfindToPose(
                         targetReefSide.getPose(),
-                        fastConstraints,
+                        constraints,
                         0.1
                 );
         }
 
         @Override
         public void execute() {
-                if(pathFindingCommand.isScheduled) {
+                if(pathFindingCommand.isScheduled()) {
 
                         if(Math.abs(driver.getLeftY()) > Constants.stickDeadband //resume path if control is let go
                         || Math.abs(driver.getLeftX()) > Constants.stickDeadband
                         || Math.abs(driver.getRightX()) > Constants.stickDeadband) {
                                 pathFindingCommand.cancel(); }
 
-                        if(pathfindingCommand.isFinished()) {
+                        if(pathFindingCommand.isFinished()) {
                                 this.end(false); } //if the path is at its end point end the command
 
                 } else if (Math.abs(driver.getLeftY()) < Constants.stickDeadband
                 && Math.abs(driver.getLeftX()) < Constants.stickDeadband
                 && Math.abs(driver.getRightX()) < Constants.stickDeadband) {
                         pathFindingCommand.schedule();
+                }
         }
 
         @Override
@@ -81,8 +90,8 @@ public class PathToReef extends Command {
 
         @Override
         public void end(boolean interrupted) {
-                if(pathfindingCommand.isScheduled) { //safeguard
-                        pathfindingCommand.cancel();
+                if(pathFindingCommand.isScheduled()) { //safeguard
+                        pathFindingCommand.cancel();
                 }
         }
 }

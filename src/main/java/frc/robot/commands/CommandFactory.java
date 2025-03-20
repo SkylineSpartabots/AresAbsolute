@@ -33,6 +33,7 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.TeleopAutomation.PathToReef;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
+import frc.robot.commands.TeleopAutomation.AlgaeAlign;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
@@ -173,6 +174,14 @@ public class CommandFactory {
             CommandFactory.FullCoralIntake(), //Intake coral
             new PathToReef(pole, controller),
             new PoleAlign(level, pole)
+            ).raceWith(new CancelableCommand(controller));
+    }
+
+    public static Command AutoPathRemoveAlgae(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+        return new SequentialCommandGroup(
+            CommandFactory.FullCoralIntake(), //Intake coral
+            new PathToReef(pole, controller),
+            new AlgaeAlign(pole)
             ).raceWith(new CancelableCommand(controller));
     }
 
