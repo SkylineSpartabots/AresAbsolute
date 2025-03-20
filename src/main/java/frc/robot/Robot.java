@@ -20,6 +20,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 
 import au.grapplerobotics.CanBridge;
 import choreo.Choreo;
@@ -187,6 +188,8 @@ public class Robot extends LoggedRobot {
     //start the logger here
     SmartDashboard.putString("Selected Pole", "First pole");
     SmartDashboard.putString("Selected Pole Level", ElevatorState.L1.name());
+
+    PathfindingCommand.warmupCommand().schedule(); //WARM UP!!!!  
   }
 
   @Override
