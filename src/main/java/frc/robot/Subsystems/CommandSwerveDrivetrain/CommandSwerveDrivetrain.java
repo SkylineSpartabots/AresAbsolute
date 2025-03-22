@@ -407,14 +407,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("ODO Y", currentPose.getY());
         SmartDashboard.putNumber("ODO ROT", currentPose.getRotation().getRadians());
 
-        SwerveModuleState[] states = new SwerveModuleState[] {
-            s_Swerve.getModule(0).getCurrentState(),
-            s_Swerve.getModule(1).getCurrentState(),
-            s_Swerve.getModule(2).getCurrentState(),
-            s_Swerve.getModule(3).getCurrentState()
-        };
+        // SwerveModuleState[] states = new SwerveModuleState[] {
+        //     s_Swerve.getModule(0).getCurrentState(),
+        //     s_Swerve.getModule(1).getCurrentState(),
+        //     s_Swerve.getModule(2).getCurrentState(),
+        //     s_Swerve.getModule(3).getCurrentState()
+        // };
         // StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-        publisher.set(states);
+        // publisher.set(states);
     }
 
 }

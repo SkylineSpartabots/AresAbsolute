@@ -55,6 +55,7 @@ import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
+import frc.robot.commands.TeleopAutomation.PathToReef;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;

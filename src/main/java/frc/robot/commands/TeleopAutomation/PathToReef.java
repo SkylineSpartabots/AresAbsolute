@@ -6,6 +6,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefSidePositions;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -33,8 +34,11 @@ public class PathToReef extends Command {
         private ReefSidePositions targetReefSide;
 
         private final CommandXboxController driver;
+        private DriveControlSystems controlSystem  = new DriveControlSystems();
 
-        private Command pathFindingCommand;
+        private Command pathFindCommand;
+
+        private boolean finished = false;
 
         private PathConstraints constraints = new PathConstraints(
                 Constants.MaxSpeed,
@@ -52,46 +56,63 @@ public class PathToReef extends Command {
 
         @Override
         public void initialize() {
+
+                s_Swerve.initAutoBuilder();
                 if(Constants.alliance == Alliance.Blue)
                         this.targetReefSide = ReefSidePositions.values()[(int) (targetReefPole.get().ordinal() / 2)];
                 else 
                         this.targetReefSide = ReefSidePositions.values()[6 + (int)((targetReefPole.get().ordinal() - 12) / 2)];
+                
+                s_Swerve.resetOdo(s_Swerve.getPose());
 
-                pathFindingCommand = AutoBuilder.pathfindToPose(
-                        targetReefSide.getPose(),
+                if (pathFindCommand != null && pathFindCommand.isScheduled()) {
+                        pathFindCommand.cancel();
+                }
+
+                // System.out.println("done init " + AutoBuilder.isPathfindingConfigured());
+
+                pathFindCommand = AutoBuilder.pathfindToPose(
+                        new Pose2d(0, 0, Rotation2d.fromRadians(0)),
                         constraints,
-                        0.1
+                        0
                 );
+
+                pathFindCommand.schedule();
         }
 
         @Override
         public void execute() {
-                if(pathFindingCommand.isScheduled()) {
+                // System.out.println(s_Swerve.getCurrentCommand().getName());
 
-                        if(Math.abs(driver.getLeftY()) > Constants.stickDeadband //resume path if control is let go
-                        || Math.abs(driver.getLeftX()) > Constants.stickDeadband
-                        || Math.abs(driver.getRightX()) > Constants.stickDeadband) {
-                                pathFindingCommand.cancel(); }
+                // System.out.println("comming still going");
 
-                        if(pathFindingCommand.isFinished()) {
-                                this.end(false); } //if the path is at its end point end the command
-
-                } else if (Math.abs(driver.getLeftY()) < Constants.stickDeadband
-                && Math.abs(driver.getLeftX()) < Constants.stickDeadband
-                && Math.abs(driver.getRightX()) < Constants.stickDeadband) {
-                        pathFindingCommand.schedule();
-                }
+                if(pathFindCommand.isScheduled()) {
+                        // Pose2d pose = s_Swerve.getPose();
+                        // if(Math.abs(pose.getX() - targetReefSide.getPose().getX()) < 0.01 
+                        // && Math.abs(pose.getY() - targetReefSide.getPose().getY()) < 0.01 
+                        // && Math.abs(pose.getRotation().minus(targetReefSide.getPose().getRotation()).getDegrees()) < 6)  {
+                        if(Math.abs(driver.getLeftY()) > Constants.stickDeadband // cancel path if driver wants to move
+                                || Math.abs(driver.getLeftX()) > Constants.stickDeadband
+                                || Math.abs(driver.getRightX()) > Constants.stickDeadband) {
+                                System.out.println("command cancelde");
+                                pathFindCommand.cancel();
+                        }
+                } else if(Math.abs(driver.getLeftY()) < Constants.stickDeadband
+                 && Math.abs(driver.getLeftX()) < Constants.stickDeadband
+                 && Math.abs(driver.getRightX()) < Constants.stickDeadband) {
+                        pathFindCommand.schedule();
+                 }
         }
 
         @Override
         public boolean isFinished() {
-                return false;
+                return pathFindCommand.isFinished();
         }
 
         @Override
         public void end(boolean interrupted) {
-                if(pathFindingCommand.isScheduled()) { //safeguard
-                        pathFindingCommand.cancel();
+                if(pathFindCommand.isScheduled()) { //safeguard
+                        pathFindCommand.cancel();
                 }
         }
 }

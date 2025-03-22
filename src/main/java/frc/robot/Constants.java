@@ -35,8 +35,6 @@ import com.pathplanner.lib.config.RobotConfig;
  */
 public final class Constants {
 
-    public static boolean usingVision = true;
-
     public static double frontLeftEncoderOffset = 0.12646484;
     public static double frontRightEncoderOffset = 0.268554684;
     public static double backLeftEncoderOffset = -0.41601559;
@@ -49,11 +47,29 @@ public final class Constants {
 
     //all these are outdated but we are not using them anymore so its fine tbh
     public static double robotMass = 45.35; //kg
-    public static double MOI = 0.14782; //sum of kg * m^2 to center of rotation
-    public static double CoF = 1; // coefficient of friction TODO get better one
+    public static double MOI = 3.5254; //sum of kg * m^2 to center of rotation
+    public static double CoF = 1.0; // coefficient of friction TODO get better one
     public static double wheelRadiusInches = 1.9125; //inches
 
     public static double intakePivotCurrentThreshold = 70;
+
+    public static DCMotor motorConfig = new DCMotor(
+        Constants.KrakenConstants.nominalVoltageVolts,
+        Constants.KrakenConstants.stallTorqueNewtonMeters,
+        Constants.KrakenConstants.stallCurrentAmps,
+        Constants.KrakenConstants.freeCurrentAmps,
+        Constants.KrakenConstants.freeSpeedRadPerSec,
+    2);
+
+    public static ModuleConfig moduleConfig = new ModuleConfig(
+        Constants.wheelRadiusInches * 0.0254, //in to m
+        Constants.MaxSpeed,
+        Constants.CoF,
+        motorConfig,
+        Constants.KrakenConstants.driveCurrentLimitAmps,
+        Constants.KrakenConstants.torqueLoss,
+        1
+    );
 
     public static RobotConfig config = new RobotConfig(
         Constants.robotMass,
@@ -63,24 +79,6 @@ public final class Constants {
         Constants.moduleLocations.FR,
         Constants.moduleLocations.BL,
         Constants.moduleLocations.BR
-    );
-
-    public static DCMotor motorConfig = new DCMotor(
-        Constants.KrakenConstants.nominalVoltageVolts,
-        Constants.KrakenConstants.stallTorqueNewtonMeters,
-        Constants.KrakenConstants.stallCurrentAmps,
-        Constants.KrakenConstants.freeCurrentAmps,
-        Constants.KrakenConstants.freeSpeedRadPerSec,
-    4);
-
-    public static ModuleConfig moduleConfig = new ModuleConfig(
-        Constants.wheelRadiusInches * 0.0254, //in to m
-        Constants.MaxSpeed,
-        Constants.CoF,
-        motorConfig,
-        Constants.KrakenConstants.driveCurrentLimitAmps,
-        Constants.KrakenConstants.torqueLoss,
-        4
     );
 
     public static class LimelightConstants{

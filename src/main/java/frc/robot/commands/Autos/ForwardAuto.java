@@ -74,9 +74,6 @@ public class ForwardAuto extends Command {
     dt.setControl(controlSystems.robotCentricDrive(1.5, 0, thetaController.calculate(currPose.getRotation().getRadians(), rotSetpoint)));
     }
     
-    
-  
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
@@ -87,7 +84,6 @@ public class ForwardAuto extends Command {
     );
     // new SetOuttake(OuttakeState.SCORE).schedule();
     SmartDashboard.putBoolean("auto running", false);
-    Constants.usingVision = true;
   }
 
   // Returns true when the command should end.

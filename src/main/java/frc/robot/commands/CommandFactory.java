@@ -169,12 +169,18 @@ public class CommandFactory {
     // }
 
 
-    public static Command AutoPathReefFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+    public static Command AutoPathReefFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
         return new SequentialCommandGroup(
             CommandFactory.FullCoralIntake(), //Intake coral
             new PathToReef(pole, controller),
             new PoleAlign(level, pole)
             ).raceWith(new CancelableCommand(controller));
+    }
+
+    public static Command AutoPathReef(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+        return new SequentialCommandGroup(
+            new PathToReef(pole, controller)
+            );
     }
 
     public static Command AutoPathRemoveAlgae(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
