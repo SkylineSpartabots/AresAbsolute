@@ -135,6 +135,9 @@ public class EndEffector extends SubsystemBase {
         SmartDashboard.putBoolean("lasercan working", false );
         SmartDashboard.putNumber("lasercan status", getLaserMeasurement().status);
       }
+    } else{
+      SmartDashboard.putNumber("lasercan measurement", -1);
+      SmartDashboard.putBoolean("lasercan working", false );
     }
     SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
   }

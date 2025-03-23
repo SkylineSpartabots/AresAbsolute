@@ -227,6 +227,7 @@ public class Robot extends LoggedRobot {
     //   new ZeroElevator(),
     //   new ForwardAuto()
     // ).schedule();
+    Constants.alliance = DriverStation.getAlliance().get();
     m_autonomousCommand = chosenAuto.getSelected();
 
     new SequentialCommandGroup(
