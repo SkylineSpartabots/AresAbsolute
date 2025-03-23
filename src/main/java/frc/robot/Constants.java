@@ -178,8 +178,8 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String FRCamera = "Liberal";
-        public static final String FLCamera = "Gretchen";
+        public static final String FLCamera = "Liberal";
+        public static final String FRCamera = "Gretchen";
         public static final String altFRCamera = "Charles";
         public static final int aprilTagMax = 22;
         public static final double aprilTagHeight = 0.122; //bottom of each april tag is 122cm above carpet | unnecessary, we have photonvision's field layout import
