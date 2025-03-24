@@ -36,6 +36,9 @@ public class DriveControlSystems {
     private double lastHeading = 0;
     private boolean homing = false;
 
+    private SlewRateLimiter xLimiter = new SlewRateLimiter(10);
+    private SlewRateLimiter yLimiter = new SlewRateLimiter(10);
+
     private PIDController homingController = new PIDController(0, 0, 0);
 
     // Can tune
@@ -81,6 +84,9 @@ public class DriveControlSystems {
         driverLY = scaledDeadBand(driverLY) * Constants.MaxSpeed;
         driverRX = scaledDeadBand(driverRX) * Constants.MaxAngularRate;
 
+        driverLY = xLimiter.calculate(driverLY); //flipped bc driver LY corresponds to x velocity 
+        driverLX = yLimiter.calculate(driverLX);
+
         if(Constants.alliance == Alliance.Red){
             driverLY = driverLY * -1;
             driverLX = driverLX * -1;
@@ -90,9 +96,10 @@ public class DriveControlSystems {
         SmartDashboard.putNumber("requested velocity x", driverLX);
         SmartDashboard.putNumber("requested velocity y", driverLY);
 
-        if(homing == true){
-            driverRX = homingL1();
-        }
+        // if(homing == true){
+        //     driverRX = homingL1();
+        // }
+
 
         return new SwerveRequest.FieldCentric()
         .withVelocityX(driverLY)
