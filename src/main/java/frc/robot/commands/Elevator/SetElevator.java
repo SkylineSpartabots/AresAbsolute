@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.LEDs;
 
 import java.util.function.Supplier;
 
@@ -54,6 +55,7 @@ public class SetElevator extends Command {
 
   @Override
   public void initialize() {
+    LEDs.getInstance().flashForever(Constants.LEDConstants.YELLOW).schedule();
     if(state != null)
       this.goalPosition = state.get().getEncoderPosition();
     
@@ -91,6 +93,9 @@ public class SetElevator extends Command {
   
   @Override
   public void end(boolean interrupted) {
+
+    LEDs.getInstance().solid(Constants.LEDConstants.YELLOW).schedule();
+    
     // s_Elevator.setSpeed(0);
     // s_Elevator.setPosition(s_Elevator.getPosition());
     s_Elevator.brake();

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import frc.robot.Subsystems.*;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -34,13 +35,8 @@ import frc.lib.SensorUtils;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
-import frc.robot.Subsystems.Climb;
-import frc.robot.Subsystems.Elevator;
-import frc.robot.Subsystems.EndEffector;
-import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.Slapdown.PivotState;
-import frc.robot.Subsystems.Slapdown;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CANCoders;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Vision.Vision;
@@ -73,8 +69,6 @@ public class Robot extends LoggedRobot {
 
  
     public Robot() { 
-      // oops just realized logging needs to be in the constructor lol
-      // facebookdata
       SignalLogger.setPath("/media/sda/ctre-logs/");
 
       DataLogManager.start();
@@ -146,6 +140,7 @@ public class Robot extends LoggedRobot {
       RobotContainer.getInstance();
       CANCoders.getInstance();
       Climb.getInstance();
+      LEDs.getInstance();
       
       // CanBridge.runTCP();
     }

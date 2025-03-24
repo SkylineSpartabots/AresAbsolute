@@ -12,8 +12,10 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.VisionConstants.AprilTags;
 import frc.robot.RobotState.RobotState;
 
@@ -211,6 +213,37 @@ public final class Constants {
         }
     }
 
+    public static final class LEDConstants{
+        public static final int length = 200;
+        public static final AddressableLEDBuffer WHITE = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer RED = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer ORANGE = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer YELLOW = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer GREEN = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer BLUE = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer CYAN = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer PURPLE = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer PINK = new AddressableLEDBuffer(length);
+        public static final AddressableLEDBuffer OFF = new AddressableLEDBuffer(length);
+
+        static {
+
+            for (int i = 0; i < length; ++i) {
+                WHITE.setLED(i, Color.kWhite);
+                RED.setLED(i, Color.kRed);
+                ORANGE.setLED(i, Color.kOrange);
+                YELLOW.setLED(i, Color.kYellow);
+                GREEN.setLED(i, Color.kGreen);
+                BLUE.setLED(i, Color.kBlue);
+                CYAN.setLED(i, Color.kCyan);
+                PURPLE.setLED(i, Color.kPurple);
+                PINK.setLED(i, Color.kPink);
+                OFF.setLED(i, Color.kBlack);
+
+            }
+        }
+    }
+    
 
     // hardware ports for all hardware components on the robot
     // these include CAN IDs, pneumatic hub ports, etc.
