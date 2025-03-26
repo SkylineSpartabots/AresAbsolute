@@ -31,6 +31,7 @@ import static frc.robot.Constants.VisionConstants.CameraTransforms.*;
 public class Vision extends SubsystemBase {
     private static Vision instance;
 
+    
     private static PhotonCamera FrontLeftCamera;
     private static PhotonCamera FrontRightCamera;
     private static PhotonCamera FrontRightAngledCamera;
@@ -84,17 +85,17 @@ public class Vision extends SubsystemBase {
         BRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         BCphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         
-        updateAprilTagResults();
+//        updateAprilTagResults();
     }
 
-    public void updateAprilTagResults() {
-        FLcameraResult = FrontLeftCamera.getAllUnreadResults();
-        FRcameraResult = FrontRightCamera.getAllUnreadResults();
-        FRAcameraResult = FrontRightAngledCamera.getAllUnreadResults();
-        BLcameraResult = BackLeftCamera.getAllUnreadResults();
-        BRcameraResult = BackRightCamera.getAllUnreadResults();
-        BCcameraResult = BackCenterCamera.getAllUnreadResults();
-    }
+//    public void updateAprilTagResults() {
+//        FLcameraResult = FrontLeftCamera.getAllUnreadResults();
+//        FRcameraResult = FrontRightCamera.getAllUnreadResults();
+//        FRAcameraResult = FrontRightAngledCamera.getAllUnreadResults();
+//        BLcameraResult = BackLeftCamera.getAllUnreadResults();
+//        BRcameraResult = BackRightCamera.getAllUnreadResults();
+//        BCcameraResult = BackCenterCamera.getAllUnreadResults();
+//    }
 
     public boolean validateTarget(PhotonPipelineResult camera) {
         if(!camera.hasTargets())
@@ -173,8 +174,13 @@ public class Vision extends SubsystemBase {
     /**
      * calculates field-relative robot pose from vision reading, feed to pose estimator (Kalman filter)
      */
-    private void updateVision(List<PhotonPipelineResult> cameraResult, Transform3d cameraToRobotTransform) throws Exception {
-        //TODO pass a camera into this instead for easier transform finding 
+    private void updateVision(PhotonCamera camera, Transform3d cameraToRobot) throws Exception {        
+        
+        List<PhotonPipelineResult> cameraResult = camera.getAllUnreadResults();
+        
+        if (cameraResult.isEmpty()) {
+            return;
+        }
         
         // something is wrong with this... (we still need it tho)
         // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
@@ -182,7 +188,6 @@ public class Vision extends SubsystemBase {
         //     return;
         // }
 
-        
         // if(Math.abs(robotState.robotVelocityVector()) > VisionLimits.k_velocityLimit) {
         //     SmartDashboard.putString("Vision accepter", "Vision failed: High speed");
         //     return;
@@ -197,7 +202,7 @@ public class Vision extends SubsystemBase {
                 //Multitag gives fieldToCamera 
                 Pose3d robotPose = new Pose3d() //start at 0,0
                     .plus(multiTagOutput.getMultiTag().estimatedPose.best) //transform to camera
-                        .plus(cameraToRobotTransform); //transform to robot
+                        .plus(cameraToRobot); //transform to robot
     
                 VisionOutput newPose = new VisionOutput(robotPose,
                     multiTagOutput.getTimestamp(),
@@ -207,72 +212,47 @@ public class Vision extends SubsystemBase {
                 s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0075, 0.0075, 0.01));
             }
         
-        } else { // if no multitags, use other tag data
+        } else {
+            // if no multitags, use other tag data
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
                 if(validateTarget(photonPipelineResult)) {
-// TODO add the other cameras
-                    if(FLphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
-
-                        VisionOutput newPose = new VisionOutput(
+                    VisionOutput newPose = new VisionOutput(
                             PhotonUtils.estimateFieldToRobotAprilTag(
-                            photonPipelineResult.getBestTarget().bestCameraToTarget,
-                                aprilTagFieldLayout.getTagPose(photonPipelineResult.getBestTarget().fiducialId).get(),
-                                    FLcameraToRobot),
+                                    photonPipelineResult.getBestTarget().bestCameraToTarget,
+                                    aprilTagFieldLayout.getTagPose(photonPipelineResult.getBestTarget().fiducialId).get(),
+                                    (cameraToRobot)),
                             photonPipelineResult.getTimestampSeconds(),
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())), false);
 
-                            System.out.println("FL pose: " + newPose.estimatedPose.toString());
+                    System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
 
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08)); 
+                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08)); 
 
-                    } else if (FRphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
-
-                        VisionOutput newPose = new VisionOutput(
-                            PhotonUtils.estimateFieldToRobotAprilTag(
-                            photonPipelineResult.getBestTarget().bestCameraToTarget,
-                                aprilTagFieldLayout.getTagPose(photonPipelineResult.getBestTarget().fiducialId).get(),
-                                    FRcameraToRobot),
-                            photonPipelineResult.getTimestampSeconds(),
-                            photonPipelineResult.getBestTarget(),
-                            robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())) , false);
-
-                            System.out.println("FR pose: " + newPose.estimatedPose.toString());
-
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08)); 
-
-                    // } else if (elevatorPhotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
-                        
-                    //     // System.out.println("Elevator pose " + elevatorPhotonPoseEstimator.update(photonPipelineResult).get().estimatedPose.toString());
-                    //     VisionOutput newPose = new VisionOutput(elevatorPhotonPoseEstimator.update(photonPipelineResult).get(),
-                    //     robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())));
-                    //     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds)); 
-
-                    } else {
-                        System.out.println("Vision is borked");
+                   
+                   
                     }
                     
                 }
 
             } 
         }
-    }
+    
 
     @Override
     public void periodic() {
-        // updateAprilTagResults();
-        // try {
-    
-        //     if(!FLcameraResult.isEmpty()) 
-        //         updateVision(FLcameraResult, FLcameraToRobotTransform);
-    
-        //     if(!FRcameraResult.isEmpty()) 
-        //         updateVision(FRcameraResult, FRcameraToRobotTransform);
-    
-            // if(!elevatorCameraResult.isEmpty()) 
-            //     updateVision(elevatorCameraResult, elevatorCameraToRobotTransform);
-    
-            // } catch (Exception e){}
+         try {
+             
+                updateVision(FrontLeftCamera, FLcameraToRobot);
+                updateVision(FrontRightCamera, FRcameraToRobot);
+                updateVision(FrontRightAngledCamera, FRACameraToRobot);
+                updateVision(BackLeftCamera, BLcameraToRobot);
+                updateVision(BackRightCamera, BRcameraToRobot);
+                updateVision(BackCenterCamera, BCcameraToRobot);
+                
+             
+         }
+         catch (Exception e){}
     }
 
 }

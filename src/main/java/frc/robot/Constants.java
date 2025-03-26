@@ -184,12 +184,12 @@ public final class Constants {
          */
         
         public static final class CameraNames{
-            public static final String FrontRight = "Richard";
-            public static final String FrontLeft = "Liberal";
-            public static final String FrontRightAngled = ""; //TODO
-            public static final String BackRight = "Gretchen";
-            public static final String BackLeft = ""; //TODO
-            public static final String BackCenter = ""; //TODO
+            public static final String FrontRight = "Richard_FR";
+            public static final String FrontLeft = "Liberal_FL";
+            public static final String FrontRightAngled = "_FRA"; //TODO
+            public static final String BackRight = "Gretchen_BR";
+            public static final String BackLeft = "_BL"; //TODO
+            public static final String BackCenter = "_BC"; //TODO
         }
         
         public static final class CameraTransforms{
