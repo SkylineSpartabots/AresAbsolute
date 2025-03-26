@@ -193,30 +193,39 @@ public final class Constants {
         }
         
         public static final class CameraTransforms{
+            /*
+            
+                    +x
+                    |
+            +y ----------- -y
+                    |
+                    -x
+             */
+            
+            //Pitch is COUNTERCLOCKWISE about the Y axis
             public static final Transform3d FLcameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+                    new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0))); //so this guy is negative not pos (cause ccw)
 
             public static final Transform3d FRcameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+                    new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0)));
 
-            // TODO not correct transforms - PLACEHOLDER
             public static final Transform3d FRACameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+                    new Translation3d(Units.inchesToMeters(Float.MAX_VALUE), Units.inchesToMeters(Float.MAX_VALUE), Units.inchesToMeters(Float.MAX_VALUE)), //TODO ALL
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(7.5),Units.degreesToRadians(45))); // positive pitch cause CCW about Y = down 
 
             public static final Transform3d BLcameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+                    new Translation3d(Units.inchesToMeters(11.412), Units.inchesToMeters(-10.720), Units.inchesToMeters(-8.350)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(135))); //TODO PITCH
 
             public static final Transform3d BRcameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+                    new Translation3d(Units.inchesToMeters(11.412), Units.inchesToMeters(10.720), Units.inchesToMeters(-8.350)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(-135))); //TODO
 
             public static final Transform3d BCcameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+                    new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(180))); //TODO PITCH
 
 
         }
