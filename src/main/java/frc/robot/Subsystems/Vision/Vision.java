@@ -1,17 +1,20 @@
-package frc.robot.Subsystems.Vision;    
+package frc.robot.Subsystems.Vision;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
-
-import javax.sound.midi.Soundbank;
-
-// import org.littletonrobotics.junction.Logger;
-import org.opencv.photo.Photo;
-import org.photonvision.EstimatedRobotPose;
+import com.ctre.phoenix6.Utils;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.MultiTagOutput;
+import frc.lib.VisionOutput;
+import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants.CameraNames;
+import frc.robot.Constants.VisionConstants.VisionLimits;
+import frc.robot.RobotState.RobotState;
+import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -20,65 +23,39 @@ import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import com.ctre.phoenix.Util;
-import com.ctre.phoenix6.Utils;
+import java.util.ArrayList;
+import java.util.List;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.LimelightHelpers;
-import frc.lib.MultiTagOutput;
-import frc.lib.VisionOutput;
-import frc.robot.Constants;
-import frc.robot.Constants.VisionConstants.VisionLimits;
-import frc.robot.RobotState.RobotState;
-import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
+import static frc.robot.Constants.VisionConstants.CameraTransforms.*;
 
 public class Vision extends SubsystemBase {
     private static Vision instance;
 
-    private static PhotonCamera LiberalLCam;
-    private static PhotonCamera GretchenRCam;
-    // private static PhotonCamera elevatorCamera;
+    private static PhotonCamera FrontLeftCamera;
+    private static PhotonCamera FrontRightCamera;
+    private static PhotonCamera FrontRightAngledCamera;
+    private static PhotonCamera BackLeftCamera;
+    private static PhotonCamera BackRightCamera;
+    private static PhotonCamera BackCenterCamera;
 
     private static List<PhotonPipelineResult> FLcameraResult;
     private static List<PhotonPipelineResult> FRcameraResult;
-    // private static List<PhotonPipelineResult> elevatorCameraResult;
+    private static List<PhotonPipelineResult> FRAcameraResult;
+    private static List<PhotonPipelineResult> BLcameraResult;
+    private static List<PhotonPipelineResult> BRcameraResult;
+    private static List<PhotonPipelineResult> BCcameraResult;
 
-    private Transform3d FLcameraToRobotTransform = new Transform3d(
-        new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
-        new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
-
-    private Transform3d FRcameraToRobotTransform = new Transform3d(
-        new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
-        new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
-
-    // private Transform3d elevatorCameraToRobotTransform = new Transform3d(
-    //     new Translation3d(Units.inchesToMeters(2.5), Units.inchesToMeters(2.215), Units.inchesToMeters(-40.322)), // need this
-    //     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0),Units.degreesToRadians(180)));
-
-    PhotonPoseEstimator FLphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FLcameraToRobotTransform);
-    PhotonPoseEstimator FRphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FRcameraToRobotTransform);
-    // PhotonPoseEstimator elevatorPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, elevatorCameraToRobotTransform);
+    PhotonPoseEstimator FLphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FLcameraToRobot);
+    PhotonPoseEstimator FRphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FRcameraToRobot);
+    PhotonPoseEstimator FRAphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FRACameraToRobot);
+    PhotonPoseEstimator BLphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BLcameraToRobot);
+    PhotonPoseEstimator BRphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BRcameraToRobot);
+    PhotonPoseEstimator BCphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BCcameraToRobot);
+    
 
     CommandSwerveDrivetrain s_Swerve;
-    LimelightSubsystem s_Lime;
     RobotState robotState;
     
-    public double floorDistance;
 
     public static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // This is the field type that will be in PNW events
 
@@ -93,20 +70,30 @@ public class Vision extends SubsystemBase {
         s_Swerve = CommandSwerveDrivetrain.getInstance();
         robotState = RobotState.getInstance();
 
-        LiberalLCam = new PhotonCamera(Constants.VisionConstants.FLCamera);
-        GretchenRCam = new PhotonCamera(Constants.VisionConstants.FRCamera);
+        FrontLeftCamera = new PhotonCamera(CameraNames.FrontLeft);
+        FrontRightCamera = new PhotonCamera(CameraNames.FrontRight);
+        FrontRightAngledCamera = new PhotonCamera(CameraNames.FrontRightAngled);
+        BackLeftCamera = new PhotonCamera(CameraNames.BackLeft);
+        BackRightCamera = new PhotonCamera(CameraNames.BackRight);
+        BackCenterCamera = new PhotonCamera(CameraNames.BackCenter);
 
         FLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         FRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-        // elevatorPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-
+        FRAphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        BLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        BRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        BCphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        
         updateAprilTagResults();
     }
 
     public void updateAprilTagResults() {
-        FLcameraResult = LiberalLCam.getAllUnreadResults();
-        FRcameraResult = GretchenRCam.getAllUnreadResults();
-        // elevatorCameraResult = elevatorCamera.getAllUnreadResults();
+        FLcameraResult = FrontLeftCamera.getAllUnreadResults();
+        FRcameraResult = FrontRightCamera.getAllUnreadResults();
+        FRAcameraResult = FrontRightAngledCamera.getAllUnreadResults();
+        BLcameraResult = BackLeftCamera.getAllUnreadResults();
+        BRcameraResult = BackRightCamera.getAllUnreadResults();
+        BCcameraResult = BackCenterCamera.getAllUnreadResults();
     }
 
     public boolean validateTarget(PhotonPipelineResult camera) {
@@ -187,6 +174,7 @@ public class Vision extends SubsystemBase {
      * calculates field-relative robot pose from vision reading, feed to pose estimator (Kalman filter)
      */
     private void updateVision(List<PhotonPipelineResult> cameraResult, Transform3d cameraToRobotTransform) throws Exception {
+        //TODO pass a camera into this instead for easier transform finding 
         
         // something is wrong with this... (we still need it tho)
         // if(Math.abs(robotState.robotAngularVelocityMagnitude()[0]) > VisionLimits.k_rotationLimit) {
@@ -222,14 +210,14 @@ public class Vision extends SubsystemBase {
         } else { // if no multitags, use other tag data
             for (PhotonPipelineResult photonPipelineResult : cameraResult) {
                 if(validateTarget(photonPipelineResult)) {
-
+// TODO add the other cameras
                     if(FLphotonPoseEstimator.getRobotToCameraTransform() == (cameraToRobotTransform)) {
 
                         VisionOutput newPose = new VisionOutput(
                             PhotonUtils.estimateFieldToRobotAprilTag(
                             photonPipelineResult.getBestTarget().bestCameraToTarget,
                                 aprilTagFieldLayout.getTagPose(photonPipelineResult.getBestTarget().fiducialId).get(),
-                                FLcameraToRobotTransform),
+                                    FLcameraToRobot),
                             photonPipelineResult.getTimestampSeconds(),
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())), false);
@@ -244,7 +232,7 @@ public class Vision extends SubsystemBase {
                             PhotonUtils.estimateFieldToRobotAprilTag(
                             photonPipelineResult.getBestTarget().bestCameraToTarget,
                                 aprilTagFieldLayout.getTagPose(photonPipelineResult.getBestTarget().fiducialId).get(),
-                                FRcameraToRobotTransform),
+                                    FRcameraToRobot),
                             photonPipelineResult.getTimestampSeconds(),
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())) , false);

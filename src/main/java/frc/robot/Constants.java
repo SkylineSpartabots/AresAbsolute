@@ -4,26 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.apriltag.AprilTag;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.VisionConstants.AprilTags;
-import frc.robot.RobotState.RobotState;
-
-import java.util.Arrays;
-import java.util.Comparator;
-
-import org.opencv.core.Point;
-
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -178,20 +166,66 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String FLCamera = "Liberal";
-        public static final String FRCamera = "Gretchen";
-        public static final String altFRCamera = "Charles";
+        
+        /*
+        ----------------- Physical Placements -----------------
+        FRONT RIGHT: FR, Richard
+        FRONT LEFT: FL, Liberal
+        FRONT RIGHT ANGLED: FRA, NAME
+        BACK RIGHT: BR, Gretchen
+        BACK LEFT: BL, NAME
+        BACK CENTER: BC, NAME        
+        
+        
+        In the code we use the physical location names or abbreviations to refer to the cameras.
+        The nicknames are to keep track of which camera is which and what its calibration is
+        
+        Name the camera, calibrate it, place it on the bot, and write down where you placed it (above).
+         */
+        
+        public static final class CameraNames{
+            public static final String FrontRight = "Richard";
+            public static final String FrontLeft = "Liberal";
+            public static final String FrontRightAngled = ""; //TODO
+            public static final String BackRight = "Gretchen";
+            public static final String BackLeft = ""; //TODO
+            public static final String BackCenter = ""; //TODO
+        }
+        
+        public static final class CameraTransforms{
+            public static final Transform3d FLcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+
+            public static final Transform3d FRcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+
+            // TODO not correct transforms - PLACEHOLDER
+            public static final Transform3d FRACameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-12.309), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+
+            public static final Transform3d BLcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+
+            public static final Transform3d BRcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(12.309), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+
+            public static final Transform3d BCcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(5),Units.degreesToRadians(0)));
+
+
+        }
+        
+
+        
+        
         public static final int aprilTagMax = 22;
-        public static final double aprilTagHeight = 0.122; //bottom of each april tag is 122cm above carpet | unnecessary, we have photonvision's field layout import
-        public static final double cameraRollOffset = Units.degreesToRadians(0);
-        public static final double cameraPitchOffset = Units.degreesToRadians(0);
-        public static final double cameraYawOffset = Units.degreesToRadians(0);
-        public static final double backRightCameraHeight = Units.inchesToMeters(9.1);
-        public static final double backRightCameraPitch = Units.degreesToRadians(30);
-
-        public static final double centerCameraHeight = Units.inchesToMeters(10.15);
-        public static final double centerCameraPitch = Units.degreesToRadians(15);
-
+       
         public static final class VisionLimits {
         public static final double k_rotationLimit = Math.PI;
         public static final double k_velocityLimit = 6;
