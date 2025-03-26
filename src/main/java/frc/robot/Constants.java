@@ -110,8 +110,8 @@ public final class Constants {
     
     public static final int timeOutMs = 10;
 
-    public static final double elevatorMaxVelocity = 250;
-    public static final double elevatorMaxAcceleration = 300;
+    public static final double elevatorMaxVelocity = 150;
+    public static final double elevatorMaxAcceleration = 250;
     public static final double elevatorCurrentThreshold = 20;
 
     public static final double slipFactor = 65;
@@ -289,7 +289,8 @@ public final class Constants {
         public static final int slapdownLeaderID = 41;
         public static final int slapdownFollowerID = 42;
 
-        public static final int funnelID = 51;
+        public static final int funnelguyID = 51;
+        public static final int funnelgirlID = 52;
 
         public static final int climbID = 61;
     }
