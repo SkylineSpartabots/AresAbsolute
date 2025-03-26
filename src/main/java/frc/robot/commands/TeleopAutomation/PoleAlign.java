@@ -26,6 +26,7 @@ import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -97,6 +98,7 @@ public class PoleAlign extends Command {
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
 
+        Vision.getInstance().useFrontCameras();
     }
 
     @Override
@@ -161,6 +163,7 @@ public class PoleAlign extends Command {
     @Override
     public void end(boolean interrupted) {
         System.out.println("Pole align done ngl");
+        Vision.getInstance().useFrontCameras();
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 
