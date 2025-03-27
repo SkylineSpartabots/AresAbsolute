@@ -206,14 +206,31 @@ public final class Constants {
         public static final class CameraTransforms{
             /*
             
+            WPI Coordinate Space
                     +x
                     |
             +y ----------- -y
                     |
                     -x
+             
+             Onshape Coordinate Space
+                    +y
+                    |
+            -x ----------- +x
+                    |
+                    -y
+                    
+             +z is up in both coordinate spaces
+                    
+                    
              */
             
             //Pitch is COUNTERCLOCKWISE about the Y axis
+            //Yaw is COUNTERCLOCKWISE about the Z axis
+            
+            // The camera to robot transform is the transform from the camera to the robot in the camera's coordinate space
+            // We are moving from the camera to the center of the robot using WPI coordinates
+            
             public static final Transform3d FLcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0))); //so this guy is negative not pos (cause ccw)
@@ -223,7 +240,7 @@ public final class Constants {
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0)));
 
             public static final Transform3d FRACameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(Float.MAX_VALUE), Units.inchesToMeters(Float.MAX_VALUE), Units.inchesToMeters(Float.MAX_VALUE)), //TODO ALL
+                    new Translation3d(Units.inchesToMeters(-7.395), Units.inchesToMeters(10.416), Units.inchesToMeters(-10.461)), 
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(7.5),Units.degreesToRadians(45))); // positive pitch cause CCW about Y = down 
 
             public static final Transform3d BLcameraToRobot = new Transform3d(
