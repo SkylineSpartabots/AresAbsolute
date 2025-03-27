@@ -232,7 +232,7 @@ public final class Constants {
 
             public static final Transform3d BRcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.412), Units.inchesToMeters(10.720), Units.inchesToMeters(-8.350)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(-135))); //TODO
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(-135))); //TODO PITCH
 
             public static final Transform3d BCcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),
