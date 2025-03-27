@@ -168,13 +168,24 @@ public final class Constants {
     public static final class VisionConstants {
         
         /*
+        ----------------- Orange Pi Names -----------------
+        In case anyone ever needs this, here is each orange pi host name and its assigned static IP
+        alpha: 10.29.76.11
+        beta: 10.29.76.12
+        gamma: 10.29.76.13
+        delta: 10.29.76.14
+        backup: 10.29.76.15 - just a hot swappable SD card with a backup image
+         */
+        
+        
+        /*
         ----------------- Physical Placements -----------------
         FRONT RIGHT: FR, Richard
         FRONT LEFT: FL, Liberal
-        FRONT RIGHT ANGLED: FRA, NAME
+        FRONT RIGHT ANGLED: FRA, Abe
         BACK RIGHT: BR, Gretchen
-        BACK LEFT: BL, NAME
-        BACK CENTER: BC, NAME        
+        BACK LEFT: BL, Blake
+        BACK CENTER: BC, Charles        
         
         
         In the code we use the physical location names or abbreviations to refer to the cameras.
@@ -186,10 +197,10 @@ public final class Constants {
         public static final class CameraNames{
             public static final String FrontRight = "Richard_FR";
             public static final String FrontLeft = "Liberal_FL";
-            public static final String FrontRightAngled = "_FRA"; //TODO
+            public static final String FrontRightAngled = "Abe_FRA";
             public static final String BackRight = "Gretchen_BR";
-            public static final String BackLeft = "_BL"; //TODO
-            public static final String BackCenter = "_BC"; //TODO
+            public static final String BackLeft = "Blake_BL"; 
+            public static final String BackCenter = "Charles_BC"; 
         }
         
         public static final class CameraTransforms{
