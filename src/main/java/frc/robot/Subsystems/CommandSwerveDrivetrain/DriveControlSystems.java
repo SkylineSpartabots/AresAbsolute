@@ -36,8 +36,8 @@ public class DriveControlSystems {
     private double lastHeading = 0;
     private boolean homing = false;
 
-    private SlewRateLimiter xLimiter = new SlewRateLimiter(10);
-    private SlewRateLimiter yLimiter = new SlewRateLimiter(10);
+    private SlewRateLimiter xLimiter = new SlewRateLimiter(12);
+    private SlewRateLimiter yLimiter = new SlewRateLimiter(12);
 
     private PIDController homingController = new PIDController(0, 0, 0);
 
@@ -84,8 +84,8 @@ public class DriveControlSystems {
         driverLY = scaledDeadBand(driverLY) * Constants.MaxSpeed;
         driverRX = scaledDeadBand(driverRX) * Constants.MaxAngularRate;
 
-        driverLY = xLimiter.calculate(driverLY); //flipped bc driver LY corresponds to x velocity 
-        driverLX = yLimiter.calculate(driverLX);
+        // driverLY = xLimiter.calculate(driverLY); //flipped bc driver LY corresponds to x velocity 
+        // driverLX = yLimiter.calculate(driverLX);
 
         if(Constants.alliance == Alliance.Red){
             driverLY = driverLY * -1;
