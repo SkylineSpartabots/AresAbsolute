@@ -199,6 +199,7 @@ public class RobotContainer {
     // driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.back().onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    driver.back().onTrue(new InstantCommand(()->drivetrain.resetOdo()));
     driver.start().onTrue(new ZeroElevator());
     driverLeftTrigger.whileTrue(new SlowDrive());
     driverRightTrigger.onTrue(CommandFactory.ShootCoral());
@@ -224,7 +225,7 @@ public class RobotContainer {
     // driverDpadUp.onTrue(new SetRoller(RollerState.OUTTAKE));
 
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
-    // driver.b().onTrue(CommandFactory.EjectFunnel());
+    driver.b().onTrue(CommandFactory.EjectFunnel());
     driver.x().onTrue(CommandFactory.FullCoralIntake());
 
     // driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
