@@ -57,6 +57,8 @@ public class Vision extends SubsystemBase {
     CommandSwerveDrivetrain s_Swerve;
     RobotState robotState;
 
+    private boolean frontCamerasBool = false;
+
 
     public static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // This is the field type that will be in PNW events
 
@@ -210,6 +212,9 @@ public class Vision extends SubsystemBase {
                         multiTagOutput.getBestTarget(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(multiTagOutput.getTimestamp())), true);
 
+                if(frontCamerasBool)
+                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0025, 0.0025, 0.01));
+                else 
                 s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0075, 0.0075, 0.01));
             }
         
@@ -228,9 +233,10 @@ public class Vision extends SubsystemBase {
 
                     System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
 
-                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08));
-
-
+                    if(frontCamerasBool)
+                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.017, 0.017, 0.017));
+                    else
+                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08));
                 }
 
             }
@@ -238,18 +244,26 @@ public class Vision extends SubsystemBase {
         }
     }
 
+    public void useFrontCameras() {
+        frontCamerasBool = !frontCamerasBool;
+    }
 
     @Override
     public void periodic() {
         try {
 
+            if(frontCamerasBool) { //only use front cameras
+                updateVision(FrontLeftCamera, FLcameraToRobot);
+                updateVision(FrontRightCamera, FRcameraToRobot);
+                updateVision(FrontRightAngledCamera, FRACameraToRobot);
+            } else {
             updateVision(FrontLeftCamera, FLcameraToRobot);
             updateVision(FrontRightCamera, FRcameraToRobot);
             updateVision(FrontRightAngledCamera, FRACameraToRobot);
             updateVision(BackLeftCamera, BLcameraToRobot);
             updateVision(BackRightCamera, BRcameraToRobot);
             updateVision(BackCenterCamera, BCcameraToRobot);
-
+            }
 
         } catch (Exception e) {
         }

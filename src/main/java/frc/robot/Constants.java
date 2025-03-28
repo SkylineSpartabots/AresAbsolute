@@ -168,13 +168,24 @@ public final class Constants {
     public static final class VisionConstants {
         
         /*
+        ----------------- Orange Pi Names -----------------
+        In case anyone ever needs this, here is each orange pi host name and its assigned static IP
+        alpha: 10.29.76.11
+        beta: 10.29.76.12
+        gamma: 10.29.76.13
+        delta: 10.29.76.14
+        backup: 10.29.76.15 - just a hot swappable SD card with a backup image
+         */
+        
+        
+        /*
         ----------------- Physical Placements -----------------
         FRONT RIGHT: FR, Richard
         FRONT LEFT: FL, Liberal
-        FRONT RIGHT ANGLED: FRA, NAME
+        FRONT RIGHT ANGLED: FRA, Abe
         BACK RIGHT: BR, Gretchen
-        BACK LEFT: BL, NAME
-        BACK CENTER: BC, NAME        
+        BACK LEFT: BL, Blake
+        BACK CENTER: BC, Charles        
         
         
         In the code we use the physical location names or abbreviations to refer to the cameras.
@@ -186,23 +197,40 @@ public final class Constants {
         public static final class CameraNames{
             public static final String FrontRight = "Richard_FR";
             public static final String FrontLeft = "Liberal_FL";
-            public static final String FrontRightAngled = "_FRA"; //TODO
+            public static final String FrontRightAngled = "Abe_FRA";
             public static final String BackRight = "Gretchen_BR";
-            public static final String BackLeft = "_BL"; //TODO
-            public static final String BackCenter = "_BC"; //TODO
+            public static final String BackLeft = "Blake_BL"; 
+            public static final String BackCenter = "Charles_BC"; 
         }
         
         public static final class CameraTransforms{
             /*
             
+            WPI Coordinate Space
                     +x
                     |
             +y ----------- -y
                     |
                     -x
+             
+             Onshape Coordinate Space
+                    +y
+                    |
+            -x ----------- +x
+                    |
+                    -y
+                    
+             +z is up in both coordinate spaces
+                    
+                    
              */
             
             //Pitch is COUNTERCLOCKWISE about the Y axis
+            //Yaw is COUNTERCLOCKWISE about the Z axis
+            
+            // The camera to robot transform is the transform from the camera to the robot in the camera's coordinate space
+            // We are moving from the camera to the center of the robot using WPI coordinates
+            
             public static final Transform3d FLcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0))); //so this guy is negative not pos (cause ccw)
@@ -212,20 +240,21 @@ public final class Constants {
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0)));
 
             public static final Transform3d FRACameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(Float.MAX_VALUE), Units.inchesToMeters(Float.MAX_VALUE), Units.inchesToMeters(Float.MAX_VALUE)), //TODO ALL
+                    new Translation3d(Units.inchesToMeters(-7.395), Units.inchesToMeters(10.416), Units.inchesToMeters(-10.461)), // See V33 in 001 DRIVETRAIN in CAD
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(7.5),Units.degreesToRadians(45))); // positive pitch cause CCW about Y = down 
 
+            // Mechancical Advantage Cameras are 30 deg from -x axis (WPI) 
             public static final Transform3d BLcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.412), Units.inchesToMeters(-10.720), Units.inchesToMeters(-8.350)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(135))); //TODO PITCH
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(150))); // MA angled 30 deg to the left of -x (WPI) thus 150 deg CCW
 
             public static final Transform3d BRcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.412), Units.inchesToMeters(10.720), Units.inchesToMeters(-8.350)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(-135))); //TODO
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(-150))); // MA angled 30 deg to the right of -x (WPI) thus 150 deg CW 
 
             public static final Transform3d BCcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(Float.MAX_VALUE),Units.degreesToRadians(180))); //TODO PITCH
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(180))); //TODO IS PITCH RIGHT? // we pitch it -15 up then rotate the yaw, pitch is unchanged
 
 
         }
