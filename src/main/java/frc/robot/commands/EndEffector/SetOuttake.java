@@ -52,7 +52,7 @@ public class SetOuttake extends Command {
 
   @Override
   public boolean isFinished() {
-    return (state == OuttakeState.INDEX && timer.hasElapsed(0.09)
-     || (timer.hasElapsed(0.3)));
+    return (state == OuttakeState.INDEX && timer.hasElapsed(0.12)
+     || (timer.hasElapsed(0.4)));
   }
 }

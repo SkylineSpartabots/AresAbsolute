@@ -202,7 +202,8 @@ public class RobotContainer {
     driver.back().onTrue(new InstantCommand(()->drivetrain.resetOdo()));
     driver.start().onTrue(new ZeroElevator());
     driverLeftTrigger.whileTrue(new SlowDrive());
-    driverRightTrigger.onTrue(CommandFactory.ShootCoral());
+    driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.4)));
+    driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
     //     driver.rightTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     //     driver.leftTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
@@ -218,8 +219,8 @@ public class RobotContainer {
     driverDpadDown.whileTrue(new RunClimb(0.9));
 
 
-    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-    driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
 
     // driverDpadDown.onTrue(CommandFactory.SmartAlgeaIntake());
     // driverDpadUp.onTrue(new SetRoller(RollerState.OUTTAKE));

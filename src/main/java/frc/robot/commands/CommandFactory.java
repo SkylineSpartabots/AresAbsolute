@@ -25,6 +25,7 @@ import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
 import frc.robot.commands.Elevator.SetElevator;
+import frc.robot.commands.EndEffector.SetAlgae;
 import frc.robot.commands.EndEffector.SetOuttake;
 import frc.robot.commands.EndEffector.SmartCoralIndex;
 import frc.robot.commands.Funnel.SetFunnel;
@@ -58,13 +59,9 @@ public class CommandFactory {
     }
     
     public static Command Dealgaeify(ElevatorState state){
-        return new SequentialCommandGroup(
-            new ParallelCommandGroup(
+        return new ParallelCommandGroup(
                 new SetElevator(() -> state),
-                new InstantCommand(()->ee.setAlgaeSpeed(0.5))
-            ),
-            Commands.waitSeconds(4.8254),
-            new InstantCommand(()->ee.setAlgaeSpeed(0))
+                new SetAlgae(0.5)
         );
     }
 
@@ -114,9 +111,13 @@ public class CommandFactory {
 
     public static Command EjectFunnel(){
         return new SequentialCommandGroup(
-            new SetFunnel(FunnelState.EJECT),
+            new ParallelCommandGroup(
+                new SetFunnel(FunnelState.EJECT),
+                new InstantCommand(()->ee.setOuttakeSpeed(0.8))
+            ),
             Commands.waitSeconds(0.5),
-            new SetFunnel(FunnelState.OFF)
+            new SetFunnel(FunnelState.OFF),
+            new InstantCommand(()->ee.setOuttakeSpeed(0))
 
         );
     }
