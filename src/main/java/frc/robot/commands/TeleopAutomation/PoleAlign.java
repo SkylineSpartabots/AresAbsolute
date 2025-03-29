@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class PoleAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            2.8, 0.2, 0.0025, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            2.8, 0.2, 0.0025, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
@@ -67,7 +67,6 @@ public class PoleAlign extends Command {
         thetaController.setTolerance(0.04); //less than 3 degrees
         driveController.setTolerance(0.03, 0.05);
 
-
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
     }
@@ -94,11 +93,10 @@ public class PoleAlign extends Command {
 
         thetaController.reset(s_Swerve.getHeading(),
                 robotState.getLatestFilteredVelocity().getOmega());
-        
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
 
-        Vision.getInstance().useFrontCameras();
+        // Vision.getInstance().useFrontCameras();
     }
 
     @Override
@@ -145,11 +143,11 @@ public class PoleAlign extends Command {
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
         // other actions
-        if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
-                System.out.println(elevatorGoalPos);
-                new SetElevator(elevatorGoalPos).schedule();
-                elevatorGoalPos = Double.POSITIVE_INFINITY;
-        }
+        // if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
+        //         System.out.println(elevatorGoalPos);
+        //         new SetElevator(elevatorGoalPos).schedule();
+        //         elevatorGoalPos = Double.POSITIVE_INFINITY;
+        // }
 
         //prints
         // System.out.println("Theta error: " + thetaErrorAbs);
@@ -162,13 +160,11 @@ public class PoleAlign extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("Pole align done ngl");
-        Vision.getInstance().useFrontCameras();
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 
     @Override
     public boolean isFinished() {
-        return targetPose.equals(null) || Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance();
+        return targetPose.equals(null) || (Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance());
     }
 }

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.Utils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -106,10 +107,14 @@ public class Vision extends SubsystemBase {
 
         PhotonTrackedTarget target = camera.getBestTarget();
 
-        if (target.area > 0.06
+        
+        double tagDistance = PhotonUtils.getDistanceToPose(s_Swerve.getPose(), aprilTagFieldLayout.getTagPose(target.getFiducialId()).get().toPose2d());
+
+        if (target.area > 0.1
                 && target.getFiducialId() >= 1
                 && target.getFiducialId() <= Constants.VisionConstants.aprilTagMax
-                && target.getPoseAmbiguity() < 0.2 && target.getPoseAmbiguity() > -1)
+                && target.getPoseAmbiguity() < 0.2 && target.getPoseAmbiguity() > -1
+                && tagDistance < 4.82542976)
             return true;
 
         return false;
@@ -139,7 +144,6 @@ public class Vision extends SubsystemBase {
             // Logger.recordOutput("Vision/MultiTag updates", "high error");
             return false;
         }
-
         if (multiTagResult.fiducialIDsUsed.size() < 2 || multiTagResult.fiducialIDsUsed.isEmpty()) {
             SmartDashboard.putString("Multitag updates", "insufficient ids");
             // Logger.recordOutput("Vision/MultiTag updates", "insufficient ids");
@@ -212,7 +216,7 @@ public class Vision extends SubsystemBase {
                         multiTagOutput.getBestTarget(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(multiTagOutput.getTimestamp())), true);
 
-                        System.out.println(camera.getName() + "Multi-pose: " + newPose.estimatedPose.toString());
+                        // System.out.println(camera.getName() + "Multi-pose: " + newPose.estimatedPose.toString());
 
                 if(frontCamerasBool)
                     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0025, 0.0025, 0.01));
@@ -233,12 +237,12 @@ public class Vision extends SubsystemBase {
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())), false);
 
-                    System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
+                    // System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
 
                     if(frontCamerasBool)
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.017, 0.017, 0.017));
                     else
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08));
+                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.055, 0.055, 0.085));
                 }
 
             }

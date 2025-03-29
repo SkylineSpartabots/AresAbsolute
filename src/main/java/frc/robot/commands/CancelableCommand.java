@@ -14,6 +14,6 @@ public class CancelableCommand extends Command {
     }
   
     public boolean isFinished() {
-      return controller.y().getAsBoolean();
+      return Math.abs(controller.getLeftX()) > 0.1 || Math.abs(controller.getLeftY()) > 0.1;
     }
 }

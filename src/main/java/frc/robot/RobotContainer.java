@@ -48,6 +48,7 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
 import frc.robot.commands.SwerveCommands.SlowDrive;
+import frc.robot.commands.TeleopAutomation.PoleAlign;
 
 public class RobotContainer {
 
@@ -218,17 +219,18 @@ public class RobotContainer {
     driverDpadUp.whileTrue(new RunClimb(-0.9));
     driverDpadDown.whileTrue(new RunClimb(0.9));
 
-    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-    driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    driverDpadLeft.onTrue(new PoleAlign(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole()));
+    // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
 
     // driverDpadDown.onTrue(CommandFactory.SmartAlgeaIntake());
     // driverDpadUp.onTrue(new SetRoller(RollerState.OUTTAKE));
 
+    
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
     driver.b().onTrue(CommandFactory.EjectFunnel());
     driver.x().onTrue(CommandFactory.FullCoralIntake());
     // driver.x().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
-
+    
     // driver.b().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
 

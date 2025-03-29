@@ -98,8 +98,8 @@ public final class Constants {
 
     public static final class KrakenConstants {
         public static final double nominalVoltageVolts = 12; //website says up to 24 volts idk man
-        public static final double stallTorqueNewtonMeters = 4.21;
-        public static final double stallCurrentAmps = 233;
+        public static final double stallTorqueNewtonMeters = 7.09;
+        public static final double stallCurrentAmps = 366;
         public static final double freeCurrentAmps = 2.32;
         public static final double freeSpeedRadPerSec = 5800;
         public static final double driveCurrentLimitAmps = 60;

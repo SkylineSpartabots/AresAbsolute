@@ -41,8 +41,8 @@ public class PathToReef extends Command {
         private boolean forceEnd = false;
 
         private PathConstraints constraints = new PathConstraints(
-                Constants.MaxSpeed,
-                Constants.MaxAcceleration,
+                Constants.MaxSpeed + 1,
+                Constants.MaxAcceleration + 4,
                 Constants.MaxAngularVelocity,
                 Constants.MaxAngularRate
         );
@@ -57,7 +57,7 @@ public class PathToReef extends Command {
         @Override
         public void initialize() {
 
-                s_Swerve.initAutoBuilder();
+                // s_Swerve.initAutoBuilder();
                 if(Constants.alliance == Alliance.Blue)
                         this.targetReefSide = ReefSidePositions.values()[(int) (targetReefPole.get().ordinal() / 2)];
                 else 
@@ -69,12 +69,12 @@ public class PathToReef extends Command {
                         pathFindCommand.cancel();
                 }
 
-                System.out.println("done init " + AutoBuilder.isPathfindingConfigured());
+                System.out.println("target pose" + targetReefSide.getPose().toString());
 
                 pathFindCommand = AutoBuilder.pathfindToPose(
                         targetReefSide.getPose(),
                         constraints,
-                        0.25
+                        0.05
                 );
 
                 pathFindCommand.schedule();
