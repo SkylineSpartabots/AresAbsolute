@@ -14,6 +14,6 @@ public class CancelableCommand extends Command {
     }
   
     public boolean isFinished() {
-      return controller.getLeftY() > Constants.stickDeadband || controller.getLeftX() > Constants.stickDeadband || controller.getRightX() > Constants.stickDeadband;
+      return controller.y().getAsBoolean();
     }
 }

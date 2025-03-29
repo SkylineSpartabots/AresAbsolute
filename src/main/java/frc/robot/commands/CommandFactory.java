@@ -156,56 +156,33 @@ public class CommandFactory {
         return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
 
-    //Automation commands
-    // public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
-    //     return new SequentialCommandGroup(
-    //         CommandFactory.FullCoralIntake(),
-    //         new SequentialCommandGroup(
-    //         new ReefAlign(pole),
-    //         new PoleAlign(level, pole)
-    //         ).raceWith(new CancelableCommand(controller)
 
-    //     ));
+    // automation
+    // public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+    //     return new SequentialCommandGroup(
+    //         new PathToReef(pole, controller),
+    //         new PoleAlign(level, pole)
+    //         ).beforeStarting(CommandFactory.FullCoralIntake())
+    //         .onlyIf(() -> EndEffector.getInstance().getBeamResult()) //if we dont have coral, start to intake
+    //         .raceWith(new CancelableCommand(controller)); 
     // }
 
-
-    public static Command AutoPathReefFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+    public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
         return new SequentialCommandGroup(
-            CommandFactory.FullCoralIntake(), //Intake coral
+            Commands.either(
+                CommandFactory.FullCoralIntake(),
+                Commands.none(),
+                EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
+            ),
             new PathToReef(pole, controller),
             new PoleAlign(level, pole)
-            ).raceWith(new CancelableCommand(controller));
+        ).raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
 
-    public static Command AutoPathReef(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+    public static Command AutoAlgaeAlign(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new PathToReef(pole, controller)
-            );
-    }
-
-    public static Command AutoPathRemoveAlgae(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
-        return new SequentialCommandGroup(
-            CommandFactory.FullCoralIntake(), //Intake coral
             new PathToReef(pole, controller),
             new AlgaeAlign(pole)
             ).raceWith(new CancelableCommand(controller));
     }
-
-    // public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
-    //     return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work
-    //         new PoleAlign(level, pole)
-    //     ).raceWith(new CancelableCommand(controller));
-    // }
-
-    // public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
-    //     return new SequentialCommandGroup(
-    //         new AutomatedAlgaeAction(level)
-    //     ).raceWith(new CancelableCommand(controller));
-    // }
-
-    // public static Command AutoScorefromSource(ElevatorState level, SourceNumber source, ReefNumber reef){
-    //     return new ParallelCommandGroup(
-            
-    //     );
-    // }
 }

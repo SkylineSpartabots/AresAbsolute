@@ -38,7 +38,7 @@ public class PathToReef extends Command {
 
         private Command pathFindCommand;
 
-        private boolean finished = false;
+        private boolean forceEnd = false;
 
         private PathConstraints constraints = new PathConstraints(
                 Constants.MaxSpeed,
@@ -69,7 +69,7 @@ public class PathToReef extends Command {
                         pathFindCommand.cancel();
                 }
 
-                // System.out.println("done init " + AutoBuilder.isPathfindingConfigured());
+                System.out.println("done init " + AutoBuilder.isPathfindingConfigured());
 
                 pathFindCommand = AutoBuilder.pathfindToPose(
                         targetReefSide.getPose(),
@@ -85,31 +85,32 @@ public class PathToReef extends Command {
                 // System.out.println(s_Swerve.getCurrentCommand().getName());
 
                 // System.out.println("comming still going");
-
                 if(pathFindCommand.isScheduled()) {
+
                         Pose2d pose = s_Swerve.getPose();
                         if(Math.abs(pose.getX() - targetReefSide.getPose().getX()) < 0.01 
                         && Math.abs(pose.getY() - targetReefSide.getPose().getY()) < 0.01 
                         && Math.abs(pose.getRotation().minus(targetReefSide.getPose().getRotation()).getDegrees()) < 6)  {
-
+                                forceEnd = true;
                         }
                          
                         if(Math.abs(driver.getLeftY()) > Constants.stickDeadband // cancel path if driver wants to move
                                 || Math.abs(driver.getLeftX()) > Constants.stickDeadband
                                 || Math.abs(driver.getRightX()) > Constants.stickDeadband) {
-                                System.out.println("command cancelde");
                                 pathFindCommand.cancel();
                         }
+
                 } else if(Math.abs(driver.getLeftY()) < Constants.stickDeadband
                  && Math.abs(driver.getLeftX()) < Constants.stickDeadband
                  && Math.abs(driver.getRightX()) < Constants.stickDeadband) {
                         pathFindCommand.schedule();
                  }
+
         }
 
         @Override
         public boolean isFinished() {
-                return pathFindCommand.isFinished();
+                return pathFindCommand.isFinished() || forceEnd;
         }
 
         @Override

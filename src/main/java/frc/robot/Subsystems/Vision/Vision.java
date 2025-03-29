@@ -73,31 +73,31 @@ public class Vision extends SubsystemBase {
         s_Swerve = CommandSwerveDrivetrain.getInstance();
         robotState = RobotState.getInstance();
 
-        FrontLeftCamera = new PhotonCamera(CameraNames.FrontLeft);
-        FrontRightCamera = new PhotonCamera(CameraNames.FrontRight);
-        FrontRightAngledCamera = new PhotonCamera(CameraNames.FrontRightAngled);
-        BackLeftCamera = new PhotonCamera(CameraNames.BackLeft);
-        BackRightCamera = new PhotonCamera(CameraNames.BackRight);
-        BackCenterCamera = new PhotonCamera(CameraNames.BackCenter);
+        FrontLeftCamera = new PhotonCamera(CameraNames.BackLeft);
+        FrontRightCamera = new PhotonCamera(CameraNames.BackCenter);
+        // FrontRightAngledCamera = new PhotonCamera(CameraNames.FrontRightAngled);
+        // BackLeftCamera = new PhotonCamera(CameraNames.BackLeft);
+        // BackRightCamera = new PhotonCamera(CameraNames.BackRight);
+        // BackCenterCamera = new PhotonCamera(CameraNames.BackCenter);
 
         FLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         FRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-        FRAphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-        BLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-        BRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-        BCphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        // FRAphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        // BLphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        // BRphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        // BCphotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-//        updateAprilTagResults();
+    //updateAprilTagResults();
     }
 
     // we refresh in updateVision now - but i will leave this method in case someone wants it
     public void updateAprilTagResults() {
         FLcameraResult = FrontLeftCamera.getAllUnreadResults();
         FRcameraResult = FrontRightCamera.getAllUnreadResults();
-        FRAcameraResult = FrontRightAngledCamera.getAllUnreadResults();
-        BLcameraResult = BackLeftCamera.getAllUnreadResults();
-        BRcameraResult = BackRightCamera.getAllUnreadResults();
-        BCcameraResult = BackCenterCamera.getAllUnreadResults();
+        // FRAcameraResult = FrontRightAngledCamera.getAllUnreadResults();
+        // BLcameraResult = BackLeftCamera.getAllUnreadResults();
+        // BRcameraResult = BackRightCamera.getAllUnreadResults();
+        // BCcameraResult = BackCenterCamera.getAllUnreadResults();
     }
 
     public boolean validateTarget(PhotonPipelineResult camera) {
@@ -212,6 +212,8 @@ public class Vision extends SubsystemBase {
                         multiTagOutput.getBestTarget(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(multiTagOutput.getTimestamp())), true);
 
+                        System.out.println(camera.getName() + "Multi-pose: " + newPose.estimatedPose.toString());
+
                 if(frontCamerasBool)
                     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0025, 0.0025, 0.01));
                 else 
@@ -252,18 +254,18 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         try {
 
-            if(frontCamerasBool) { //only use front cameras
+            // if(frontCamerasBool) { //only use front cameras
                 updateVision(FrontLeftCamera, FLcameraToRobot);
                 updateVision(FrontRightCamera, FRcameraToRobot);
-                updateVision(FrontRightAngledCamera, FRACameraToRobot);
-            } else {
-            updateVision(FrontLeftCamera, FLcameraToRobot);
-            updateVision(FrontRightCamera, FRcameraToRobot);
-            updateVision(FrontRightAngledCamera, FRACameraToRobot);
-            updateVision(BackLeftCamera, BLcameraToRobot);
-            updateVision(BackRightCamera, BRcameraToRobot);
-            updateVision(BackCenterCamera, BCcameraToRobot);
-            }
+                // updateVision(FrontRightAngledCamera, FRACameraToRobot);
+            // } else {
+            // updateVision(FrontLeftCamera, FLcameraToRobot);
+            // updateVision(FrontRightCamera, FRcameraToRobot);
+            // updateVision(FrontRightAngledCamera, FRACameraToRobot);
+            // updateVision(BackLeftCamera, BLcameraToRobot);
+            // updateVision(BackRightCamera, BRcameraToRobot);
+            // updateVision(BackCenterCamera, BCcameraToRobot);
+            // }
 
         } catch (Exception e) {
         }
