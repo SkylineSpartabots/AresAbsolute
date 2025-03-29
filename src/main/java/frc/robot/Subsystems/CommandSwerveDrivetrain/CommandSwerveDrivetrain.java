@@ -95,7 +95,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private static CommandSwerveDrivetrain s_Swerve;
 
-    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    // Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();

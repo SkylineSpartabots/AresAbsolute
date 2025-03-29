@@ -226,6 +226,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    Constants.alliance = DriverStation.getAlliance().get();
     // m_autonomousCommand = new SequentialCommandGroup();
     // new SequentialCommandGroup(
     //   new ZeroSlapdown(),

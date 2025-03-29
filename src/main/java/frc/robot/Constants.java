@@ -136,7 +136,7 @@ public final class Constants {
         public static final int elevatorPeakCurrentLimit = 120;
     }
     
-    public static Alliance alliance;
+    public static Alliance alliance = Alliance.Blue;
 
     public static Mode deployMode = Mode.REAL;
 

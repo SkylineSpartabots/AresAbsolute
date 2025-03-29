@@ -47,8 +47,8 @@ public class Elevator extends SubsystemBase {
     L3(35.29394),
     L4(60),
     GROUND(0.11), //bad
-    A1(7.3), //bad
-    A2(22), //bad
+    A1(8), //bad
+    A2(23.5), //bad
     SOURCE(0.75);
     //48.1 should be max
     private double encoderPosition;
