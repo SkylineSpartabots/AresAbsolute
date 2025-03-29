@@ -213,7 +213,7 @@ public final class Constants {
                     |
                     -x
              
-             Onshape Coordinate Space
+            Onshape Coordinate Space
                     +y
                     |
             -x ----------- +x
@@ -255,8 +255,6 @@ public final class Constants {
             public static final Transform3d BCcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(180))); //TODO IS PITCH RIGHT? // we pitch it -15 up then rotate the yaw, pitch is unchanged
-
-
         }
         
 
