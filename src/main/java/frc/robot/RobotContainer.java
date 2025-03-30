@@ -48,7 +48,7 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
 import frc.robot.commands.SwerveCommands.SlowDrive;
-import frc.robot.commands.TeleopAutomation.PoleAlign;
+import frc.robot.commands.TeleopAutomation.PathToReef;
 
 public class RobotContainer {
 
@@ -193,21 +193,18 @@ public class RobotContainer {
 
     // driver.rightBumper().onTrue(new InstantCommand(() -> elevator.raisePoleLevel()));
     // driver.leftBumper().onTrue(new InstantCommand(() -> elevator.lowerPoleLevel()));
-        
+
+    // ----------====# Automation bindings #====----------
+    
     // driver.back().whileTrue(new RunClimb(0.9));
     // driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.back().onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     // driver.back().onTrue(new InstantCommand(()->drivetrain.resetOdo()));
-
-    // ----------====# Driver bindings #====----------
-
-    // driver.y() IS FOR CANCELABLE COMMAND!!!! DO NOT BIND IT!!!!
-
-    driver.start().onTrue(new ZeroElevator());
-    driverLeftTrigger.whileTrue(new SlowDrive());
-    driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.4)));
-    driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
+    // driver.start().onTrue(new ZeroElevator());
+    // driverLeftTrigger.whileTrue(new SlowDrive());
+    // driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.4)));
+    // driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
     //     driver.rightTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     //     driver.leftTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
@@ -215,27 +212,27 @@ public class RobotContainer {
     driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
     driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
 
-    // driver.povRight().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
-    // driver.povLeft().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
+    driver.povRight().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
+    driver.povLeft().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
     // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-
     driverDpadUp.whileTrue(new RunClimb(-0.9));
     driverDpadDown.whileTrue(new RunClimb(0.9));
 
 
-    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-    driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
 
     // driverDpadDown.onTrue(CommandFactory.SmartAlgeaIntake());
     // driverDpadUp.onTrue(new SetRoller(RollerState.OUTTAKE));
 
-    
-    driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
-    driver.b().onTrue(CommandFactory.EjectFunnel());
-    driver.x().onTrue(CommandFactory.FullCoralIntake());
-    // driver.x().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
-    
+    // driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
+    // driver.b().onTrue(CommandFactory.EjectFunnel());
+    // driver.x().onTrue(CommandFactory.FullCoralIntake());
+    driver.y().onTrue(new PathToReef(() -> robotstate.getSelectedReefPole(), driver));
+
+    // driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
+
     // driver.b().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
 
