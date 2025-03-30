@@ -75,7 +75,7 @@ public class Vision extends SubsystemBase {
 
         FrontLeftCamera = new PhotonCamera(CameraNames.FrontLeft);
         FrontRightCamera = new PhotonCamera(CameraNames.FrontRight);
-        FrontRightAngledCamera = new PhotonCamera(CameraNames.FrontRightAngled);
+        FrontRightAngledCamera = new PhotonCamera(CameraNames.FrontRightCenter);
         BackLeftCamera = new PhotonCamera(CameraNames.BackLeft);
         BackRightCamera = new PhotonCamera(CameraNames.BackRight);
         BackCenterCamera = new PhotonCamera(CameraNames.BackCenter);

@@ -180,8 +180,8 @@ public final class Constants {
         
         /*
         ----------------- Physical Placements -----------------
-        FRONT RIGHT: FR, Richard
-        FRONT LEFT: FL, Liberal
+        FRONT RIGHT: FR, Diggy
+        FRONT LEFT: FL, Liggy
         FRONT RIGHT ANGLED: FRA, Abe
         BACK RIGHT: BR, Gretchen
         BACK LEFT: BL, Blake
@@ -195,12 +195,13 @@ public final class Constants {
          */
         
         public static final class CameraNames{
-            public static final String FrontRight = "Richard_FR";
-            public static final String FrontLeft = "Liberal_FL";
-            public static final String FrontRightAngled = "Abe_FRA";
-            public static final String BackRight = "Gretchen_BR";
-            public static final String BackLeft = "Blake_BL"; 
-            public static final String BackCenter = "Charles_BC"; 
+
+            public static final String FrontRight = "Diggy";
+            public static final String FrontLeft = "Liggy";
+            public static final String FrontRightCenter = "Abe";
+            public static final String BackRight = "Gretchen";
+            public static final String BackLeft = "Blake"; 
+            public static final String BackCenter = "Charles"; 
         }
         
         public static final class CameraTransforms{
