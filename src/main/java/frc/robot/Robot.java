@@ -174,8 +174,6 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData("first auto", firstAuto);
     SmartDashboard.putData("autochoices", chosenAuto);
 
-    
-
     if(isReal()){
       Logger.addDataReceiver(new WPILOGWriter()); // should be savig to usb
       Logger.addDataReceiver(new NT4Publisher());
