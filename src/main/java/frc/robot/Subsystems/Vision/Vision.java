@@ -48,7 +48,7 @@ public class Vision extends SubsystemBase {
 
     PhotonPoseEstimator FLphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FLcameraToRobot);
     PhotonPoseEstimator FRphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FRcameraToRobot);
-    PhotonPoseEstimator FRAphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FRACameraToRobot);
+    PhotonPoseEstimator FRAphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, FCcameraToRobot);
     PhotonPoseEstimator BLphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BLcameraToRobot);
     PhotonPoseEstimator BRphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BRcameraToRobot);
     PhotonPoseEstimator BCphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BCcameraToRobot);
@@ -255,11 +255,11 @@ public class Vision extends SubsystemBase {
             if(frontCamerasBool) { //only use front cameras
                 updateVision(FrontLeftCamera, FLcameraToRobot);
                 updateVision(FrontRightCamera, FRcameraToRobot);
-                updateVision(FrontRightAngledCamera, FRACameraToRobot);
+                updateVision(FrontRightAngledCamera, FCcameraToRobot);
             } else {
             updateVision(FrontLeftCamera, FLcameraToRobot);
             updateVision(FrontRightCamera, FRcameraToRobot);
-            updateVision(FrontRightAngledCamera, FRACameraToRobot);
+            updateVision(FrontRightAngledCamera, FCcameraToRobot);
             updateVision(BackLeftCamera, BLcameraToRobot);
             updateVision(BackRightCamera, BRcameraToRobot);
             updateVision(BackCenterCamera, BCcameraToRobot);

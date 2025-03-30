@@ -240,9 +240,9 @@ public final class Constants {
                     new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0)));
 
-            public static final Transform3d FRACameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(-7.395), Units.inchesToMeters(10.416), Units.inchesToMeters(-10.461)), // See V33 in 001 DRIVETRAIN in CAD
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(7.5),Units.degreesToRadians(45))); // positive pitch cause CCW about Y = down 
+            public static final Transform3d FCcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-11.882), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)), 
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(0)));
 
             // Mechancical Advantage Cameras are 30 deg from -x axis (WPI) 
             public static final Transform3d BLcameraToRobot = new Transform3d(
@@ -255,9 +255,8 @@ public final class Constants {
 
             public static final Transform3d BCcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(180))); //TODO IS PITCH RIGHT? // we pitch it -15 up then rotate the yaw, pitch is unchanged
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(180)));
         }
-        
 
         
         
