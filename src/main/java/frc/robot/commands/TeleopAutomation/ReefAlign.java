@@ -37,9 +37,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class ReefAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            2.8, 0.2, 0.0025, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 3, Constants.MaxAcceleration + 2.5), 0.02);
+            3, 0.2, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed , Constants.MaxAcceleration + 6), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
+            2.8, 0.8, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate + 2 * Math.PI), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
     private EndEffector s_EndEffector;
@@ -60,8 +60,8 @@ public class ReefAlign extends Command {
         
         this.targetReefPole = pole;
 
-        thetaController.setTolerance(0.7); //less than 3 degrees
-        driveController.setTolerance(0.1, 0.05);
+        thetaController.setTolerance(0.35); //less than 3 degrees
+        driveController.setTolerance(0.2, 0.05);
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       

@@ -29,13 +29,13 @@ public final class Constants {
     public static double backRightEncoderOffset = -0.335205077;
 
     public static double MaxSpeed = 6; //can be lowered during testing
-    public static double MaxAcceleration = 3.2542976; //can be lowered during testing
+    public static double MaxAcceleration = 1.2542976; //can be lowered during testing
     public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
     public static double MaxAngularVelocity = 2 * Math.PI;
 
     //all these are outdated but we are not using them anymore so its fine tbh
-    public static double robotMass = 47; //kg
-    public static double MOI = 3.9254; //sum of kg * m^2 to center of rotation
+    public static double robotMass = 25; //kg
+    public static double MOI = 2; //sum of kg * m^2 to center of rotation
     public static double CoF = 1.0; // coefficient of friction TODO get better one
     public static double wheelRadiusInches = 1.9125; //inches
 
@@ -97,7 +97,7 @@ public final class Constants {
     };
 
     public static final class KrakenConstants {
-        public static final double nominalVoltageVolts = 12; //website says up to 24 volts idk man
+        public static final double nominalVoltageVolts = 24; //website says up to 24 volts idk man
         public static final double stallTorqueNewtonMeters = 7.09;
         public static final double stallCurrentAmps = 366;
         public static final double freeCurrentAmps = 2.32;

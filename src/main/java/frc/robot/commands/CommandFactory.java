@@ -32,8 +32,8 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.TeleopAutomation.PathToReef;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
+import frc.robot.commands.TeleopAutomation.ReefAlign;
 import frc.robot.commands.TeleopAutomation.AlgaeAlign;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -169,20 +169,25 @@ public class CommandFactory {
     // }
 
     public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+        // return new SequentialCommandGroup(
+        //     Commands.either(
+        //         CommandFactory.FullCoralIntake(),
+        //         Commands.none(),
+        //         EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
+        //     ),
         return new SequentialCommandGroup(
-            Commands.either(
-                CommandFactory.FullCoralIntake(),
-                Commands.none(),
-                EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
-            ),
-            new PathToReef(pole, controller),
-            new PoleAlign(level, pole)
+            new ReefAlign(pole),
+            new ParallelCommandGroup(
+                new PoleAlign(level, pole)
+                // new SetElevator(level)
+            )
+            
         ).raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
 
     public static Command AutoAlgaeAlign(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new PathToReef(pole, controller),
+            new ReefAlign(pole),
             new AlgaeAlign(pole)
             ).raceWith(new CancelableCommand(controller));
     }

@@ -48,7 +48,6 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
 import frc.robot.commands.SwerveCommands.SlowDrive;
-import frc.robot.commands.TeleopAutomation.PathToReef;
 
 public class RobotContainer {
 
@@ -229,8 +228,8 @@ public class RobotContainer {
     // driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
     // driver.b().onTrue(CommandFactory.EjectFunnel());
     // driver.x().onTrue(CommandFactory.FullCoralIntake());
-    driver.y().onTrue(new PathToReef(() -> robotstate.getSelectedReefPole(), driver));
-
+    // driver.y().onTrue(new PathToReef(() -> robotstate.getSelectedReefPole(), driver));
+    driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
     // driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
 
     // driver.b().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
