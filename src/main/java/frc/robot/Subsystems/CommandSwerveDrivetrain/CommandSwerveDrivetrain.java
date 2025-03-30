@@ -283,9 +283,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> setControl(requestSupplier.get()));
     }
 
-    public void applyFieldSpeedsFF(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+    public void applyRobotSpeedsFF(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
         setControl(
-        new SwerveRequest.ApplyFieldSpeeds()
+        new SwerveRequest.ApplyRobotSpeeds()
         .withSpeeds(speeds)
         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX())
         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY()));
@@ -317,10 +317,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this::getPose,
             this::resetOdo,
             this::getRobotRelativeSpeeds,
-            this::applyFieldSpeedsFF,
+            this::applyRobotSpeedsFF,
             new PPHolonomicDriveController(
-            new PIDConstants( 7, 0.135, 0.05),
-            new PIDConstants( 3.254, 2, 0)
+            new PIDConstants( 4.32976, 0, 0.01),
+            new PIDConstants( 3.254, 1.6, 0)
             ),
             Constants.config,
             () -> false, //we change poses ourselves so no need for flipping
@@ -333,13 +333,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void resetOdo(Pose2d pose){
-        resetOdoUtil(pose);
-        robotState.reset(0.02, new IPose2d(pose));
+        s_Swerve.resetPose(pose);
+        // robotState.reset(0.02, new IPose2d(pose));
     }
 
-    public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
-        s_Swerve.resetPose(pose);
-    }
+    // public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
+    //     s_Swerve.resetPose(pose);
+    // }
 
     public Pose2d getPose(){
         return s_Swerve.getState().Pose;

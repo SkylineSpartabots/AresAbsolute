@@ -52,7 +52,7 @@ public class SmartCoralIntake extends Command {
     ee.setOuttakeSpeed(OuttakeState.HOLD);
     timer.stop();
     timer.reset();
-    if(ee.getBeamResult() == false) CommandFactory.AutoPoleAlignFromSource(() -> robotState.getSelectedElevatorLevel(), () -> robotState.getSelectedReefPole(), driver).schedule();
+    // if(ee.getBeamResult() == false) CommandFactory.AutoPoleAlignFromSource(() -> robotState.getSelectedElevatorLevel(), () -> robotState.getSelectedReefPole(), driver).schedule();
   }
 
   // Returns true when the command should end.
