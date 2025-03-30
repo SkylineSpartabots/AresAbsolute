@@ -37,9 +37,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class AlgaeAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            2.8, 0.2, 0.0025, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
+            3, 0.22, 0, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
+            2.3, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
     private EndEffector s_EndEffector;

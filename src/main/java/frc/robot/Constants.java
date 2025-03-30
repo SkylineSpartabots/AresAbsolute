@@ -29,13 +29,13 @@ public final class Constants {
     public static double backRightEncoderOffset = -0.335205077;
 
     public static double MaxSpeed = 6; //can be lowered during testing
-    public static double MaxAcceleration = 3; //can be lowered during testing
+    public static double MaxAcceleration = 1.2542976; //can be lowered during testing
     public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
     public static double MaxAngularVelocity = 2 * Math.PI;
 
     //all these are outdated but we are not using them anymore so its fine tbh
-    public static double robotMass = 45.35; //kg
-    public static double MOI = 3.5254; //sum of kg * m^2 to center of rotation
+    public static double robotMass = 25; //kg
+    public static double MOI = 2; //sum of kg * m^2 to center of rotation
     public static double CoF = 1.0; // coefficient of friction TODO get better one
     public static double wheelRadiusInches = 1.9125; //inches
 
@@ -54,8 +54,8 @@ public final class Constants {
         Constants.MaxSpeed,
         Constants.CoF,
         motorConfig,
+        5.90777778,
         Constants.KrakenConstants.driveCurrentLimitAmps,
-        Constants.KrakenConstants.torqueLoss,
         1
     );
 
@@ -97,11 +97,11 @@ public final class Constants {
     };
 
     public static final class KrakenConstants {
-        public static final double nominalVoltageVolts = 12; //website says up to 24 volts idk man
-        public static final double stallTorqueNewtonMeters = 4.21;
-        public static final double stallCurrentAmps = 233;
+        public static final double nominalVoltageVolts = 24; //website says up to 24 volts idk man
+        public static final double stallTorqueNewtonMeters = 7.09;
+        public static final double stallCurrentAmps = 366;
         public static final double freeCurrentAmps = 2.32;
-        public static final double freeSpeedRadPerSec = 5800;
+        public static final double freeSpeedRadPerSec = 607;
         public static final double driveCurrentLimitAmps = 60;
         public static final double torqueLoss = 60;
     }
@@ -136,7 +136,7 @@ public final class Constants {
         public static final int elevatorPeakCurrentLimit = 120;
     }
     
-    public static Alliance alliance;
+    public static Alliance alliance = Alliance.Blue;
 
     public static Mode deployMode = Mode.REAL;
 
@@ -214,7 +214,7 @@ public final class Constants {
                     |
                     -x
              
-             Onshape Coordinate Space
+            Onshape Coordinate Space
                     +y
                     |
             -x ----------- +x
@@ -256,8 +256,6 @@ public final class Constants {
             public static final Transform3d BCcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),
                     new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(180))); //TODO IS PITCH RIGHT? // we pitch it -15 up then rotate the yaw, pitch is unchanged
-
-
         }
         
 

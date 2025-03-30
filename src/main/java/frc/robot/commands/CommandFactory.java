@@ -25,14 +25,15 @@ import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
 import frc.robot.commands.Elevator.SetElevator;
+import frc.robot.commands.EndEffector.SetAlgae;
 import frc.robot.commands.EndEffector.SetOuttake;
 import frc.robot.commands.EndEffector.SmartCoralIndex;
 import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.TeleopAutomation.PathToReef;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
+import frc.robot.commands.TeleopAutomation.ReefAlign;
 import frc.robot.commands.TeleopAutomation.AlgaeAlign;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -58,13 +59,9 @@ public class CommandFactory {
     }
     
     public static Command Dealgaeify(ElevatorState state){
-        return new SequentialCommandGroup(
-            new ParallelCommandGroup(
+        return new ParallelCommandGroup(
                 new SetElevator(() -> state),
-                new InstantCommand(()->ee.setAlgaeSpeed(0.5))
-            ),
-            Commands.waitSeconds(4.8254),
-            new InstantCommand(()->ee.setAlgaeSpeed(0))
+                new SetAlgae(0.5)
         );
     }
 
@@ -114,9 +111,13 @@ public class CommandFactory {
 
     public static Command EjectFunnel(){
         return new SequentialCommandGroup(
-            new SetFunnel(FunnelState.EJECT),
+            new ParallelCommandGroup(
+                new SetFunnel(FunnelState.EJECT),
+                new InstantCommand(()->ee.setOuttakeSpeed(0.8))
+            ),
             Commands.waitSeconds(0.5),
-            new SetFunnel(FunnelState.OFF)
+            new SetFunnel(FunnelState.OFF),
+            new InstantCommand(()->ee.setOuttakeSpeed(0))
 
         );
     }
@@ -156,56 +157,38 @@ public class CommandFactory {
         return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
 
-    //Automation commands
-    // public static Command AutoScoreCoral(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
-    //     return new SequentialCommandGroup(
-    //         CommandFactory.FullCoralIntake(),
-    //         new SequentialCommandGroup(
-    //         new ReefAlign(pole),
-    //         new PoleAlign(level, pole)
-    //         ).raceWith(new CancelableCommand(controller)
 
-    //     ));
+    // automation
+    // public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+    //     return new SequentialCommandGroup(
+    //         new PathToReef(pole, controller),
+    //         new PoleAlign(level, pole)
+    //         ).beforeStarting(CommandFactory.FullCoralIntake())
+    //         .onlyIf(() -> EndEffector.getInstance().getBeamResult()) //if we dont have coral, start to intake
+    //         .raceWith(new CancelableCommand(controller)); 
     // }
 
-
-    public static Command AutoPathReefFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+    public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+        // return new SequentialCommandGroup(
+        //     Commands.either(
+        //         CommandFactory.FullCoralIntake(),
+        //         Commands.none(),
+        //         EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
+        //     ),
         return new SequentialCommandGroup(
-            CommandFactory.FullCoralIntake(), //Intake coral
-            new PathToReef(pole, controller),
-            new PoleAlign(level, pole)
-            ).raceWith(new CancelableCommand(controller));
+            new ReefAlign(pole),
+            new ParallelCommandGroup(
+                new PoleAlign(level, pole)
+                // new SetElevator(level)
+            )
+            
+        ).raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
 
-    public static Command AutoPathReef(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+    public static Command AutoAlgaeAlign(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
-            new PathToReef(pole, controller)
-            );
-    }
-
-    public static Command AutoPathRemoveAlgae(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
-        return new SequentialCommandGroup(
-            CommandFactory.FullCoralIntake(), //Intake coral
-            new PathToReef(pole, controller),
+            new ReefAlign(pole),
             new AlgaeAlign(pole)
             ).raceWith(new CancelableCommand(controller));
     }
-
-    // public static Command AutoScoreCoralCloes(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
-    //     return new SequentialCommandGroup( //i could make logic to make this a reef align if the pole is far away but that would be a lot of work
-    //         new PoleAlign(level, pole)
-    //     ).raceWith(new CancelableCommand(controller));
-    // }
-
-    // public static Command AutoRemoveAlgae(Supplier<ElevatorState> level, CommandXboxController controller){
-    //     return new SequentialCommandGroup(
-    //         new AutomatedAlgaeAction(level)
-    //     ).raceWith(new CancelableCommand(controller));
-    // }
-
-    // public static Command AutoScorefromSource(ElevatorState level, SourceNumber source, ReefNumber reef){
-    //     return new ParallelCommandGroup(
-            
-    //     );
-    // }
 }

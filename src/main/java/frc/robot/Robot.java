@@ -55,7 +55,6 @@ import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
-import frc.robot.commands.TeleopAutomation.PathToReef;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -175,8 +174,6 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData("first auto", firstAuto);
     SmartDashboard.putData("autochoices", chosenAuto);
 
-    
-
     if(isReal()){
       Logger.addDataReceiver(new WPILOGWriter()); // should be savig to usb
       Logger.addDataReceiver(new NT4Publisher());
@@ -226,6 +223,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    Constants.alliance = DriverStation.getAlliance().get();
     // m_autonomousCommand = new SequentialCommandGroup();
     // new SequentialCommandGroup(
     //   new ZeroSlapdown(),

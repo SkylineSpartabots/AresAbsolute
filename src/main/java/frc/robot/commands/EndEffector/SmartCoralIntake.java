@@ -5,20 +5,27 @@
 package frc.robot.commands.EndEffector;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
 import frc.robot.Subsystems.Funnel.FunnelState;
+import frc.robot.commands.CommandFactory;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SmartCoralIntake extends Command {
   private EndEffector ee;
   private Funnel funnel;
+  private CommandXboxController driver = new CommandXboxController(0);
   Timer timer;
+  private RobotState robotState;
   public SmartCoralIntake() {
     ee = EndEffector.getInstance();
     funnel = Funnel.getInstance();
+    robotState = RobotState.getInstance();
     addRequirements(ee, funnel);
     timer = new Timer();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -45,6 +52,7 @@ public class SmartCoralIntake extends Command {
     ee.setOuttakeSpeed(OuttakeState.HOLD);
     timer.stop();
     timer.reset();
+    // if(ee.getBeamResult() == false) CommandFactory.AutoPoleAlignFromSource(() -> robotState.getSelectedElevatorLevel(), () -> robotState.getSelectedReefPole(), driver).schedule();
   }
 
   // Returns true when the command should end.
