@@ -53,7 +53,7 @@ public class ReefAlign extends Command {
     private double driveErrorAbs;
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2; // used to scale the feedforward based on distance to target pose, this allows for a curve path to be followed when close to the target.
-    private double curveScalerMaxRadius = 1.5, curveScaler = 1, curveRating;
+    private double curveScalerMaxRadius = 1.5, curveRating;
     private Boolean curveDirectionLeft; //true is left, false is right
     private double initialDistance;
 
@@ -161,8 +161,9 @@ public class ReefAlign extends Command {
                 double curveIntensity = MathUtil.clamp(Math.pow(Math.abs(1 - Math.abs((2 * currentDistance)/initialDistance)), 2),
                  0, 1); // 0 - 1 how close we are to the midpoint of the path
 
-                double curveVectorX = curveDirectionLeft ? -curveRating : curveRating;
-                double curveVectorY = curveDirectionLeft ? curveRating : -curveRating;
+                 //field centric so we dont need to adjust based on alliance
+                double curveVectorX = curveDirectionLeft ? -driveVelocity.getX() : driveVelocity.getX();
+                double curveVectorY = curveDirectionLeft ? driveVelocity.getY() : -driveVelocity.getY();
 
                 double scale = Math.hypot(curveVectorX, curveVectorY);
 
@@ -171,7 +172,7 @@ public class ReefAlign extends Command {
 
                 System.out.println(curveVectorX);
                         
-                driveVelocity.plus(new Translation2d(curveVectorX * curveIntensity * curveScaler, curveVectorY * curveIntensity * curveScaler));
+                driveVelocity.plus(new Translation2d(curveVectorX * curveIntensity * curveRating, curveVectorY * curveIntensity * curveRating));
         }
 
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
@@ -197,6 +198,7 @@ public class ReefAlign extends Command {
         return targetPose.equals(null) || Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance();
     }
 
+    // https://www.desmos.com/calculator/qghiccdvqx
     public boolean pointDirection(Pose2d currentPose, Pose2d reefMiddle, Pose2d targetPose) {
         double abX = reefMiddle.getX() - currentPose.getX();
         double abY = reefMiddle.getY() - currentPose.getY();

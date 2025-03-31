@@ -365,7 +365,7 @@ public final class Constants {
 
                 private final Pose2d waypoints;
 
-                public int getReefSideRating(Pose2d currentPose) {
+                public double getReefSideRating(Pose2d currentPose) {
                     int rating = 0;
                     int k = 0;
 
@@ -380,19 +380,19 @@ public final class Constants {
                             }
                         }
 
-                        switch(rating)  {
+                        switch(rating)  { //TODO tune
                             case 1:
-                                return 0;
+                                return 0; // none needed
                             case 2:
-                                return 1; 
+                                return 0.1; // slight adjustment
                             case 3:
-                                return 1; 
+                                return 0.1; // slight adjustment
                             case 4:
-                                return 2;
+                                return 0.2;// mid adjustment
                             case 5:
-                                return 2;
+                                return 0.2;// mid adjustment
                             case 6:
-                                return 3; 
+                                return 0.4; // high adjustment
                             default:                                                            
                                 return 0; 
                         }
