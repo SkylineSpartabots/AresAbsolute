@@ -343,6 +343,9 @@ public final class Constants {
 
         public static final class ReefConstants{
 
+            public static final Pose2d reefMiddleBlue = new Pose2d(4.486, 4.025, Rotation2d.fromDegrees(0)); // this is the middle of the reef field, used for alignment purposes, change as needed
+            public static final Pose2d reefMiddleRed = new Pose2d(8.57 + 4.486, 4.025, Rotation2d.fromDegrees(0)); // this is the middle of the reef field, used for alignment purposes, change as needed
+
             public enum ReefSidePositions {
                 //blue 
                 POLE_1AB(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
@@ -361,6 +364,39 @@ public final class Constants {
                 POLE_KL(new Pose2d(8.57 + 5.27304,2.6685, Rotation2d.fromRadians(2.0944))); //
 
                 private final Pose2d waypoints;
+
+                public int getReefSideRating(Pose2d currentPose) {
+                    int rating = 0;
+                    int k = 0;
+
+                    double targetDistance = currentPose.getTranslation().getDistance(this.getPose().getTranslation());
+
+                    if(Constants.alliance == Alliance.Blue)
+                        k += 5; //move up ReefSidePoles
+
+                        for (int i = k; i < k + 5; i++) {
+                            if(currentPose.getTranslation().getDistance(ReefSidePositions.values()[i].getPose().getTranslation()) <= targetDistance) {
+                                rating++;
+                            }
+                        }
+
+                        switch(rating)  {
+                            case 1:
+                                return 0;
+                            case 2:
+                                return 1; 
+                            case 3:
+                                return 1; 
+                            case 4:
+                                return 2;
+                            case 5:
+                                return 2;
+                            case 6:
+                                return 3; 
+                            default:                                                            
+                                return 0; 
+                        }
+                }
 
                 ReefSidePositions(Pose2d poses) {
                     this.waypoints = poses;

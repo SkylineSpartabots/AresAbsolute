@@ -181,7 +181,7 @@ public class Robot extends LoggedRobot {
     else {
       Logger.addDataReceiver(new NT4Publisher());
     }
-    Logger.start();
+    // Logger.start();
 
     //start the logger here
     SmartDashboard.putString("Selected Pole", "First pole");

@@ -135,23 +135,23 @@ public class Vision extends SubsystemBase {
         MultiTargetPNPResult multiTagResult = photonPipelineResult.getMultiTagResult().get();
 
         if (multiTagResult.estimatedPose.bestReprojErr > VisionLimits.k_reprojectionLimit) {
-            SmartDashboard.putString("Multitag updates", "high error");
+            // SmartDashboard.putString("Multitag updates", "high error");
             // Logger.recordOutput("Vision/MultiTag updates", "high error");
             return false;
         }
 
         if (multiTagResult.fiducialIDsUsed.size() < 2 || multiTagResult.fiducialIDsUsed.isEmpty()) {
-            SmartDashboard.putString("Multitag updates", "insufficient ids");
+            // SmartDashboard.putString("Multitag updates", "insufficient ids");
             // Logger.recordOutput("Vision/MultiTag updates", "insufficient ids");
             return false;
         }
         if (multiTagResult.estimatedPose.best.getTranslation().getNorm() < VisionLimits.k_normThreshold) {
-            SmartDashboard.putString("Multitag updates", "norm check failed");
+            // SmartDashboard.putString("Multitag updates", "norm check failed");
             // Logger.recordOutput("Vision/MultiTag updates", "norm check failed");
             return false;
         }
         if (multiTagResult.estimatedPose.ambiguity > VisionLimits.k_ambiguityLimit) {
-            SmartDashboard.putString("Multitag updates", "high ambiguity");
+            // SmartDashboard.putString("Multitag updates", "high ambiguity");
             // Logger.recordOutput("Vision/MultiTag updates", "high ambiguity");
             return false;
         }
@@ -215,7 +215,7 @@ public class Vision extends SubsystemBase {
                 if(frontCamerasBool)
                     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0025, 0.0025, 0.01));
                 else 
-                s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0075, 0.0075, 0.01));
+                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0075, 0.0075, 0.01));
             }
         
         } else {
@@ -231,7 +231,7 @@ public class Vision extends SubsystemBase {
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())), false);
 
-                    System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
+                    // System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
 
                     if(frontCamerasBool)
                         s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.017, 0.017, 0.017));
@@ -252,18 +252,18 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         try {
 
-            if(frontCamerasBool) { //only use front cameras
+            // if(frontCamerasBool) { //only use front cameras
                 updateVision(FrontLeftCamera, FLcameraToRobot);
                 updateVision(FrontRightCamera, FRcameraToRobot);
                 updateVision(FrontRightAngledCamera, FCcameraToRobot);
-            } else {
-            updateVision(FrontLeftCamera, FLcameraToRobot);
-            updateVision(FrontRightCamera, FRcameraToRobot);
-            updateVision(FrontRightAngledCamera, FCcameraToRobot);
-            updateVision(BackLeftCamera, BLcameraToRobot);
-            updateVision(BackRightCamera, BRcameraToRobot);
-            updateVision(BackCenterCamera, BCcameraToRobot);
-            }
+            // } else {
+            // updateVision(FrontLeftCamera, FLcameraToRobot);
+            // updateVision(FrontRightCamera, FRcameraToRobot);
+            // updateVision(FrontRightAngledCamera, FCcameraToRobot);
+            // updateVision(BackLeftCamera, BLcameraToRobot);
+            // updateVision(BackRightCamera, BRcameraToRobot);
+            // updateVision(BackCenterCamera, BCcameraToRobot);
+            // }
 
         } catch (Exception e) {
         }

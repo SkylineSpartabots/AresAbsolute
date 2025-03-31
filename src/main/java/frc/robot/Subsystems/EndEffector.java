@@ -126,16 +126,16 @@ public class EndEffector extends SubsystemBase {
   @Override
   public void periodic() {
     // SmartDashboard.putBoolean("Can score L1", outtakeProfiler.coralTrajAligned());
-    if(getLaserMeasurement() != null){
-      if(getLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-        SmartDashboard.putNumber("lasercan measurement", getLaserMeasurement().distance_mm);
-        SmartDashboard.putBoolean("lasercan working", true);
-      }else{
-        SmartDashboard.putNumber("lasercan measurement", -1);
-        SmartDashboard.putBoolean("lasercan working", false );
-        SmartDashboard.putNumber("lasercan status", getLaserMeasurement().status);
-      }
-    }
-    SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
+  //   if(getLaserMeasurement() != null){
+  //     if(getLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+  //       SmartDashboard.putNumber("lasercan measurement", getLaserMeasurement().distance_mm);
+  //       SmartDashboard.putBoolean("lasercan working", true);
+  //     }else{
+  //       SmartDashboard.putNumber("lasercan measurement", -1);
+  //       SmartDashboard.putBoolean("lasercan working", false );
+  //       SmartDashboard.putNumber("lasercan status", getLaserMeasurement().status);
+  //     }
+  //   }
+  //   SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
   }
 }

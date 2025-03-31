@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants.ReefConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefSidePositions;
 import frc.robot.RobotState.RobotState;
@@ -37,9 +38,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public class ReefAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            3, 0.2, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed , Constants.MaxAcceleration + 6), 0.02);
+            2.9, 0.3, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration + 2.5), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            2.8, 0.8, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate + 2 * Math.PI), 0.02);
+            2.3, 0.8, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
     private EndEffector s_EndEffector;
@@ -51,7 +52,10 @@ public class ReefAlign extends Command {
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
-    private double ffMinRadius = 0.2, ffMaxRadius = 1.2;
+    private double ffMinRadius = 0.2, ffMaxRadius = 1.2; // used to scale the feedforward based on distance to target pose, this allows for a curve path to be followed when close to the target.
+    private double curveScalerMaxRadius = 1.5, curveScaler = 1, curveRating;
+    private Boolean curveDirectionLeft; //true is left, false is right
+    private double initialDistance;
 
     public ReefAlign(Supplier<ReefPoleScoringPoses> pole) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
@@ -60,22 +64,34 @@ public class ReefAlign extends Command {
         
         this.targetReefPole = pole;
 
-        thetaController.setTolerance(0.35); //less than 3 degrees
-        driveController.setTolerance(0.2, 0.05);
+        thetaController.setTolerance(0.3); //less than 3 degrees
+        driveController.setTolerance(0.125, 0.05);
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
     }
-
+    
     @Override
     public void initialize() {
-
-        if(Constants.alliance == Alliance.Blue)
-                targetPose = ReefSidePositions.values()[(int) (targetReefPole.get().ordinal() / 2)].getPose();
-        else 
-                targetPose = ReefSidePositions.values()[6 + (int)((targetReefPole.get().ordinal() - 12) / 2)].getPose();
-
         Pose2d currentPose = s_Swerve.getPose();
+
+        if(Constants.alliance == Alliance.Blue) {
+                ReefSidePositions reefSide = ReefSidePositions.values()[(int) (targetReefPole.get().ordinal() / 2)];
+                curveRating = reefSide.getReefSideRating(currentPose);
+                targetPose = reefSide.getPose();
+                curveDirectionLeft = pointDirection(currentPose, ReefConstants.reefMiddleBlue, targetPose);
+        }
+        else {
+                ReefSidePositions reefSide = ReefSidePositions.values()[6 + (int)((targetReefPole.get().ordinal() - 12) / 2)];
+                curveRating = reefSide.getReefSideRating(currentPose);
+                targetPose = reefSide.getPose();
+                curveDirectionLeft = pointDirection(currentPose, ReefConstants.reefMiddleRed, targetPose);
+        }
+
+        System.out.println("curve rating " + curveRating);
+
+        initialDistance = s_Swerve.getPose().getTranslation().getDistance(targetPose.getTranslation());
+
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
                 currentPose.getTranslation().getDistance(targetPose.getTranslation()),
@@ -137,9 +153,29 @@ public class ReefAlign extends Command {
 
         // Command speeds
         var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
-                .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
-                .getTranslation();
-                s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
+        .transformBy(new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
+        .getTranslation();
+
+        // curve path based on pole
+        if(currentDistance < curveScalerMaxRadius) {
+                double curveIntensity = MathUtil.clamp(Math.pow(Math.abs(1 - Math.abs((2 * currentDistance)/initialDistance)), 2),
+                 0, 1); // 0 - 1 how close we are to the midpoint of the path
+
+                double curveVectorX = curveDirectionLeft ? -curveRating : curveRating;
+                double curveVectorY = curveDirectionLeft ? curveRating : -curveRating;
+
+                double scale = Math.hypot(curveVectorX, curveVectorY);
+
+                curveVectorX /= scale;
+                curveVectorY /= scale;
+
+                System.out.println(curveVectorX);
+                        
+                driveVelocity.plus(new Translation2d(curveVectorX * curveIntensity * curveScaler, curveVectorY * curveIntensity * curveScaler));
+        }
+
+        s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
+
 
         //prints
         // System.out.println("Theta error: " + thetaErrorAbs);
@@ -159,5 +195,18 @@ public class ReefAlign extends Command {
     @Override
     public boolean isFinished() {
         return targetPose.equals(null) || Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance();
+    }
+
+    public boolean pointDirection(Pose2d currentPose, Pose2d reefMiddle, Pose2d targetPose) {
+        double abX = reefMiddle.getX() - currentPose.getX();
+        double abY = reefMiddle.getY() - currentPose.getY();
+    
+        double acX = targetPose.getX() - currentPose.getX();
+        double acY = targetPose.getY() - currentPose.getY();
+    
+        double crossProduct = abX * acY - abY * acX;
+    
+        // If cross product is positive, the point is to the left
+        return crossProduct > 0 ? true : false;
     }
 }

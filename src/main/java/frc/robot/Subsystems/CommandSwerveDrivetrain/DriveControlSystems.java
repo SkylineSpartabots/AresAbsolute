@@ -93,8 +93,8 @@ public class DriveControlSystems {
         }
 
 
-        SmartDashboard.putNumber("requested velocity x", driverLX);
-        SmartDashboard.putNumber("requested velocity y", driverLY);
+        // SmartDashboard.putNumber("requested velocity x", driverLX);
+        // SmartDashboard.putNumber("requested velocity y", driverLY);
 
         // if(homing == true){
         //     driverRX = homingL1();
@@ -116,8 +116,8 @@ public class DriveControlSystems {
     }
 
     public SwerveRequest robotCentricDrive(double xVel, double yVel, double rot){
-        SmartDashboard.putNumber("requested velocity x", xVel);
-        SmartDashboard.putNumber("requested velocity y", yVel);
+        // SmartDashboard.putNumber("requested velocity x", xVel);
+        // SmartDashboard.putNumber("requested velocity y", yVel);
 
         
 
@@ -127,8 +127,8 @@ public class DriveControlSystems {
         
 
 
-        SmartDashboard.putNumber("requested velocity x", xVel);
-        SmartDashboard.putNumber("requested velocity y", yVel);
+        // SmartDashboard.putNumber("requested velocity x", xVel);
+        // SmartDashboard.putNumber("requested velocity y", yVel);
 
         
 
@@ -235,7 +235,7 @@ public class DriveControlSystems {
         if(currentVelocity == 0) { slipRatio = 1; } else {
             slipRatio = ((getModule(i).getCurrentState().speedMetersPerSecond) / currentVelocity); 
         }
-        SmartDashboard.putNumber("Module " + i + " slipratio", slipRatio);
+        // SmartDashboard.putNumber("Module " + i + " slipratio", slipRatio);
         // Logger.recordOutput("SwerveModules/SlipRatios/Module " + i , slipRatio);
         //if over the upper or lower threshold save the value
         if (slipRatio > (Constants.slipThreshold + 1) || slipRatio < (1 - Constants.slipThreshold)) {
