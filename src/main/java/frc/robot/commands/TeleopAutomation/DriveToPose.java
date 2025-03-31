@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
@@ -34,7 +33,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 /**
  * Drives to a specified pose.
  */
-public class PoleAlign extends Command {
+public class DriveToPose extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
             3, 0.45, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration + 1), 0.02);
@@ -44,11 +43,7 @@ public class PoleAlign extends Command {
     private CommandSwerveDrivetrain s_Swerve;
     private EndEffector s_EndEffector;
 
-    private Supplier<ElevatorState> elevatorLevel;
-    private Supplier<ReefPoleScoringPoses> targetReefPole; 
-
-    private Double elevatorGoalPos = Double.POSITIVE_INFINITY;
-
+    private Supplier<Pose2d> targetPoseSupplier;
     private Pose2d targetPose;
     private RobotState robotState;
     private Translation2d lastSetpointTranslation;
@@ -56,29 +51,13 @@ public class PoleAlign extends Command {
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1;
 
-    public PoleAlign(Supplier<ElevatorState> elevatorLevel, Supplier<ReefPoleScoringPoses> pole) {
+    public DriveToPose(Supplier<Pose2d> pose) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
         this.s_EndEffector = EndEffector.getInstance();
+
+        targetPoseSupplier = pose;
         
-        this.targetReefPole = pole;
-        // this.elevatorLevel = elevatorLevel;
-
-        thetaController.setTolerance(0.04); //less than 3 degrees
-        driveController.setTolerance(0.03, 0.05);
-
-        addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
-    }
-
-    public PoleAlign(Supplier<ReefPoleScoringPoses> pole) {
-        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
-        this.robotState = RobotState.getInstance();
-        this.s_EndEffector = EndEffector.getInstance();
-        
-        this.targetReefPole = pole;
-        // this.elevatorLevel = elevatorLevel;
-
         thetaController.setTolerance(0.04); //less than 3 degrees
         driveController.setTolerance(0.03, 0.05);
 
@@ -88,8 +67,7 @@ public class PoleAlign extends Command {
 
     @Override
     public void initialize() {
-        // elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
-        targetPose = targetReefPole.get().getPose();
+        targetPose = targetPoseSupplier.get();
 
         Pose2d currentPose = s_Swerve.getPose();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();

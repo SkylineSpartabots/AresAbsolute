@@ -34,11 +34,7 @@ public class SetOuttake extends Command {
   @Override
   public void initialize() {
     timer.restart();
-    
-  
-      s_EndEffector.setOuttakeSpeed(state);
-    
-
+    s_EndEffector.setOuttakeSpeed(state);
   }
 
   @Override
