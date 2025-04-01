@@ -286,7 +286,15 @@ public class Autos {
 
   public static Command forwardDealgaeRight(){
     return new SequentialCommandGroup(
-      new FollowChoreoTrajectory("B3R5"),
+      new ParallelCommandGroup(
+        new FollowChoreoTrajectory("B3R5"),
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.45),
+          new SetElevator(()->ElevatorState.L4)
+        )
+      ),
+      CommandFactory.ShootCoral(),
+      
       new InstantCommand(()->ee.setAlgaeSpeed(0.45)),
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("R5A4"),

@@ -110,8 +110,8 @@ public final class Constants {
     
     public static final int timeOutMs = 10;
 
-    public static final double elevatorMaxVelocity = 150;
-    public static final double elevatorMaxAcceleration = 250;
+    public static final double elevatorMaxVelocity = 250;
+    public static final double elevatorMaxAcceleration = 300;
     public static final double elevatorCurrentThreshold = 20;
 
     public static final double slipFactor = 65;
