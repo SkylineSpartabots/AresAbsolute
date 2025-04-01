@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -32,9 +33,10 @@ import frc.robot.commands.Funnel.SetFunnel;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
-import frc.robot.commands.TeleopAutomation.PoleAlign;
+import frc.robot.commands.TeleopAutomation.DriveToPose;
 import frc.robot.commands.TeleopAutomation.ReefAlign;
 import frc.robot.commands.TeleopAutomation.AlgaeAlign;
+import frc.robot.commands.TeleopAutomation.PoleAlign;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
@@ -125,7 +127,6 @@ public class CommandFactory {
     public static Command SmartCoralOuttake(){
         return new SequentialCommandGroup(
             new SetOuttake(OuttakeState.SCORE)
-            
         );
     }
 
@@ -169,19 +170,17 @@ public class CommandFactory {
     // }
 
     public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
-        // return new SequentialCommandGroup(
-        //     Commands.either(
-        //         CommandFactory.FullCoralIntake(),
-        //         Commands.none(),
-        //         EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
-        //     ),
         return new SequentialCommandGroup(
+            Commands.either(
+                CommandFactory.FullCoralIntake(),
+                Commands.none(),
+                EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
+            ),
             new ReefAlign(pole),
             new ParallelCommandGroup(
-                new PoleAlign(level, pole)
-                // new SetElevator(level)
+                new PoleAlign(level, pole),
+                new SetElevator(level)
             )
-            
         ).raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
 
@@ -191,4 +190,45 @@ public class CommandFactory {
             new AlgaeAlign(pole)
             ).raceWith(new CancelableCommand(controller));
     }
+
+    public static Command OnePlusTwo(
+    ReefPoleScoringPoses pole1,
+    Pose2d source1,
+    ReefPoleScoringPoses pole2,
+    Pose2d source2,
+    ReefPoleScoringPoses pole3
+    ) {
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                new PoleAlign(() -> pole1),
+                new SetElevator(() -> ElevatorState.L4)
+            ), // align first
+
+            new SetOuttake(OuttakeState.SCORE), //score first
+
+            new ParallelCommandGroup(
+                new DriveToPose(() -> source1),
+                CommandFactory.SmartCoralIntake()
+            ), //source and intake
+
+            new ReefAlign(() -> pole2),
+            new ParallelCommandGroup(
+                new PoleAlign(() -> pole2),
+                new SetElevator(() -> ElevatorState.L4)
+            ),
+
+            new SetOuttake(OuttakeState.SCORE), //score second
+
+            new ParallelCommandGroup(
+                new DriveToPose(() -> source2),
+                CommandFactory.SmartCoralIntake()
+            ), //source and intake
+
+            new ReefAlign(() -> pole3),
+            new ParallelCommandGroup(
+                new PoleAlign(() -> pole3),
+                new SetElevator(() -> ElevatorState.L4)
+            )
+            );
+    };
 }
