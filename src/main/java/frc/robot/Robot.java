@@ -184,10 +184,8 @@ public class Robot extends LoggedRobot {
     // Logger.start();
 
     //start the logger here
-    SmartDashboard.putString("Selected Pole", "First pole");
+    SmartDashboard.putString("Selected Pole", "POLE_A");
     SmartDashboard.putString("Selected Pole Level", ElevatorState.L1.name());
-
-    PathfindingCommand.warmupCommand().schedule(); //WARM UP!!!!  
   }
 
   @Override

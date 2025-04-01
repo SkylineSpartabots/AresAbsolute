@@ -371,28 +371,33 @@ public final class Constants {
 
                     double targetDistance = currentPose.getTranslation().getDistance(this.getPose().getTranslation());
 
-                    if(Constants.alliance == Alliance.Blue)
-                        k += 5; //move up ReefSidePoles
+                    System.out.println("targe " + targetDistance);
+                    System.out.println(Constants.alliance.name());
+                    if(Constants.alliance != Alliance.Blue)
+                        k += 6; //move up ReefSidePoles
 
-                        for (int i = k; i < k + 5; i++) {
+                        for (int i = k; i <= k + 5; i++) {
                             if(currentPose.getTranslation().getDistance(ReefSidePositions.values()[i].getPose().getTranslation()) <= targetDistance) {
                                 rating++;
                             }
+                            System.out.println(currentPose.getTranslation().getDistance(ReefSidePositions.values()[i].getPose().getTranslation()));
                         }
+
+                        System.out.println("rating " + rating);
 
                         switch(rating)  { //TODO tune
                             case 1:
                                 return 0; // none needed
                             case 2:
-                                return 0.1; // slight adjustment
+                                return 0.8; // slight adjustment
                             case 3:
-                                return 0.1; // slight adjustment
+                                return 0.8; // slight adjustment
                             case 4:
-                                return 0.2;// mid adjustment
+                                return 30;// mid adjustment
                             case 5:
-                                return 0.2;// mid adjustment
+                                return 30;// mid adjustment
                             case 6:
-                                return 0.4; // high adjustment
+                                return 65; // high adjustment
                             default:                                                            
                                 return 0; 
                         }
