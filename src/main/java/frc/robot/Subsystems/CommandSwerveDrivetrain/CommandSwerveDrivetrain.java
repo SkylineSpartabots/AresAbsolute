@@ -35,7 +35,9 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
+import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import choreo.util.ChoreoAllianceFlipUtil.Flipper;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
@@ -63,6 +65,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.Interpolating.Geometry.IPose2d;
 import frc.lib.Interpolating.Geometry.ITranslation2d;
@@ -74,6 +77,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.robotPIDs.HeadingControlPID;
 import frc.robot.RobotState.RobotState;
+import frc.robot.Subsystems.Elevator.ElevatorState;
 // import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.commands.CancelableCommand;
 
@@ -289,6 +293,111 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         .withSpeeds(speeds)
         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX())
         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY()));
+    }
+
+    public Supplier<String> loadTraj(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole){
+        boolean bottomSource;
+        String path;
+        ReefPoleScoringPoses poleTarget;
+        Trajectory traj;
+        if(Constants.alliance == Alliance.Blue){
+            poleTarget = pole.get();
+            bottomSource = getPose().getY() > 4 ? false : true;
+        } else{
+            poleTarget = ReefPoleScoringPoses.values()[pole.get().ordinal()-12];
+            bottomSource = getPose().getY() > 4 ? true : false;
+        }
+
+        if(bottomSource == false){
+            switch (poleTarget) {
+                case POLE_12L:
+                    path = "S1R1";
+                    break;
+                case POLE_11K:
+                    path = "S1R2";
+                    break;
+                case POLE_10J:
+                    path = "S1R3";
+                    break;
+                case POLE_9I:
+                    path = "S1R4";
+                    break;
+                case POLE_8H:
+                    path = "S1R5";
+                    break;
+                case POLE_7G:
+                    path = "S1R6";
+                    break;
+                case POLE_6F:
+                    path = "S1R7";
+                    break;
+                case POLE_5E:
+                    path = "S1R8";
+                    break;
+                case POLE_4D:
+                    path = "S1R9";
+                    break;
+                case POLE_3C:
+                    path = "S1R10";
+                    break;
+                case POLE_2B:
+                    path = "S1R11";
+                    break;
+                case POLE_1A:
+                    path = "S1R12";
+                    break;
+            
+                default:
+                    path = "S1R12";
+                    break;
+            }
+        } else {
+            switch (poleTarget) {
+                case POLE_12L:
+                    path = "S2R1";
+                    break;
+                case POLE_11K:
+                    path = "S2R2";
+                    break;
+                case POLE_10J:
+                    path = "S2R3";
+                    break;
+                case POLE_9I:
+                    path = "S2R4";
+                    break;
+                case POLE_8H:
+                    path = "S2R5";
+                    break;
+                case POLE_7G:
+                    path = "S2R6";
+                    break;
+                case POLE_6F:
+                    path = "S2R7";
+                    break;
+                case POLE_5E:
+                    path = "S2R8";
+                    break;
+                case POLE_4D:
+                    path = "S2R9";
+                    break;
+                case POLE_3C:
+                    path = "S2R10";
+                    break;
+                case POLE_2B:
+                    path = "S2R11";
+                    break;
+                case POLE_1A:
+                    path = "S2R12";
+                    break;
+            
+                default:
+                    path = "S1R12";
+                    break;
+            }
+        }
+        traj = Choreo.loadTrajectory(path).get();
+        Optional<Pose2d> initialPose = traj.getInitialPose(Constants.alliance == Alliance.Red);
+        return () -> path;
     }
 
     public void applyFieldSpeeds(ChassisSpeeds speeds) {

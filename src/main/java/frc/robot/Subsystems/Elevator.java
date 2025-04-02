@@ -103,9 +103,9 @@ public class Elevator extends SubsystemBase {
 
   public enum ElevatorState {
     L1(17.5), //bad
-    L2(20.2),
-    L3(37),
-    L4(62.2),
+    L2(21.7),
+    L3(36.3),
+    L4(61),
     GROUND(0.11), //bad
     A1(10.5), //bad
     A2(26), //bad

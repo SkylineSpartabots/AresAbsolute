@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
+import choreo.Choreo;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -29,6 +30,7 @@ import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Drives to a specified pose.
@@ -59,6 +61,20 @@ public class DriveToPoseChill extends Command {
         this.s_EndEffector = EndEffector.getInstance();
 
         targetPoseSupplier = pose;
+        
+        thetaController.setTolerance(0.04); //less than 3 degrees
+        driveController.setTolerance(0.03, 0.05);
+
+        addRequirements(s_Swerve);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
+    }
+
+    public DriveToPoseChill(Supplier<String> path, boolean guy) {
+        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
+        this.robotState = RobotState.getInstance();
+        this.s_EndEffector = EndEffector.getInstance();
+
+        targetPoseSupplier = ()-> Choreo.loadTrajectory(path.get()).get().getInitialPose(Constants.alliance == Alliance.Blue).get();
         
         thetaController.setTolerance(0.04); //less than 3 degrees
         driveController.setTolerance(0.03, 0.05);

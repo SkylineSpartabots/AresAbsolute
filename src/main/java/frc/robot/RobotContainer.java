@@ -242,7 +242,7 @@ public class RobotContainer {
     driver.b().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
 
     // driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
-    driver.y().onTrue(CommandFactory.ScoringPath(()->robotstate.getSelectedElevatorLevel(), ()->robotstate.getSelectedReefPole(), driver));
+    driver.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), driver));
     // driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
     // driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
 

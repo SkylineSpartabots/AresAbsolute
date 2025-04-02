@@ -39,7 +39,9 @@ import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.TeleopAutomation.DriveToPose;
+import frc.robot.commands.TeleopAutomation.DriveToPoseChill;
 import frc.robot.commands.TeleopAutomation.ReefAlign;
+import frc.robot.commands.TeleopAutomation.TeleopPathing;
 import frc.robot.commands.TeleopAutomation.AlgaeAlign;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
 import frc.robot.Constants;
@@ -165,117 +167,20 @@ public class CommandFactory {
         return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
 
-    public static Command ScoringPath(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+    public static Command ScoringPath(Supplier<String> path, CommandXboxController controller){
         if(ee.getBeamResult() == true){
             return Commands.none();
         }
-        boolean bottomSource;
-        String path = "R1S1";
-        ReefPoleScoringPoses poleTarget;
-        Trajectory traj;
-        if(Constants.alliance == Alliance.Blue){
-            poleTarget = pole.get();
-            bottomSource = dt.getPose().getY() > 4 ? false : true;
-        } else{
-            poleTarget = ReefPoleScoringPoses.values()[pole.get().ordinal()-12];
-            bottomSource = dt.getPose().getY() > 4 ? true : false;
-        }
-
-        if(bottomSource == false){
-            switch (poleTarget) {
-                case POLE_12L:
-                    path = "S1R1";
-                    break;
-                case POLE_11K:
-                    path = "S1R2";
-                    break;
-                case POLE_10J:
-                    path = "S1R3";
-                    break;
-                case POLE_9I:
-                    path = "S1R4";
-                    break;
-                case POLE_8H:
-                    path = "S1R5";
-                    break;
-                case POLE_7G:
-                    path = "S1R6";
-                    break;
-                case POLE_6F:
-                    path = "S1R7";
-                    break;
-                case POLE_5E:
-                    path = "S1R8";
-                    break;
-                case POLE_4D:
-                    path = "S1R9";
-                    break;
-                case POLE_3C:
-                    path = "S1R10";
-                    break;
-                case POLE_2B:
-                    path = "S1R11";
-                    break;
-                case POLE_1A:
-                    path = "S1R12";
-                    break;
-            
-                default:
-                    break;
-            }
-        } else {
-            switch (poleTarget) {
-                case POLE_12L:
-                    path = "S2R1";
-                    break;
-                case POLE_11K:
-                    path = "S2R2";
-                    break;
-                case POLE_10J:
-                    path = "S2R3";
-                    break;
-                case POLE_9I:
-                    path = "S2R4";
-                    break;
-                case POLE_8H:
-                    path = "S2R5";
-                    break;
-                case POLE_7G:
-                    path = "S2R6";
-                    break;
-                case POLE_6F:
-                    path = "S2R7";
-                    break;
-                case POLE_5E:
-                    path = "S2R8";
-                    break;
-                case POLE_4D:
-                    path = "S2R9";
-                    break;
-                case POLE_3C:
-                    path = "S2R10";
-                    break;
-                case POLE_2B:
-                    path = "S2R11";
-                    break;
-                case POLE_1A:
-                    path = "S2R12";
-                    break;
-            
-                default:
-                    break;
-            }
-        }
-        traj = Choreo.loadTrajectory(path).get();
-        Optional<Pose2d> initialPose = traj.getInitialPose(Constants.alliance == Alliance.Red);
+        
         return new SequentialCommandGroup(
-            new DriveToPose(() -> initialPose.get()),
+            new DriveToPoseChill(path, true),
             new ParallelCommandGroup(
-                new FollowChoreoTrajectory(path),
-                new SequentialCommandGroup(
-                    Commands.waitSeconds(traj.getTotalTime() - 0.9),
-                    new SetElevator(level)
-                )
+                // new FollowChoreoTrajectory(path.get())
+                new TeleopPathing(path.get())
+                // new SequentialCommandGroup(
+                //     Commands.waitSeconds(traj.getTotalTime() - 0.9),
+                //     new SetElevator(level)
+                // )
             ),
             ShootCoral()
         ).raceWith(new CancelableCommand(controller));
