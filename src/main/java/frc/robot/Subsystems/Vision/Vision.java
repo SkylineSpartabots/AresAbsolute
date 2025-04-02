@@ -4,8 +4,11 @@ import com.ctre.phoenix6.Utils;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.MultiTagOutput;
@@ -53,12 +56,10 @@ public class Vision extends SubsystemBase {
     PhotonPoseEstimator BRphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BRcameraToRobot);
     PhotonPoseEstimator BCphotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, BCcameraToRobot);
 
-
     CommandSwerveDrivetrain s_Swerve;
     RobotState robotState;
 
     private boolean frontCamerasBool = false;
-
 
     public static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded); // This is the field type that will be in PNW events
 
@@ -177,7 +178,7 @@ public class Vision extends SubsystemBase {
     /**
      * calculates field-relative robot pose from vision reading, feed to pose estimator (Kalman filter)
      */
-    private void updateVision(PhotonCamera camera, Transform3d cameraToRobot) throws Exception {
+    private void updateVision(PhotonCamera camera, Transform3d cameraToRobot , StandardDevs stddev) throws Exception {
 
         List<PhotonPipelineResult> cameraResult = camera.getAllUnreadResults();
 
@@ -212,10 +213,7 @@ public class Vision extends SubsystemBase {
                         multiTagOutput.getBestTarget(),
                         robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(multiTagOutput.getTimestamp())), true);
 
-                if(frontCamerasBool)
-                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0025, 0.0025, 0.01));
-                else 
-                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.0075, 0.0075, 0.01));
+                s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), stddev.getStandardDev(true));
             }
         
         } else {
@@ -233,16 +231,15 @@ public class Vision extends SubsystemBase {
 
                     // System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
 
-                    if(frontCamerasBool)
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.017, 0.017, 0.017));
-                    else
-                        s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), VecBuilder.fill(0.05, 0.05, 0.08));
+                    s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), stddev.getStandardDev(false));
                 }
 
             }
 
         }
     }
+
+    
 
     public void useFrontCameras() {
         frontCamerasBool = !frontCamerasBool;
@@ -252,20 +249,49 @@ public class Vision extends SubsystemBase {
     public void periodic() {
         try {
 
-            // if(frontCamerasBool) { //only use front cameras
-                updateVision(FrontLeftCamera, FLcameraToRobot);
-                updateVision(FrontRightCamera, FRcameraToRobot);
-                updateVision(FrontRightAngledCamera, FCcameraToRobot);
-            // } else {
-            // updateVision(FrontLeftCamera, FLcameraToRobot);
-            // updateVision(FrontRightCamera, FRcameraToRobot);
-            // updateVision(FrontRightAngledCamera, FCcameraToRobot);
-            // updateVision(BackLeftCamera, BLcameraToRobot);
-            // updateVision(BackRightCamera, BRcameraToRobot);
-            // updateVision(BackCenterCamera, BCcameraToRobot);
-            // }
+            if(frontCamerasBool) { //only use front cameras
+                updateVision(FrontLeftCamera, FLcameraToRobot, StandardDevs.ALIGNING_FRONT);
+                updateVision(FrontRightCamera, FRcameraToRobot, StandardDevs.ALIGNING_FRONT);
+                updateVision(FrontRightAngledCamera, FCcameraToRobot, StandardDevs.ALIGNING_FRONTMIDDLE);
+            } else {
+                updateVision(FrontLeftCamera, FLcameraToRobot, StandardDevs.DEFAULT_FRONT);
+                updateVision(FrontRightCamera, FRcameraToRobot, StandardDevs.DEFAULT_FRONT);
+                updateVision(FrontRightAngledCamera, FCcameraToRobot, StandardDevs.DEFAULT_FRONTMIDDLE);
+                updateVision(BackLeftCamera, BLcameraToRobot, StandardDevs.DEFAULT_BACK);
+                updateVision(BackRightCamera, BRcameraToRobot, StandardDevs.DEFAULT_BACK);
+                updateVision(BackCenterCamera, BCcameraToRobot, StandardDevs.DEFAULT_BACK);
+            }
 
         } catch (Exception e) {
+        }
+    }
+
+    private enum StandardDevs { // # # # mulittag, # # # single tag
+        DEFAULT_FRONT(VecBuilder.fill(0.013, 0.013, 0.045, //good
+                                     0.0254, 0.0254, 0.08)), //good
+
+        DEFAULT_FRONTMIDDLE(VecBuilder.fill(0.013, 0.013, 0.045, //good
+                                        0.0254, 0.0254, 0.08)), //good
+
+        DEFAULT_BACK(VecBuilder.fill(0.0165, 0.0165, 0.0165, //good
+                                     0.06, 0.06, 0.1)), //good
+
+        ALIGNING_FRONT(VecBuilder.fill(0.01, 0.01, 0.01, //good
+                                        0.02, 0.02, 0.06)), //good
+
+        ALIGNING_FRONTMIDDLE(VecBuilder.fill(0.008, 0.008, 0.04, //good
+                                        0.019, 0.019, 0.05)); //good
+
+
+        private Vector<N6> StandardDev;
+
+        private StandardDevs(Vector<N6> StandardDev) {
+            this.StandardDev = StandardDev;
+        }
+
+        public Vector<N3> getStandardDev(boolean mulittag) {
+            Vector<N6> vec = this.StandardDev;
+            return mulittag ? VecBuilder.fill(vec.get(0),vec.get(1),vec.get(2)) : VecBuilder.fill(vec.get(3),vec.get(4),vec.get(5));
         }
     }
 
