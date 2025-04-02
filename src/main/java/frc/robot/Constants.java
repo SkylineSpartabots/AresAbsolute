@@ -247,11 +247,11 @@ public final class Constants {
             // Mechancical Advantage Cameras are 30 deg from -x axis (WPI) 
             public static final Transform3d BLcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.412), Units.inchesToMeters(-10.720), Units.inchesToMeters(-8.350)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(150))); // MA angled 30 deg to the left of -x (WPI) thus 150 deg CCW
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(120))); // MA angled 30 deg to the left of -x (WPI) thus 150 deg CCW
 
             public static final Transform3d BRcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(11.412), Units.inchesToMeters(10.720), Units.inchesToMeters(-8.350)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(-150))); // MA angled 30 deg to the right of -x (WPI) thus 150 deg CW 
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(-120))); // MA angled 30 deg to the right of -x (WPI) thus 150 deg CW 
 
             public static final Transform3d BCcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),

@@ -166,6 +166,9 @@ public class CommandFactory {
     }
 
     public static Command ScoringPath(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+        if(ee.getBeamResult() == true){
+            return Commands.none();
+        }
         boolean bottomSource;
         String path = "R1S1";
         ReefPoleScoringPoses poleTarget;
