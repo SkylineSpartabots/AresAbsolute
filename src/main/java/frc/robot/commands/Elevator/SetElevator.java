@@ -35,7 +35,7 @@ public class SetElevator extends Command {
   private Timer timer = new Timer();
 
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
-  private PIDController controller = new PIDController(1.6, 1.42, 0.0115);
+  private PIDController controller = new PIDController(1.3, 0.7, 0.014);
 
   // pls dont add more constructors
   public SetElevator(Supplier<ElevatorState> state){
@@ -103,6 +103,6 @@ public class SetElevator extends Command {
   @Override
   public boolean isFinished() {
     
-    return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.15;
+    return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.07;
   }
 }

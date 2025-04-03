@@ -187,8 +187,8 @@ public class CommandFactory {
                     Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 0.9),
                     new SetElevator(level)
                 )
-            ),
-            ShootCoral()
+            )
+
         ).raceWith(new CancelableCommand(controller));
     }
 
@@ -203,14 +203,16 @@ public class CommandFactory {
     //         .raceWith(new CancelableCommand(controller)); 
     // }
 
+    
+
     public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
         
         return new SequentialCommandGroup(
-            Commands.either(
-                CommandFactory.FullCoralIntake(),
-                Commands.none(),
-                EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
-            ),
+            // Commands.either(
+            //     CommandFactory.FullCoralIntake(),
+            //     Commands.none(),
+            //     EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
+            // ),
             new ReefAlign(pole),
             new ParallelCommandGroup(
                 new PoleAlign(level, pole),

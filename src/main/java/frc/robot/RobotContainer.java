@@ -206,8 +206,10 @@ public class RobotContainer {
     // driver.back().onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     // driver.back().onTrue(new InstantCommand(()->drivetrain.resetOdo()));
     driver.start().onTrue(new ZeroElevator());
+    driver.back().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.35)));
+    driver.back().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
     // driverLeftTrigger.whileTrue(new SlowDrive());
-    driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.4)));
+    driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2769)));
     driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
       // driver.rightTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
@@ -259,7 +261,7 @@ public class RobotContainer {
     // ----------====# Operator bindings #====----------
     operator.start().whileTrue(new ZeroElevator());
     // operator.back().onTrue(new ZeroSlapdown());
-    // operator.y().onTrue(new PoleAlign(() -> robotstate.getSelectedReefPole()));
+    operator.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
 
 
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));

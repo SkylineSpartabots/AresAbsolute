@@ -102,7 +102,6 @@ public class Autos {
         )
       ),
       new SetOuttake(OuttakeState.SCORE),
-      new ForwardAuto(),
       new InstantCommand(()->ee.setAlgaeSpeed(0.8)),
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("R5A4"),
