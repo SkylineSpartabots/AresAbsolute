@@ -239,8 +239,6 @@ public class Vision extends SubsystemBase {
         }
     }
 
-    
-
     public void useFrontCameras() {
         frontCamerasBool = !frontCamerasBool;
     }

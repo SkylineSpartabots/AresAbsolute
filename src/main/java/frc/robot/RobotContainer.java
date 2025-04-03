@@ -216,12 +216,12 @@ public class RobotContainer {
     driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
     driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
 
-    driver.povRight().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
-    driver.povLeft().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
-    // // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
-    // // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-    // driverDpadUp.whileTrue(new RunClimb(-0.9));
-    // driverDpadDown.whileTrue(new RunClimb(0.9));
+    // driver.povRight().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
+    // driver.povLeft().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
+    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
+    driverDpadUp.whileTrue(new RunClimb(-0.95));
+    driverDpadDown.whileTrue(new RunClimb(0.95));
 
 
     // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
@@ -241,13 +241,13 @@ public class RobotContainer {
     // driver.x().onTrue(CommandFactory.FullCoralIntake());
     driver.b().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
 
-    // driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
-    driver.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), driver));
+    driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
+    // driver.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
     // driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
     // driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
 
     // driver.b().onTrue(new PoleAlign(() -> robotstate.getSelectedReefPole()));
-    // driver.b().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
+    // operator.a().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
 
     // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
@@ -259,7 +259,7 @@ public class RobotContainer {
     // ----------====# Operator bindings #====----------
     operator.start().whileTrue(new ZeroElevator());
     // operator.back().onTrue(new ZeroSlapdown());
-    operator.y().onTrue(new PoleAlign(() -> robotstate.getSelectedReefPole()));
+    // operator.y().onTrue(new PoleAlign(() -> robotstate.getSelectedReefPole()));
 
 
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
@@ -268,11 +268,11 @@ public class RobotContainer {
     // operatorDpadUp.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
     operatorDpadDown.whileTrue(new AdjustElevator(-0.2));
     // operatorDpadDown.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
-    operatorRightTrigger.onTrue(new InstantCommand(()-> cancoders.getNewOffsets()));
+    // operatorRightTrigger.onTrue(new InstantCommand(()-> cancoders.getNewOffsets()));
     // operator.a().onTrue(new SetPivot(PivotState.HOLD));
     // operator.rightTrigger().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2)));
 
-    operator.b().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.3)));
+    operator.b().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.4)));
     operator.b().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
 

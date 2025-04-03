@@ -149,7 +149,7 @@ public class Robot extends LoggedRobot {
       CANCoders.getInstance();
       Climb.getInstance();
       
-      // CanBridge.runTCP();
+      CanBridge.runTCP();
     }
 
   @Override

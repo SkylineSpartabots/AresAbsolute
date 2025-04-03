@@ -37,7 +37,8 @@ public class EndEffector extends SubsystemBase {
   private DigitalInput beam;
   private TalonFX coral;
   private TalonFX algae;
-  private LaserCan aligner;
+  private LaserCan leftLaser;
+  private LaserCan rightLaser;
 
   public static EndEffector getInstance(){
     if(instance == null) instance = new EndEffector();
@@ -47,8 +48,10 @@ public class EndEffector extends SubsystemBase {
   public EndEffector() {
     beam = new DigitalInput(Constants.HardwarePorts.endEffectorBeamPort);
     coral = new TalonFX(Constants.HardwarePorts.outtakeID);
-    aligner = new LaserCan(Constants.HardwarePorts.laserID);
-    configLaser();
+    leftLaser = new LaserCan(Constants.HardwarePorts.laserID);
+    rightLaser = new LaserCan(Constants.HardwarePorts.laser2ID);
+    configLasers();
+
     // config(roller, InvertedValue.Clockwise_Positive, NeutralModeValue.Brake);
     algae = new TalonFX(Constants.HardwarePorts.algaeID);
     config(coral, NeutralModeValue.Brake, InvertedValue.CounterClockwise_Positive);
@@ -58,8 +61,8 @@ public class EndEffector extends SubsystemBase {
 
   public enum OuttakeState{
     HOLD(0),
-    INDEX(-0.45254),
-    SCORE(-0.6);
+    INDEX(-0.2),
+    SCORE(-0.3);
     private double speed;
     private OuttakeState(double speed){
       this.speed = speed;
@@ -69,19 +72,30 @@ public class EndEffector extends SubsystemBase {
     }
   }
 
-   private void configLaser(){
+   private void configLasers(){
     try{
-      aligner.setRangingMode(RangingMode.SHORT);
-      aligner.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_20MS);
-      aligner.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4)); 
+      leftLaser.setRangingMode(RangingMode.SHORT);
+      leftLaser.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+      leftLaser.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4)); 
+    }
+    catch(ConfigurationFailedException e){
+      SmartDashboard.putBoolean("laser working", false);
+    }
+    try{
+      rightLaser.setRangingMode(RangingMode.SHORT);
+      rightLaser.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+      rightLaser.setRegionOfInterest(new LaserCan.RegionOfInterest(8, 8, 4, 4)); 
     }
     catch(ConfigurationFailedException e){
       SmartDashboard.putBoolean("laser working", false);
     }
   }
+  public Measurement getRightLaserMeasurement() {
+    return rightLaser.getMeasurement();
+  }
 
-  public Measurement getLaserMeasurement(){
-    return aligner.getMeasurement();
+  public Measurement getLeftLaserMeasurement(){
+    return leftLaser.getMeasurement();
   }
 
   private void config(TalonFX motor, NeutralModeValue neutralMode, InvertedValue direction){
@@ -126,16 +140,41 @@ public class EndEffector extends SubsystemBase {
   @Override
   public void periodic() {
     // SmartDashboard.putBoolean("Can score L1", outtakeProfiler.coralTrajAligned());
-  //   if(getLaserMeasurement() != null){
-  //     if(getLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-  //       SmartDashboard.putNumber("lasercan measurement", getLaserMeasurement().distance_mm);
-  //       SmartDashboard.putBoolean("lasercan working", true);
-  //     }else{
-  //       SmartDashboard.putNumber("lasercan measurement", -1);
-  //       SmartDashboard.putBoolean("lasercan working", false );
-  //       SmartDashboard.putNumber("lasercan status", getLaserMeasurement().status);
-  //     }
-  //   }
+    if(getLeftLaserMeasurement() != null){
+      if(getLeftLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+        SmartDashboard.putNumber("leftlasercan measurement", getLeftLaserMeasurement().distance_mm);
+        SmartDashboard.putBoolean("leftlasercan working", true);
+      }else{
+        SmartDashboard.putNumber("leftlasercan measurement", -1);
+        SmartDashboard.putBoolean("leftlasercan working", false );
+        SmartDashboard.putNumber("leftlasercan status", getLeftLaserMeasurement().status);
+      }
+    }
+    if(getRightLaserMeasurement() != null){
+      if(getRightLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+        SmartDashboard.putNumber("rightlasercan measurement", getRightLaserMeasurement().distance_mm);
+        SmartDashboard.putBoolean("rightlasercan working", true);
+      }else{
+        SmartDashboard.putNumber("rightlasercan measurement", -1);
+        SmartDashboard.putBoolean("rightlasercan working", false );
+        SmartDashboard.putNumber("rightlasercan status", getRightLaserMeasurement().status);
+      }
+    }
+
+    if(getLeftLaserMeasurement()!= null && getRightLaserMeasurement() != null){
+      if(getRightLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && getLeftLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+        if(getLeftLaserMeasurement().distance_mm < 300 && getRightLaserMeasurement().distance_mm < 300){
+          SmartDashboard.putBoolean("aligned", true);
+        } else{
+          SmartDashboard.putBoolean("aligned", false);
+        }
+        
+      }else{
+        SmartDashboard.putBoolean("aligned", false);
+      }
+    }else{
+      SmartDashboard.putBoolean("aligned", false);
+    }
   //   SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
   }
 }

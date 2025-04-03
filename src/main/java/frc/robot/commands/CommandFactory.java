@@ -40,10 +40,10 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SmartAlgaeIntake;
 import frc.robot.commands.TeleopAutomation.DriveToPose;
 import frc.robot.commands.TeleopAutomation.DriveToPoseChill;
-import frc.robot.commands.TeleopAutomation.ReefAlign;
 import frc.robot.commands.TeleopAutomation.TeleopPathing;
 import frc.robot.commands.TeleopAutomation.AlgaeAlign;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
+import frc.robot.commands.TeleopAutomation.ReefAlign;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
@@ -160,6 +160,8 @@ public class CommandFactory {
         return new SequentialCommandGroup(
             new SetElevator(ElevatorState.SOURCE.getEncoderPosition()),
             new SmartCoralIntake()
+            
+            // ScoringPath(dt.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver)
         );
     }
 
@@ -167,20 +169,24 @@ public class CommandFactory {
         return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
 
-    public static Command ScoringPath(Supplier<String> path, CommandXboxController controller){
+    public static Command ScoringPath(Supplier<String> path, Supplier<ElevatorState> level, CommandXboxController controller){
+
+
         if(ee.getBeamResult() == true){
             return Commands.none();
         }
         
         return new SequentialCommandGroup(
-            new DriveToPoseChill(path, true),
+
+            
+            // new DriveToPoseChill(path, true),
             new ParallelCommandGroup(
                 // new FollowChoreoTrajectory(path.get())
-                new TeleopPathing(path.get())
-                // new SequentialCommandGroup(
-                //     Commands.waitSeconds(traj.getTotalTime() - 0.9),
-                //     new SetElevator(level)
-                // )
+                new TeleopPathing(path.get()),
+                new SequentialCommandGroup(
+                    Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 0.9),
+                    new SetElevator(level)
+                )
             ),
             ShootCoral()
         ).raceWith(new CancelableCommand(controller));
@@ -198,6 +204,7 @@ public class CommandFactory {
     // }
 
     public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+        
         return new SequentialCommandGroup(
             Commands.either(
                 CommandFactory.FullCoralIntake(),
@@ -239,7 +246,7 @@ public class CommandFactory {
                 CommandFactory.SmartCoralIntake()
             ), //source and intake
 
-            new ReefAlign(() -> pole2),
+            new AlgaeAlign(() -> pole2),
             new ParallelCommandGroup(
                 new PoleAlign(() -> pole2),
                 new SetElevator(() -> ElevatorState.L4)

@@ -116,8 +116,6 @@ public class ReefAlign extends Command {
                 robotState.getLatestFilteredVelocity().getOmega());
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
-
-        Vision.getInstance().useFrontCameras();
     }
 
     @Override
@@ -170,26 +168,26 @@ public class ReefAlign extends Command {
         .getTranslation();
 
         // curve path based on pole
-        if(currentDistance < curveScalerMaxRadius) {
-                double curveIntensity = MathUtil.clamp(Math.pow(Math.abs(1 - Math.abs((curveOffset * currentDistance - initialDistance)/initialDistance)), 2),
-                 0, 1); // 0 - 1 how close we are to the midpoint of the path
+        // if(currentDistance < curveScalerMaxRadius) {
+        //         double curveIntensity = MathUtil.clamp(Math.pow(Math.abs(1 - Math.abs((curveOffset * currentDistance - initialDistance)/initialDistance)), 2),
+        //          0, 1); // 0 - 1 how close we are to the midpoint of the path
 
-                 System.out.println("curve intensity " + curveIntensity);
+        //          System.out.println("curve intensity " + curveIntensity);
 
-                 //field centric so we dont need to adjust based on alliance
-                double curveVectorX = curveDirectionLeft ? -driveVelocity.getX() : driveVelocity.getX();
-                double curveVectorY = curveDirectionLeft ? driveVelocity.getY() : -driveVelocity.getY();
+        //          //field centric so we dont need to adjust based on alliance
+        //         double curveVectorX = curveDirectionLeft ? -driveVelocity.getX() : driveVelocity.getX();
+        //         double curveVectorY = curveDirectionLeft ? driveVelocity.getY() : -driveVelocity.getY();
 
-                double scale = Math.hypot(curveVectorX, curveVectorY);
+        //         double scale = Math.hypot(curveVectorX, curveVectorY);
 
-                curveVectorX /= scale;
-                curveVectorY /= scale;
+        //         curveVectorX /= scale;
+        //         curveVectorY /= scale;
 
-                System.out.println("curve vector x" + curveVectorX);
-                System.out.println("curve vector x" + curveVectorY);
+        //         System.out.println("curve vector x" + curveVectorX);
+        //         System.out.println("curve vector x" + curveVectorY);
                         
-                driveVelocity.plus(new Translation2d(curveVectorX * curveIntensity * curveRating, curveVectorY * curveIntensity * curveRating));
-        }
+        //         driveVelocity.plus(new Translation2d(curveVectorX * curveIntensity * curveRating, curveVectorY * curveIntensity * curveRating));
+        // }
 
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
@@ -205,7 +203,6 @@ public class ReefAlign extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        // Vision.getInstance().useFrontCameras();
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 

@@ -81,11 +81,11 @@ public class TeleopPathing extends Command {
     System.out.println("expected time: " + trajectory.getTotalTime());
     s_Swerve.setControl(controlSystems.autoDrive(0, 0, 0));
     timer.stop();
-    Pose2d pose = s_Swerve.getPose();
-    Optional<Pose2d> goal = trajectory.getFinalPose(alliance.get() == DriverStation.Alliance.Red);
-    System.out.println("x error: " + (pose.getX() - goal.get().getX()));
-    System.out.println("y error: " + (pose.getY() - goal.get().getY()));
-    System.out.println("rot error: " + (pose.getRotation().getDegrees() - goal.get().getRotation().getDegrees()));
+    // Pose2d pose = s_Swerve.getPose();
+    // Optional<Pose2d> goal = trajectory.getFinalPose(alliance.get() == DriverStation.Alliance.Red);
+    // System.out.println("x error: " + (pose.getX() - goal.get().getX()));
+    // System.out.println("y error: " + (pose.getY() - goal.get().getY()));
+    // System.out.println("rot error: " + (pose.getRotation().getDegrees() - goal.get().getRotation().getDegrees()));
   }
 
   // Returns true when the command should end.

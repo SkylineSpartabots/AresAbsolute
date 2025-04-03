@@ -111,7 +111,7 @@ public class PoleAlign extends Command {
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
 
-        // Vision.getInstance().useFrontCameras();
+        Vision.getInstance().useFrontCameras();
     }
 
     @Override
@@ -175,6 +175,7 @@ public class PoleAlign extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        Vision.getInstance().useFrontCameras();
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 

@@ -308,6 +308,7 @@ public final class Constants {
         public static final int outtakeID = 21;
         public static final int algaeID = 22;
         public static final int laserID = 23;
+        public static final int laser2ID = 24;
 
         public static final int elevatorLeaderId = 31;
         public static final int elevatorFollowerId = 32;
