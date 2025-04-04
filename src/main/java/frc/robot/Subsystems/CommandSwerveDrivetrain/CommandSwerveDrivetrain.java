@@ -395,8 +395,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     break;
             }
         }
-        traj = Choreo.loadTrajectory(path).get();
-        Optional<Pose2d> initialPose = traj.getInitialPose(Constants.alliance == Alliance.Red);
+        // traj = Choreo.loadTrajectory(path).get();
+        // Optional<Pose2d> initialPose = traj.getInitialPose(Constants.alliance == Alliance.Red);
         return () -> path;
     }
 

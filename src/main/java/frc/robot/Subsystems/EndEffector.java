@@ -175,6 +175,6 @@ public class EndEffector extends SubsystemBase {
     }else{
       SmartDashboard.putBoolean("aligned", false);
     }
-  //   SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
+   SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
   }
 }

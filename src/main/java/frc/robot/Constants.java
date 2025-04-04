@@ -23,10 +23,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  */
 public final class Constants {
 
-    public static double frontLeftEncoderOffset = 0.12646484;
-    public static double frontRightEncoderOffset = 0.268554684;
-    public static double backLeftEncoderOffset = -0.41601559;
-    public static double backRightEncoderOffset = -0.335205077;
+    public static double frontLeftEncoderOffset = 0.1235351525;
+    public static double frontRightEncoderOffset = 0.263916012125;
+    public static double backLeftEncoderOffset = -0.422119105625;
+    public static double backRightEncoderOffset = -0.3244628895;
 
     public static double MaxSpeed = 6; //can be lowered during testing
     public static double MaxAcceleration = 1.2542976; //can be lowered during testing

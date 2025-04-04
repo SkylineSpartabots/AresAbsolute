@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.EndEffector;
 
 import java.util.function.Supplier;
 
@@ -31,16 +32,18 @@ public class SetElevator extends Command {
   private State setpoint;
   private State initialState;
   private Supplier<ElevatorState> state;
+  private EndEffector ee;
 
   private Timer timer = new Timer();
 
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
-  private PIDController controller = new PIDController(1.3, 0.7, 0.014);
+  private PIDController controller = new PIDController(1.3, 0.7, 0.03);
 
   // pls dont add more constructors
   public SetElevator(Supplier<ElevatorState> state){
     this.state = state;
 
+    ee = EndEffector.getInstance();
     s_Elevator = Elevator.getInstance();
     addRequirements(s_Elevator);
   }
@@ -102,7 +105,9 @@ public class SetElevator extends Command {
 
   @Override
   public boolean isFinished() {
-    
+    if(state.get() == ElevatorState.SOURCE){
+      return (!ee.getBeamResult() || Math.abs(s_Elevator.getPosition() - goalPosition) < 0.07);
+    }
     return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.07;
   }
 }

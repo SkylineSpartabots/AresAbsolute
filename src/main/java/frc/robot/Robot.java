@@ -163,6 +163,7 @@ public class Robot extends LoggedRobot {
     firstAuto.addOption(AutoCommand.B1R3().name, AutoCommand.B1R3());
     firstAuto.addOption(AutoCommand.B2R8().name, AutoCommand.B2R8());
 
+    chosenAuto.addOption("forward + dealgae back", Autos.forwardDealgaeBack());
     chosenAuto.addOption("forward + dealgae left", Autos.forwardDealgaeLeft());
     chosenAuto.addOption("forward + dealgae right", Autos.forwardDealgaeRight());
     chosenAuto.addOption("1 + 1 left", Autos.twoCoralLeft());
@@ -170,7 +171,7 @@ public class Robot extends LoggedRobot {
     chosenAuto.addOption("1 + 2 left", Autos.threeCoralLeft());
     chosenAuto.addOption("1 + 2 right", Autos.threeCoralRight());
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
-    // AutoCommand.loadAutos(); TODO ethan fix this
+    // AutoCommand.loadAutos(); 
     SmartDashboard.putData("first auto", firstAuto);
     SmartDashboard.putData("autochoices", chosenAuto);
 

@@ -37,7 +37,7 @@ public class TeleopPathing extends Command {
   private PIDController xController = new PIDController(3.6, 0, 0.02);
   private PIDController yController = new PIDController(3.6, 0, 0.02);
   private PIDController thetaController = new PIDController(1.4, 0, 0.02);
-  private boolean toggled = false;
+  // private boolean toggled = false;
 
   public TeleopPathing(String name) {
     if (Choreo.loadTrajectory(name).isPresent()) {
@@ -59,7 +59,7 @@ public class TeleopPathing extends Command {
   public void initialize() {
     timer.reset();
     timer.start();
-    toggled = false;
+    // toggled = false;
     // if (trajectory != null){
     //   startPose = trajectory.getInitialPose(alliance.get() == DriverStation.Alliance.Red);
     //   s_Swerve.resetOdo(startPose.get());
@@ -76,10 +76,10 @@ public class TeleopPathing extends Command {
       Optional<SwerveSample> sample = trajectory.sampleAt(timer.get(), alliance.get() == DriverStation.Alliance.Red);
       followAutoTrajectory(sample.get());
 
-      if(!toggled && timer.hasElapsed(trajectory.getTotalTime() - 0.7)){
-        Vision.getInstance().useFrontCameras();
-        toggled = true;
-      }
+      // if(!toggled && timer.hasElapsed(trajectory.getTotalTime() - 0.7)){
+      //   Vision.getInstance().useFrontCameras();
+      //   toggled = true;
+      // }
     }
   }
 
@@ -89,7 +89,7 @@ public class TeleopPathing extends Command {
     System.out.println("final time: " + timer.get());
     System.out.println("expected time: " + trajectory.getTotalTime());
     s_Swerve.setControl(controlSystems.autoDrive(0, 0, 0));
-    if(toggled) Vision.getInstance().useFrontCameras();
+    // if(toggled) Vision.getInstance().useFrontCameras();
     timer.stop();
     // Pose2d pose = s_Swerve.getPose();
     // Optional<Pose2d> goal = trajectory.getFinalPose(alliance.get() == DriverStation.Alliance.Red);

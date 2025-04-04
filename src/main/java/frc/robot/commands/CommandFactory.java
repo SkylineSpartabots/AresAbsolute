@@ -157,9 +157,13 @@ public class CommandFactory {
     }    
 
     public static Command FullCoralIntake(){
-        return new SequentialCommandGroup(
-            new SetElevator(ElevatorState.SOURCE.getEncoderPosition()),
-            new SmartCoralIntake()
+        return new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                Commands.waitSeconds(1), 
+                new SmartCoralIntake()
+            ),
+            new SetElevator(ElevatorState.SOURCE.getEncoderPosition())
+            
             
             // ScoringPath(dt.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver)
         );
@@ -184,7 +188,7 @@ public class CommandFactory {
                 // new FollowChoreoTrajectory(path.get())
                 new TeleopPathing(path.get()),
                 new SequentialCommandGroup(
-                    Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 0.9),
+                    Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 1.1),
                     new SetElevator(level)
                 )
             )
