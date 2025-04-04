@@ -105,9 +105,10 @@ public class SetElevator extends Command {
 
   @Override
   public boolean isFinished() {
-    if(state.get() == ElevatorState.SOURCE){
+    if(state.get() != null){if(state.get() == ElevatorState.SOURCE){
       return (!ee.getBeamResult() || Math.abs(s_Elevator.getPosition() - goalPosition) < 0.07);
     }
+  }
     return Math.abs(s_Elevator.getPosition() - goalPosition) < 0.07;
   }
 }

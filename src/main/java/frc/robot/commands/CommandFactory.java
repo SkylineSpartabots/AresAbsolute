@@ -162,7 +162,7 @@ public class CommandFactory {
                 Commands.waitSeconds(1), 
                 new SmartCoralIntake()
             ),
-            new SetElevator(ElevatorState.SOURCE.getEncoderPosition())
+            new SetElevator(()->ElevatorState.SOURCE)
             
             
             // ScoringPath(dt.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver)

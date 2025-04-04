@@ -250,13 +250,13 @@ public class Vision extends SubsystemBase {
         try {
 
             if(frontCamerasBool) { //only use front cameras
-                updateVision(FrontLeftCamera, FLcameraToRobot, StandardDevs.ALIGNING_FRONT);
-                updateVision(FrontRightCamera, FRcameraToRobot, StandardDevs.ALIGNING_FRONT);
-                updateVision(FrontRightAngledCamera, FCcameraToRobot, StandardDevs.ALIGNING_FRONTMIDDLE);
+                updateVision(FrontLeftCamera, FLcameraToRobot, StandardDevs.DEFAULT_FRONT);
+                updateVision(FrontRightCamera, FRcameraToRobot, StandardDevs.DEFAULT_FRONT);
+                updateVision(FrontRightAngledCamera, FCcameraToRobot, StandardDevs.DEFAULT_FRONT);
             } else {
                 updateVision(FrontLeftCamera, FLcameraToRobot, StandardDevs.DEFAULT_FRONT);
                 updateVision(FrontRightCamera, FRcameraToRobot, StandardDevs.DEFAULT_FRONT);
-                updateVision(FrontRightAngledCamera, FCcameraToRobot, StandardDevs.DEFAULT_FRONTMIDDLE);
+                updateVision(FrontRightAngledCamera, FCcameraToRobot, StandardDevs.DEFAULT_FRONT);
                 // updateVision(BackLeftCamera, BLcameraToRobot, StandardDevs.DEFAULT_BACK);
                 // updateVision(BackRightCamera, BRcameraToRobot, StandardDevs.DEFAULT_BACK);
                 // updateVision(BackCenterCamera, BCcameraToRobot, StandardDevs.DEFAULT_BACK);
@@ -267,11 +267,16 @@ public class Vision extends SubsystemBase {
     }
 
     private enum StandardDevs { // # # # mulittag, # # # single tag
-        DEFAULT_FRONT(VecBuilder.fill(0.013, 0.013, 0.045, //good
-                                     0.0254, 0.0254, 0.08)), //good
+        // DEFAULT_FRONT(VecBuilder.fill(0.013, 0.013, 0.045, //good
+        //                              0.0254, 0.0254, 0.08)), //good
 
-        DEFAULT_FRONTMIDDLE(VecBuilder.fill(0.013, 0.013, 0.045, //good
-                                        0.0254, 0.0254, 0.08)), //good
+        // DEFAULT_FRONTMIDDLE(VecBuilder.fill(0.013, 0.013, 0.045, //good
+        //                                 0.0254, 0.0254, 0.08)), //good
+        DEFAULT_FRONT(VecBuilder.fill(0.014, 0.014, 0.05, //good
+                                     0.03, 0.03, 0.08)), //good
+
+        DEFAULT_FRONTMIDDLE(VecBuilder.fill(0.01, 0.016, 0.06, //good
+                                        0.03, 0.03, 0.08)), //good
 
         DEFAULT_BACK(VecBuilder.fill(0.0165, 0.0165, 0.0165, //good
                                      0.06, 0.06, 0.1)), //good
