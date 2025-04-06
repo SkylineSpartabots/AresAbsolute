@@ -1,0 +1,31 @@
+package frc.robot.commands.TeleopAutomation;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Subsystems.EndEffector;
+import frc.robot.Subsystems.EndEffector.OuttakeState;
+
+public class AutoShootCoral extends Command {
+    private EndEffector s_EndEffector;
+    Timer timer = new Timer();
+
+    public AutoShootCoral() {
+        s_EndEffector = EndEffector.getInstance();
+
+        addRequirements(s_EndEffector);
+    }
+
+    public void initialize() {
+        timer.restart();
+        s_EndEffector.setOuttakeSpeed(OuttakeState.SCORE);
+    }
+
+    public void end() {
+        s_EndEffector.setAlgaeSpeed(0);
+    }
+
+    public boolean isFinished() {
+        return timer.hasElapsed(0.5); //need the elevator to not be wiggling till test this #
+    }
+
+}

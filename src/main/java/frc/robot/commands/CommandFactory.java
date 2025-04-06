@@ -29,6 +29,7 @@ import frc.robot.Subsystems.EndEffector.OuttakeState;
 import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown.RollerState;
+import frc.robot.commands.Autos.Autos;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.EndEffector.SetAlgae;
@@ -42,6 +43,7 @@ import frc.robot.commands.TeleopAutomation.DriveToPose;
 import frc.robot.commands.TeleopAutomation.DriveToPoseChill;
 import frc.robot.commands.TeleopAutomation.TeleopPathing;
 import frc.robot.commands.TeleopAutomation.AlgaeAlign;
+import frc.robot.commands.TeleopAutomation.AutoShootCoral;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
 import frc.robot.commands.TeleopAutomation.ReefAlign;
 import frc.robot.Constants;
@@ -219,7 +221,9 @@ public class CommandFactory {
             new ParallelCommandGroup(
                 new PoleAlign(level, pole),
                 new SetElevator(level)
-            )
+            ),
+            new AutoShootCoral()
+            // TODO: ETHAN ADD THE PATH BACK TO SOURCE HERE!!
         ).raceWith(new PausableCommand(controller, AutoPoleAlign(level, pole, controller)))
         .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
@@ -235,9 +239,13 @@ public class CommandFactory {
                     Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 1.1),
                     new SetElevator(level)
                 )
-            )
+            ),
+            new AutoShootCoral()
+            // TODO: ETHAN ADD THE PATH BACK TO SOURCE HERE!!
         ).raceWith(new AdaptableCommand(controller, pole, level));
     }
+
+    // TODO: path to source command here
 
 
     // other stuff idk
