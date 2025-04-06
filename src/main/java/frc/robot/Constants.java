@@ -196,7 +196,7 @@ public final class Constants {
         
         public static final class CameraNames{
 
-            public static final String FrontRight = "Diggy";
+            public static final String FrontRight = "Biggy";
             public static final String FrontLeft = "Liggy";
             public static final String FrontRightCenter = "Abe";
             public static final String BackRight = "Gretchen";

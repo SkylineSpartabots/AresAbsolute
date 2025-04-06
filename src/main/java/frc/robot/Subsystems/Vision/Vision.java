@@ -18,6 +18,8 @@ import frc.robot.Constants.VisionConstants.CameraNames;
 import frc.robot.Constants.VisionConstants.VisionLimits;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
+
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -232,6 +234,7 @@ public class Vision extends SubsystemBase {
                     // System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
 
                     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), stddev.getStandardDev(false));
+                    Logger.recordOutput("odo", s_Swerve.getPose());
                 }
 
             }

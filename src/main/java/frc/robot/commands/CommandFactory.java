@@ -176,9 +176,9 @@ public class CommandFactory {
     public static Command ScoringPath(Supplier<String> path, Supplier<ElevatorState> level, CommandXboxController controller){
 
 
-        if(ee.getBeamResult() == true){
-            return Commands.none();
-        }
+        // if(ee.getBeamResult() == true){
+        //     return Commands.none();
+        // }
         
         return new SequentialCommandGroup(
 

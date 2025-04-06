@@ -173,7 +173,7 @@ public class Autos {
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("B1R3"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.75),
+          Commands.waitSeconds(0.6),
           new SetElevator(()->ElevatorState.L4),
           Commands.waitSeconds(0.2),
           new SetOuttake(OuttakeState.SCORE)
@@ -219,7 +219,7 @@ public class Autos {
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("B2R8"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.75),
+          Commands.waitSeconds(0.6),
           new SetElevator(()->ElevatorState.L4),
           Commands.waitSeconds(0.2),
           new SetOuttake(OuttakeState.SCORE)
