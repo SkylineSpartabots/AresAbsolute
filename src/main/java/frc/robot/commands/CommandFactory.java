@@ -173,30 +173,6 @@ public class CommandFactory {
         return new InstantCommand(()->Slapdown.getInstance().setRollerSpeed(RollerState.OUTTAKE.getRollerSpeed()));
     }
 
-    public static Command ScoringPath(Supplier<String> path, Supplier<ElevatorState> level, CommandXboxController controller){
-
-
-        // if(ee.getBeamResult() == true){
-        //     return Commands.none();
-        // }
-        
-        return new SequentialCommandGroup(
-
-            
-            // new DriveToPoseChill(path, true),
-            new ParallelCommandGroup(
-                // new FollowChoreoTrajectory(path.get())
-                new TeleopPathing(path.get()),
-                new SequentialCommandGroup(
-                    Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 1.1),
-                    new SetElevator(level)
-                )
-            )
-
-        ).raceWith(new CancelableCommand(controller));
-    }
-
-
     // automation
     // public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
     //     return new SequentialCommandGroup(
@@ -207,23 +183,64 @@ public class CommandFactory {
     //         .raceWith(new CancelableCommand(controller)); 
     // }
 
-    
+    // public static Command TeleopAutoRoutine() {
+    //     return new SequentialCommandGroup(
+    //         Commands.either(
+    //             CommandFactory.FullCoralIntake(),
+    //             Commands.none(),
+    //             EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
+    //         ),
 
-    public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
-        
+    //     )
+    // }
+
+    // public static Command AutoPoleAlignFromSource(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
+    //     return new SequentialCommandGroup(
+    //         Commands.either(
+    //             CommandFactory.FullCoralIntake(),
+    //             Commands.none(),
+    //             EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
+    //         ),
+    //         new ReefAlign(pole),
+    //         new ParallelCommandGroup(
+    //             new PoleAlign(level, pole),
+    //             new SetElevator(level)
+    //         )
+    //     ).raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
+    // }
+
+    // -----===== Teleop Automation Routine =====-----
+
+
+
+    public static Command AutoPoleAlign(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
         return new SequentialCommandGroup(
-            // Commands.either(
-            //     CommandFactory.FullCoralIntake(),
-            //     Commands.none(),
-            //     EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
-            // ),
             new ReefAlign(pole),
             new ParallelCommandGroup(
                 new PoleAlign(level, pole),
                 new SetElevator(level)
             )
-        ).raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
+        ).raceWith(new PausableCommand(controller, AutoPoleAlign(level, pole, controller)))
+        .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
+    
+    public static Command ScoringPath(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
+        Supplier<String> path = dt.loadTraj(level, pole);
+        return new SequentialCommandGroup(
+            // new DriveToPoseChill(path, true),
+            new ParallelCommandGroup(
+                // new FollowChoreoTrajectory(path.get())
+                new TeleopPathing(path.get()),
+                new SequentialCommandGroup(
+                    Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 1.1),
+                    new SetElevator(level)
+                )
+            )
+        ).raceWith(new AdaptableCommand(controller, pole, level));
+    }
+
+
+    // other stuff idk
 
     public static Command AutoAlgaeAlign(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(

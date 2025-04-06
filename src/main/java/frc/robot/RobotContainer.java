@@ -244,8 +244,8 @@ public class RobotContainer {
     // driver.x().onTrue(CommandFactory.FullCoralIntake());
     driver.b().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
 
-    driver.back().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
-    driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
+    driver.back().onTrue(CommandFactory.ScoringPath(()->robotstate.getSelectedElevatorLevel(), ()-> robotstate.getSelectedReefPole(), driver));
+    driver.y().onTrue(CommandFactory.AutoPoleAlign(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
     // driver.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
     // driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
     // driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
@@ -263,7 +263,7 @@ public class RobotContainer {
     // ----------====# Operator bindings #====----------
     operator.start().whileTrue(new ZeroElevator());
     // operator.back().onTrue(new ZeroSlapdown());
-    operator.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
+    // operator.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
 
     // operator.back().onTrue(new InstantCommand(() -> Vision.getInstance().useFrontCameras()));
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));

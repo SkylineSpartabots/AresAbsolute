@@ -160,7 +160,6 @@ public class ReefAlign extends Command {
         thetaErrorAbs = Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
         if (thetaErrorAbs < thetaController.getPositionTolerance())
             thetaVelocity = 0.0;
-        
 
         // Command speeds
         var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
@@ -191,7 +190,6 @@ public class ReefAlign extends Command {
 
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
-
         //prints
         // System.out.println("Theta error: " + thetaErrorAbs);
         // System.out.println("drive error: " + driveErrorAbs);
@@ -199,6 +197,8 @@ public class ReefAlign extends Command {
         // System.out.println("Drivetrain error: " + driveController.getPositionError());
         // System.out.println("Position Theta error: " + thetaController.getPositionError());
         // System.out.println("Drive velocity: " + driveVelocityScalar);
+
+
     }
 
     @Override
