@@ -28,13 +28,16 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
+import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import choreo.util.ChoreoAllianceFlipUtil.Flipper;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
@@ -57,10 +60,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.Interpolating.Geometry.IPose2d;
 import frc.lib.Interpolating.Geometry.ITranslation2d;
@@ -72,6 +77,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.Constants.robotPIDs.HeadingControlPID;
 import frc.robot.RobotState.RobotState;
+import frc.robot.Subsystems.Elevator.ElevatorState;
 // import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
 import frc.robot.commands.CancelableCommand;
 
@@ -93,7 +99,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private static CommandSwerveDrivetrain s_Swerve;
 
-    Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
+    // Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
 
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
@@ -191,8 +197,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if(s_Swerve == null){
             s_Swerve = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants,
              250,
-             VecBuilder.fill(0.05, 0.05, 0.04),
-             VecBuilder.fill(0.025, 0.025, 0.015),
+             VecBuilder.fill(0.049, 0.049, 0.04),
+             VecBuilder.fill(0.025, 0.025, 0.025),
             TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);  
         }
         
@@ -271,6 +277,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
+        initAutoBuilder();
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -280,13 +287,117 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> setControl(requestSupplier.get()));
     }
 
-    public void applyFieldSpeeds(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
-        
+    public void applyRobotSpeedsFF(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
         setControl(
-        new SwerveRequest.ApplyFieldSpeeds()
+        new SwerveRequest.ApplyRobotSpeeds()
         .withSpeeds(speeds)
         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesX())
         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY()));
+    }
+
+    public Supplier<String> loadTraj(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole){
+        boolean bottomSource;
+        String path;
+        ReefPoleScoringPoses poleTarget;
+        Trajectory traj;
+        if(Constants.alliance == Alliance.Blue){
+            poleTarget = pole.get();
+            bottomSource = getPose().getY() > 4 ? false : true;
+        } else{
+            poleTarget = ReefPoleScoringPoses.values()[pole.get().ordinal()-12];
+            bottomSource = getPose().getY() > 4 ? true : false;
+        }
+
+        if(bottomSource == false){
+            switch (poleTarget) {
+                case POLE_12L:
+                    path = "S1R1";
+                    break;
+                case POLE_11K:
+                    path = "S1R2";
+                    break;
+                case POLE_10J:
+                    path = "S1R3";
+                    break;
+                case POLE_9I:
+                    path = "S1R4";
+                    break;
+                case POLE_8H:
+                    path = "S1R5";
+                    break;
+                case POLE_7G:
+                    path = "S1R6";
+                    break;
+                case POLE_6F:
+                    path = "S1R7";
+                    break;
+                case POLE_5E:
+                    path = "S1R8";
+                    break;
+                case POLE_4D:
+                    path = "S1R9";
+                    break;
+                case POLE_3C:
+                    path = "S1R10";
+                    break;
+                case POLE_2B:
+                    path = "S1R11";
+                    break;
+                case POLE_1A:
+                    path = "S1R12";
+                    break;
+            
+                default:
+                    path = "S1R12";
+                    break;
+            }
+        } else {
+            switch (poleTarget) {
+                case POLE_12L:
+                    path = "S2R1";
+                    break;
+                case POLE_11K:
+                    path = "S2R2";
+                    break;
+                case POLE_10J:
+                    path = "S2R3";
+                    break;
+                case POLE_9I:
+                    path = "S2R4";
+                    break;
+                case POLE_8H:
+                    path = "S2R5";
+                    break;
+                case POLE_7G:
+                    path = "S2R6";
+                    break;
+                case POLE_6F:
+                    path = "S2R7";
+                    break;
+                case POLE_5E:
+                    path = "S2R8";
+                    break;
+                case POLE_4D:
+                    path = "S2R9";
+                    break;
+                case POLE_3C:
+                    path = "S2R10";
+                    break;
+                case POLE_2B:
+                    path = "S2R11";
+                    break;
+                case POLE_1A:
+                    path = "S2R12";
+                    break;
+            
+                default:
+                    path = "S1R12";
+                    break;
+            }
+        }
+        // traj = Choreo.loadTrajectory(path).get();
+        // Optional<Pose2d> initialPose = traj.getInitialPose(Constants.alliance == Alliance.Red);
+        return () -> path;
     }
 
     public void applyFieldSpeeds(ChassisSpeeds speeds) {
@@ -310,19 +421,34 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
+    public void initAutoBuilder() {
+        AutoBuilder.configure(
+            this::getPose,
+            this::resetOdo,
+            this::getRobotRelativeSpeeds,
+            this::applyRobotSpeedsFF,
+            new PPHolonomicDriveController(
+            new PIDConstants( 4.32976, 0, 0.01),
+            new PIDConstants( 3.254, 1.6, 0)
+            ),
+            Constants.config,
+            () -> false, //we change poses ourselves so no need for flipping
+            this);
+    }
+
     public void resetOdo(){ //not being used, drivetrain.seedFieldRelative() instead for field centric driving
         s_Swerve.seedFieldCentric();
         robotState.reset(0.02, IPose2d.identity());
     }
 
     public void resetOdo(Pose2d pose){
-        resetOdoUtil(pose);
-        robotState.reset(0.02, new IPose2d(pose));
+        s_Swerve.resetPose(pose);
+        // robotState.reset(0.02, new IPose2d(pose));
     }
 
-    public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
-        s_Swerve.resetPose(pose);
-    }
+    // public void resetOdoUtil(Pose2d pose){ //IDK if this works as we want it to
+    //     s_Swerve.resetPose(pose);
+    // }
 
     public Pose2d getPose(){
         return s_Swerve.getState().Pose;
@@ -389,15 +515,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("ODO X", currentPose.getX());
         SmartDashboard.putNumber("ODO Y", currentPose.getY());
         SmartDashboard.putNumber("ODO ROT", currentPose.getRotation().getRadians());
+        // System.out.println("odo; x: " + currentPose.getX() + " y " + currentPose.getY());
 
-        SwerveModuleState[] states = new SwerveModuleState[] {
-            s_Swerve.getModule(0).getCurrentState(),
-            s_Swerve.getModule(1).getCurrentState(),
-            s_Swerve.getModule(2).getCurrentState(),
-            s_Swerve.getModule(3).getCurrentState()
-        };
+        // SwerveModuleState[] states = new SwerveModuleState[] {
+        //     s_Swerve.getModule(0).getCurrentState(),
+        //     s_Swerve.getModule(1).getCurrentState(),
+        //     s_Swerve.getModule(2).getCurrentState(),
+        //     s_Swerve.getModule(3).getCurrentState()
+        // };
         // StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
-        publisher.set(states);
+        // publisher.set(states);
     }
 
 }

@@ -4,26 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.apriltag.AprilTag;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.apriltag.AprilTagPoseEstimate;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.VisionConstants.AprilTags;
-import frc.robot.RobotState.RobotState;
-
-import java.util.Arrays;
-import java.util.Comparator;
-
-import org.opencv.core.Point;
-
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -35,22 +23,20 @@ import com.pathplanner.lib.config.RobotConfig;
  */
 public final class Constants {
 
-    public static boolean usingVision = true;
-
-    public static double frontLeftEncoderOffset = 0.11889648;
-    public static double frontRightEncoderOffset = 0.2739255;
-    public static double backLeftEncoderOffset = -0.421142515625;
-    public static double backRightEncoderOffset = -0.3290965                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ;
+    public static double frontLeftEncoderOffset = 0.1235351525;
+    public static double frontRightEncoderOffset = 0.263916012125;
+    public static double backLeftEncoderOffset = -0.422119105625;
+    public static double backRightEncoderOffset = -0.3244628895;
 
     public static double MaxSpeed = 6; //can be lowered during testing
-    public static double MaxAcceleration = 3; //can be lowered during testing
+    public static double MaxAcceleration = 1.2542976; //can be lowered during testing
     public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
     public static double MaxAngularVelocity = 2 * Math.PI;
 
     //all these are outdated but we are not using them anymore so its fine tbh
-    public static double robotMass = 58.9; //kg
-    public static double MOI = 0.14782; //sum of kg * m^2 to center of rotation
-    public static double CoF = 1; // coefficient of friction TODO get better one
+    public static double robotMass = 25; //kg
+    public static double MOI = 2; //sum of kg * m^2 to center of rotation
+    public static double CoF = 1.0; // coefficient of friction TODO get better one
     public static double wheelRadiusInches = 1.9125; //inches
 
     public static double intakePivotCurrentThreshold = 70;
@@ -61,16 +47,26 @@ public final class Constants {
         Constants.KrakenConstants.stallCurrentAmps,
         Constants.KrakenConstants.freeCurrentAmps,
         Constants.KrakenConstants.freeSpeedRadPerSec,
-    4);
+    2);
 
     public static ModuleConfig moduleConfig = new ModuleConfig(
         Constants.wheelRadiusInches * 0.0254, //in to m
         Constants.MaxSpeed,
         Constants.CoF,
         motorConfig,
+        5.90777778,
         Constants.KrakenConstants.driveCurrentLimitAmps,
-        Constants.KrakenConstants.torqueLoss,
-        4
+        1
+    );
+
+    public static RobotConfig config = new RobotConfig(
+        Constants.robotMass,
+        Constants.MOI,
+        Constants.moduleConfig,
+        Constants.moduleLocations.FL,
+        Constants.moduleLocations.FR,
+        Constants.moduleLocations.BL,
+        Constants.moduleLocations.BR
     );
 
     public static class LimelightConstants{
@@ -92,16 +88,6 @@ public final class Constants {
         );
 
     }
-    
-    public static RobotConfig config = new RobotConfig(
-        Constants.robotMass,
-        Constants.MOI,
-        Constants.moduleConfig,
-        Constants.moduleLocations.FL,
-        Constants.moduleLocations.FR,
-        Constants.moduleLocations.BL,
-        Constants.moduleLocations.BR
-    );
 
     public static final class moduleLocations {
         public static final Translation2d FL = new Translation2d(-13.5, 13.5);
@@ -111,11 +97,11 @@ public final class Constants {
     };
 
     public static final class KrakenConstants {
-        public static final double nominalVoltageVolts = 9; //website says up to 24 volts idk man
-        public static final double stallTorqueNewtonMeters = 7;
+        public static final double nominalVoltageVolts = 24; //website says up to 24 volts idk man
+        public static final double stallTorqueNewtonMeters = 7.09;
         public static final double stallCurrentAmps = 366;
-        public static final double freeCurrentAmps = 2;
-        public static final double freeSpeedRadPerSec = 5800;
+        public static final double freeCurrentAmps = 2.32;
+        public static final double freeSpeedRadPerSec = 607;
         public static final double driveCurrentLimitAmps = 60;
         public static final double torqueLoss = 60;
     }
@@ -136,10 +122,8 @@ public final class Constants {
         public static final double outtakeOffsetMillimeters = 0; //distance between center of robot and PVC center of mass after exiting outtake in mm
     }
 
-
     public static final double stickDeadband = 0.075;
     public static final double triggerDeadzone = 0.2;
-
 
     public static final class CurrentLimits{
         public static final int outtakeContinuousCurrentLimit = 35;
@@ -152,7 +136,7 @@ public final class Constants {
         public static final int elevatorPeakCurrentLimit = 120;
     }
     
-    public static Alliance alliance;
+    public static Alliance alliance = Alliance.Blue;
 
     public static Mode deployMode = Mode.REAL;
 
@@ -182,20 +166,102 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final String FRCamera = "Liberal";
-        public static final String FLCamera = "Gretchen";
-        public static final String altFRCamera = "Charles";
+        
+        /*
+        ----------------- Orange Pi Names -----------------
+        In case anyone ever needs this, here is each orange pi host name and its assigned static IP
+        alpha: 10.29.76.11
+        beta: 10.29.76.12
+        gamma: 10.29.76.13
+        delta: 10.29.76.14
+        backup: 10.29.76.15 - just a hot swappable SD card with a backup image
+         */
+        
+        
+        /*
+        ----------------- Physical Placements -----------------
+        FRONT RIGHT: FR, Diggy
+        FRONT LEFT: FL, Liggy
+        FRONT RIGHT ANGLED: FRA, Abe
+        BACK RIGHT: BR, Gretchen
+        BACK LEFT: BL, Blake
+        BACK CENTER: BC, Charles        
+        
+        
+        In the code we use the physical location names or abbreviations to refer to the cameras.
+        The nicknames are to keep track of which camera is which and what its calibration is
+        
+        Name the camera, calibrate it, place it on the bot, and write down where you placed it (above).
+         */
+        
+        public static final class CameraNames{
+
+            public static final String FrontRight = "Biggy";
+            public static final String FrontLeft = "Liggy";
+            public static final String FrontRightCenter = "Abe";
+            public static final String BackRight = "Gretchen";
+            public static final String BackLeft = "Blake"; 
+            public static final String BackCenter = "Charles"; 
+        }
+        
+        public static final class CameraTransforms{
+            /*
+            
+            WPI Coordinate Space
+                    +x
+                    |
+            +y ----------- -y
+                    |
+                    -x
+             
+            Onshape Coordinate Space
+                    +y
+                    |
+            -x ----------- +x
+                    |
+                    -y
+                    
+             +z is up in both coordinate spaces
+                    
+                    
+             */
+            
+            //Pitch is COUNTERCLOCKWISE about the Y axis
+            //Yaw is COUNTERCLOCKWISE about the Z axis
+            
+            // The camera to robot transform is the transform from the camera to the robot in the camera's coordinate space
+            // We are moving from the camera to the center of the robot using WPI coordinates
+            
+            public static final Transform3d FLcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0))); //so this guy is negative not pos (cause ccw)
+
+            public static final Transform3d FRcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0)));
+
+            public static final Transform3d FCcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(-11.882), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)), 
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(0)));
+
+            // Mechancical Advantage Cameras are 30 deg from -x axis (WPI) 
+            public static final Transform3d BLcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(10.720), Units.inchesToMeters(-11.412), Units.inchesToMeters(-8.350)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(120))); // MA angled 30 deg to the left of -x (WPI) thus 150 deg CCW
+
+            public static final Transform3d BRcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(10.720), Units.inchesToMeters(11.412), Units.inchesToMeters(-8.350)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-61.8750),Units.degreesToRadians(-120))); // MA angled 30 deg to the right of -x (WPI) thus 150 deg CW 
+
+            public static final Transform3d BCcameraToRobot = new Transform3d(
+                    new Translation3d(Units.inchesToMeters(13.382), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-35),Units.degreesToRadians(180)));
+        }
+
+        
+        
         public static final int aprilTagMax = 22;
-        public static final double aprilTagHeight = 0.122; //bottom of each april tag is 122cm above carpet | unnecessary, we have photonvision's field layout import
-        public static final double cameraRollOffset = Units.degreesToRadians(0);
-        public static final double cameraPitchOffset = Units.degreesToRadians(0);
-        public static final double cameraYawOffset = Units.degreesToRadians(0);
-        public static final double backRightCameraHeight = Units.inchesToMeters(9.1);
-        public static final double backRightCameraPitch = Units.degreesToRadians(30);
-
-        public static final double centerCameraHeight = Units.inchesToMeters(10.15);
-        public static final double centerCameraPitch = Units.degreesToRadians(15);
-
+       
         public static final class VisionLimits {
         public static final double k_rotationLimit = Math.PI;
         public static final double k_velocityLimit = 6;
@@ -242,6 +308,7 @@ public final class Constants {
         public static final int outtakeID = 21;
         public static final int algaeID = 22;
         public static final int laserID = 23;
+        public static final int laser2ID = 24;
 
         public static final int elevatorLeaderId = 31;
         public static final int elevatorFollowerId = 32;
@@ -250,7 +317,8 @@ public final class Constants {
         public static final int slapdownLeaderID = 41;
         public static final int slapdownFollowerID = 42;
 
-        public static final int funnelID = 51;
+        public static final int funnelguyID = 51;
+        public static final int funnelgirlID = 52;
 
         public static final int climbID = 61;
     }
@@ -276,6 +344,9 @@ public final class Constants {
 
         public static final class ReefConstants{
 
+            public static final Pose2d reefMiddleBlue = new Pose2d(4.486, 4.025, Rotation2d.fromDegrees(0)); // this is the middle of the reef field, used for alignment purposes, change as needed
+            public static final Pose2d reefMiddleRed = new Pose2d(8.57 + 4.486, 4.025, Rotation2d.fromDegrees(0)); // this is the middle of the reef field, used for alignment purposes, change as needed
+
             public enum ReefSidePositions {
                 //blue 
                 POLE_1AB(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
@@ -295,7 +366,65 @@ public final class Constants {
 
                 private final Pose2d waypoints;
 
+                public double getReefSideRating(Pose2d currentPose) {
+                    int rating = 0;
+                    int k = 0;
+
+                    double targetDistance = currentPose.getTranslation().getDistance(this.getPose().getTranslation());
+
+                    System.out.println("targe " + targetDistance);
+                    System.out.println(Constants.alliance.name());
+                    if(Constants.alliance != Alliance.Blue)
+                        k += 6; //move up ReefSidePoles
+
+                        for (int i = k; i <= k + 5; i++) {
+                            if(currentPose.getTranslation().getDistance(ReefSidePositions.values()[i].getPose().getTranslation()) <= targetDistance) {
+                                rating++;
+                            }
+                            System.out.println(currentPose.getTranslation().getDistance(ReefSidePositions.values()[i].getPose().getTranslation()));
+                        }
+
+                        System.out.println("rating " + rating);
+
+                        switch(rating)  { //TODO tune
+                            case 1:
+                                return 0; // none needed
+                            case 2:
+                                return 0.8; // slight adjustment
+                            case 3:
+                                return 0.8; // slight adjustment
+                            case 4:
+                                return 30;// mid adjustment
+                            case 5:
+                                return 30;// mid adjustment
+                            case 6:
+                                return 65; // high adjustment
+                            default:                                                            
+                                return 0; 
+                        }
+                }
+
                 ReefSidePositions(Pose2d poses) {
+                    this.waypoints = poses;
+                }
+
+                public Pose2d getPose() {
+                    return this.waypoints;
+                }
+            }
+
+            public enum ReefAlgaeRemovalPoses {
+
+                ALG_AB(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_CD(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_EF(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_GH(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_IJ(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))), //
+                ALG_KL(new Pose2d(2.921, 4.0259, Rotation2d.fromRadians(0.0))); //
+
+                private final Pose2d waypoints;
+
+                ReefAlgaeRemovalPoses(Pose2d poses) {
                     this.waypoints = poses;
                 }
 
@@ -306,36 +435,6 @@ public final class Constants {
 
             public enum ReefPoleScoringPoses {
                 //Now 4.2545 cm offset (to the right)
-
-                // //blue
-                // POLE_1A(new Pose2d(3.2808, 4.232, Rotation2d.fromRadians(0.0))), //
-                // POLE_2B(new Pose2d(3.2808, 3.90219, Rotation2d.fromRadians(0.0))), //
-                // POLE_3C(new Pose2d(3.6924, 3.06299, Rotation2d.fromRadians(1.0472))), //
-                // POLE_4D(new Pose2d(3.9764, 2.89799, Rotation2d.fromRadians(1.0472))), //
-                // POLE_5E(new Pose2d(4.9256, 2.85499, Rotation2d.fromRadians(2.0944))), //
-                // POLE_6F(new Pose2d(5.2096, 3.01899, Rotation2d.fromRadians(2.0944))), //
-                // POLE_7G(new Pose2d(5.7232, 3.818, Rotation2d.fromRadians(3.14159))), //
-                // POLE_8H(new Pose2d(5.7232, 4.147, Rotation2d.fromRadians(3.14159))), //
-                // POLE_9I(new Pose2d(5.2856, 4.992, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_10J(new Pose2d(4.9636, 5.1775, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_11K(new Pose2d(4.0514, 5.197, Rotation2d.fromRadians(-1.0472))), //
-                // POLE_12L(new Pose2d(3.7654, 5.032, Rotation2d.fromRadians(-1.0472))), //
-                
-                // // red
-                // POLE_A(new Pose2d(14.2932, 3.818, Rotation2d.fromRadians(3.14159))), //
-                // POLE_B(new Pose2d(14.2932, 4.147, Rotation2d.fromRadians(3.14159))), //
-                // POLE_C(new Pose2d(13.8556, 4.992, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_D(new Pose2d(13.5336, 5.1775, Rotation2d.fromRadians(-2.0944))), //
-                // POLE_E(new Pose2d(12.6214, 5.197, Rotation2d.fromRadians(-1.0472))), //
-                // POLE_F(new Pose2d(12.3354, 5.032, Rotation2d.fromRadians(-1.0472))), //
-                // POLE_G(new Pose2d(11.8508, 4.232, Rotation2d.fromRadians(0.0))), //
-                // POLE_H(new Pose2d(11.8508, 3.90219, Rotation2d.fromRadians(0.0))), //
-                // POLE_I(new Pose2d(12.2624, 3.06299, Rotation2d.fromRadians(1.0472))), //
-                // POLE_J(new Pose2d(12.5464, 2.89799, Rotation2d.fromRadians(1.0472))), //
-                // POLE_K(new Pose2d(13.4956, 2.85499, Rotation2d.fromRadians(2.0944))), //
-                // POLE_L(new Pose2d(13.7776, 3.01899, Rotation2d.fromRadians(2.0944))); //
-
-
                 //quarter inch to the right poses
                 POLE_1A(new Pose2d(3.2808, 4.2257, Rotation2d.fromRadians(0.0))), //
                 POLE_2B(new Pose2d(3.2808, 3.89584, Rotation2d.fromRadians(0.0))), //
@@ -363,8 +462,6 @@ public final class Constants {
                 POLE_J(new Pose2d(12.55269, 2.89349, Rotation2d.fromRadians(1.0472))), //
                 POLE_K(new Pose2d(13.49909, 2.86057, Rotation2d.fromRadians(2.0944))), //
                 POLE_L(new Pose2d(13.78309, 3.02457, Rotation2d.fromRadians(2.0944))); //
-
-                
                 
                 private final Pose2d waypoints;
 

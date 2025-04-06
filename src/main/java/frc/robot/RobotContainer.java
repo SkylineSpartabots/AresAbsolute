@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CANCoders;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
+import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.Climb;
@@ -48,6 +49,7 @@ import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.SetRoller;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
 import frc.robot.commands.SwerveCommands.SlowDrive;
+import frc.robot.commands.TeleopAutomation.PoleAlign;
 
 public class RobotContainer {
 
@@ -172,7 +174,7 @@ public class RobotContainer {
           
       // Scholarly Commands
         // driverDpadRight.onTrue(new SmartIntake());
-        // driver.x().onTrue(CommandFactory.FullCoralIntake());
+        driver.x().onTrue(CommandFactory.FullCoralIntake());
         // driver.y().onTrue(CommandFactory.EjectFunnel());
         // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
         // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
@@ -185,9 +187,13 @@ public class RobotContainer {
     // ----------====# Active binding ====----------
     // driver.start().onTrue(new ZeroElevator());
 
+    // driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+    // driver.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
     
-    
-    // driver.a().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.LEFT, driver));
+    // driver.y().whileTrue(Elevator.getInstance().sysIdQuasistatic(Direction.kForward)); // Start SysId Quasistatic test in forward direction
+    // driver.a().whileTrue(Elevator.getInstance().sysIdQuasistatic(Direction.kReverse)); // Start SysId Quasistatic test in forward direction
+    // driver.b().whileTrue(Elevator.getInstance().sysIdDynamic(Direction.kForward)); // Start SysId Quasistatic test in forward direction
+    // driver.x().whileTrue(Elevator.getInstance().sysIdDynamic(Direction.kReverse)); // Start SysId Quasistatic test in forward direction
     // driver.povUp().onTrue(new SetElevator(() -> elevator.getSelectedState()));
 
     // driver.rightBumper().onTrue(new InstantCommand(() -> elevator.raisePoleLevel()));
@@ -199,37 +205,53 @@ public class RobotContainer {
     // driver.back().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.start().onFalse(new InstantCommand(()->climb.setSpeed(0)));
     // driver.back().onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
-    driver.start().onTrue(new ZeroElevator());
+    // driver.back().onTrue(new InstantCommand(()->drivetrain.resetOdo()));
+    // driver.start().onTrue(new ZeroElevator());
+    driver.start().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.35)));
+    driver.start().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
     driverLeftTrigger.whileTrue(new SlowDrive());
-    driverRightTrigger.onTrue(CommandFactory.ShootCoral());
+    driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2769)));
+    driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
-    //     driver.rightTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
-    //     driver.leftTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
-    
+      // driver.rightTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
+      // driver.leftTrigger().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
+  
     driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
     driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
 
     // driver.povRight().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     // driver.povLeft().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
+    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
+    driverDpadUp.whileTrue(new RunClimb(-0.95));
+    driverDpadDown.whileTrue(new RunClimb(0.95));
+
+
     // driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     // driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-    driverDpadUp.whileTrue(new RunClimb(-0.9));
-    driverDpadDown.whileTrue(new RunClimb(0.9));
-
-
-    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
-    driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
 
     // driverDpadDown.onTrue(CommandFactory.SmartAlgeaIntake());
     // driverDpadUp.onTrue(new SetRoller(RollerState.OUTTAKE));
 
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
-    driver.b().onTrue(CommandFactory.EjectFunnel());
-    driver.x().onTrue(CommandFactory.FullCoralIntake());
+    // driver.b().onTrue(CommandFactory.OnePlusTwo(
+    //   ReefPoleScoringPoses.POLE_10J,
+    //   new Pose2d(1.291, 7.228, Rotation2d.fromRadians(2.21)),
+    //   ReefPoleScoringPoses.POLE_11K,
+    //   new Pose2d(1.291, 7.228, Rotation2d.fromRadians(2.21)),
+    //   ReefPoleScoringPoses.POLE_12L));
+    // driver.b().onTrue(CommandFactory.EjectFunnel());
+    // driver.x().onTrue(CommandFactory.FullCoralIntake());
+    driver.b().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
 
-    driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
+    driver.back().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
+    driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
+    // driver.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
+    // driver.y().onTrue(CommandFactory.AutoPoleAlignFromSource(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
+    // driver.y().onTrue(CommandFactory.AutoScoreCoral(() -> robotstate.getSelectedElevatorLevel(), () -> robotstate.getSelectedReefPole(), driver));
 
-    // driver.b().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
+    // driver.b().onTrue(new PoleAlign(() -> robotstate.getSelectedReefPole()));
+    // operator.a().onTrue(CommandFactory.AutoScoreCoral(() -> elevator.getSelectedState(), ReefPoleSide.RIGHT, driver));
     // driver.a().onTrue(CommandFactory.AutoRemoveAlgae(() -> elevator.getSelectedState(), driver));
 
     // driver.a().onTrue(CommandFactory.SmartAlgeaIntake());
@@ -241,20 +263,20 @@ public class RobotContainer {
     // ----------====# Operator bindings #====----------
     operator.start().whileTrue(new ZeroElevator());
     // operator.back().onTrue(new ZeroSlapdown());
+    operator.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
 
-    operator.y().onTrue(CommandFactory.EjectFunnel()); //should go to operator tbh
-
+    // operator.back().onTrue(new InstantCommand(() -> Vision.getInstance().useFrontCameras()));
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
-    operatorDpadUp.whileTrue(new AdjustElevator(0.05));
+    operatorDpadUp.whileTrue(new AdjustElevator(0.2));
     // operatorDpadUp.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
-    operatorDpadDown.whileTrue(new AdjustElevator(-0.05));
+    operatorDpadDown.whileTrue(new AdjustElevator(-0.2));
     // operatorDpadDown.onFalse(new InstantCommand(()->elevator.setPosition(elevator.getPosition())));
-    operatorRightTrigger.onTrue(new InstantCommand(()-> cancoders.getNewOffsets()));
+    // operatorRightTrigger.onTrue(new InstantCommand(()-> cancoders.getNewOffsets()));
     // operator.a().onTrue(new SetPivot(PivotState.HOLD));
     // operator.rightTrigger().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2)));
 
-    operator.b().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.15)));
+    operator.b().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.4)));
     operator.b().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
     operator.a().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(-0.15)));
     operator.a().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));

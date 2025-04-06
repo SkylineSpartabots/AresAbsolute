@@ -18,7 +18,8 @@ public class Funnel extends SubsystemBase {
   /** Creates a new Funnel. */
   private static Funnel instance;
   
-  private TalonFX roller;
+  private TalonFX gril;
+  private TalonFX boril;
   private DigitalInput beam;
   
   private FunnelState state;
@@ -46,23 +47,26 @@ public class Funnel extends SubsystemBase {
 
   public Funnel() {
     beam = new DigitalInput(Constants.HardwarePorts.funnelBeamPort);
-    roller = new TalonFX(Constants.HardwarePorts.funnelID);
-    configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast);
+    gril = new TalonFX(Constants.HardwarePorts.funnelgirlID);
+    boril = new TalonFX(Constants.HardwarePorts.funnelguyID);
+    configMotor(InvertedValue.Clockwise_Positive, NeutralModeValue.Coast, gril);
+    configMotor(InvertedValue.CounterClockwise_Positive, NeutralModeValue.Coast, boril);
   }
 
-  public void configMotor(InvertedValue direction, NeutralModeValue neutralMode){
+  public void configMotor(InvertedValue direction, NeutralModeValue neutralMode, TalonFX motor){
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     config.MotorOutput.NeutralMode = neutralMode;
     config.MotorOutput.Inverted = direction;
 
-    roller.getConfigurator().apply(config);
-    roller.getSupplyCurrent().setUpdateFrequency(50);
-    roller.optimizeBusUtilization();
+    motor.getConfigurator().apply(config);
+    motor.getSupplyCurrent().setUpdateFrequency(50);
+    motor.optimizeBusUtilization();
   }
 
   public void setSpeed(double speed){
-    roller.set(speed);
+    gril.set(speed);
+    boril.set(speed);
   }
 
   public boolean getBeamResult(){
@@ -71,12 +75,13 @@ public class Funnel extends SubsystemBase {
 
   public void setState(FunnelState desiredState){
     state = desiredState;
-    roller.set(state.getRollerSpeed());
+    gril.set(state.getRollerSpeed());
+    boril.set(state.getRollerSpeed());
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("funnel current", roller.getSupplyCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("funnel current", gril.getSupplyCurrent().getValueAsDouble());
     // This method will be called once per scheduler run
     // SmartDashboard.putBoolean("funnel beam", getBeamResult());
   }

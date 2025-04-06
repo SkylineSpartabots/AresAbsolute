@@ -4,6 +4,13 @@
 
 package frc.robot.Subsystems;
 
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -15,11 +22,23 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.controls.PositionVoltage;
 
+import edu.wpi.first.units.BaseUnits;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.VelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
@@ -33,6 +52,47 @@ public class Elevator extends SubsystemBase {
 
   private boolean holdPosition = false;
 
+  // sysid
+      private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            null,        // Use default ramp rate (1 V/s)
+            Volts.of(3), // Reduce dynamic step voltage to 4 V to prevent brownout
+            Units.Seconds.of(5),        // Use default timeout (10 s)
+            // Log state with SignalLogger class
+            state -> SignalLogger.writeString("SysIdElevator_State", state.toString())
+        ),
+        new SysIdRoutine.Mechanism(
+            this::setVoltage,
+            null,
+            this
+        )
+    );
+
+    /* The SysId routine to test */
+    private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutine;
+    
+    /**
+     * Runs the SysId Quasistatic test in the given direction for the routine
+     * specified by {@link #m_sysIdRoutineToApply}.
+     *
+     * @param direction Direction of the SysId Quasistatic test
+     * @return Command to run
+     */
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutineToApply.quasistatic(direction);
+    }
+
+    /**
+     * Runs the SysId Dynamic test in the given direction for the routine
+     * specified by {@link #m_sysIdRoutineToApply}.
+     *
+     * @param direction Direction of the SysId Dynamic test
+     * @return Command to run
+     */
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return m_sysIdRoutineToApply.dynamic(direction);
+    }
+
 
   public static Elevator getInstance(){
     if(instance == null){
@@ -42,14 +102,14 @@ public class Elevator extends SubsystemBase {
   }
 
   public enum ElevatorState {
-    L1(15), //bad
-    L2(20.287),
-    L3(35.29394),
-    L4(61.17),
+    L1(14), //bad
+    L2(21.7),
+    L3(36.3),
+    L4(61.7),
     GROUND(0.11), //bad
-    A1(7.8), //bad
+    A1(10.5), //bad
     A2(26), //bad
-    SOURCE(0.8);
+    SOURCE(2.35);
     //48.1 should be max
     private double encoderPosition;
 
@@ -74,7 +134,6 @@ public class Elevator extends SubsystemBase {
 
     voltOutput = new VoltageOut(0).withEnableFOC(true);
     torqueOutput = new TorqueCurrentFOC(0);
-
   }
 
   private void configMotor(TalonFX motor, InvertedValue direction, NeutralModeValue neutralMode){
@@ -100,7 +159,7 @@ public class Elevator extends SubsystemBase {
     Slot0Configs configuration = new Slot0Configs();
     configuration.kG = 0.25;
     configuration.kI = 0.15;
-    configuration.kP = 0.3;
+    configuration.kP = 0.13;
 
     motor.getConfigurator().apply(configuration);
      // motor.optimizeBusUtilization();
@@ -136,6 +195,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setVoltage(double voltage){
+    holdPosition = false;
+    leader.setControl(voltOutput.withOutput(voltage));
+    follower.setControl(voltOutput.withOutput(voltage));
+  }
+
+  public void setVoltage(Voltage voltage){
     holdPosition = false;
     leader.setControl(voltOutput.withOutput(voltage));
     follower.setControl(voltOutput.withOutput(voltage));

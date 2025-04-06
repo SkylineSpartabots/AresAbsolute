@@ -1,4 +1,4 @@
-package frc.robot.commands.SwerveCommands;
+package frc.robot.commands.TeleopAutomation;
 
 import java.awt.Robot;
 import java.util.Vector;
@@ -21,61 +21,45 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.Interpolating.Geometry.IChassisSpeeds;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
-import frc.robot.Constants.FieldConstants.ReefConstants.ReefSidePositions;
 import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Elevator.ElevatorState;
+import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Drives to a specified pose.
  */
-public class ReefAlign extends Command {
+public class DriveToPose extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            4, 0.12, 0.05, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 2, Constants.MaxAcceleration + 1), 0.02);
+            3, 0.45, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration + 1), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
-            3.254, 2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity + Math.PI, Constants.MaxAngularRate), 0.02);
+            2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
     private CommandSwerveDrivetrain s_Swerve;
+    private EndEffector s_EndEffector;
 
-    private ReefSidePositions targetReefSide; 
-
-    private Supplier<ReefPoleScoringPoses> pole;
+    private Supplier<Pose2d> targetPoseSupplier;
     private Pose2d targetPose;
     private RobotState robotState;
     private Translation2d lastSetpointTranslation;
     private double driveErrorAbs;
     private double thetaErrorAbs;
-    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
+    private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1;
 
-//     public ReefAlign(ReefSidePositions side) {
-//         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
-//         this.robotState = RobotState.getInstance();
-        
-//         this.targetReefSide = side;
-
-//         thetaController.setTolerance(0.1047); //6 degrees
-//         driveController.setTolerance(0.2);
-
-//         addRequirements(s_Swerve);
-//         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
-//     }
-
-    public ReefAlign(Supplier<ReefPoleScoringPoses> pole) {
+    public DriveToPose(Supplier<Pose2d> pose) {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
-        System.out.println("my o dinal: " + (int) pole.get().ordinal() / 2);
+        this.s_EndEffector = EndEffector.getInstance();
 
-        this.pole = pole;
-
-        thetaController.setTolerance(0.1); //less than 6 degrees
-        driveController.setTolerance(0.2);
+        targetPoseSupplier = pose;
+        
+        thetaController.setTolerance(0.04); //less than 3 degrees
+        driveController.setTolerance(0.03, 0.05);
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
@@ -83,12 +67,7 @@ public class ReefAlign extends Command {
 
     @Override
     public void initialize() {
-        if(Constants.alliance == Alliance.Blue)
-                this.targetReefSide = ReefSidePositions.values()[(int) (pole.get().ordinal() / 2)];
-        else 
-                this.targetReefSide = ReefSidePositions.values()[6 + (int)((pole.get().ordinal() - 12) / 2)];
-
-        targetPose = targetReefSide.getPose();
+        targetPose = targetPoseSupplier.get();
 
         Pose2d currentPose = s_Swerve.getPose();
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
@@ -107,10 +86,10 @@ public class ReefAlign extends Command {
 
         thetaController.reset(s_Swerve.getHeading(),
                 robotState.getLatestFilteredVelocity().getOmega());
-        
-
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
+
+        // Vision.getInstance().useFrontCameras();
     }
 
     @Override
@@ -156,15 +135,20 @@ public class ReefAlign extends Command {
                 .getTranslation();
                 s_Swerve.applyFieldSpeeds(new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity));
 
+        // other actions
+        // if(!elevatorGoalPos.isInfinite() && driveErrorAbs < elevatorDistanceThreshold && !s_EndEffector.getBeamResult()) {
+        //         System.out.println(elevatorGoalPos);
+        //         new SetElevator(elevatorGoalPos).schedule();
+        //         elevatorGoalPos = Double.POSITIVE_INFINITY;
+        // }
+
         //prints
-        // System.out.println("Theta error: " + thetaErrorAbs);()
-        // System.out.println("theta error: " + thetaController.getPositionError() + (Math.abs(thetaController.getPositionError()) < 0.1));
+        // System.out.println("Theta error: " + thetaErrorAbs);
+        // System.out.println("drive error: " + driveErrorAbs);
         // System.out.println("Position Drivetrain error: " + driveController.getPositionError());
         // System.out.println("Drivetrain error: " + driveController.getPositionError());
         // System.out.println("Position Theta error: " + thetaController.getPositionError());
         // System.out.println("Drive velocity: " + driveVelocityScalar);
-
-        
     }
 
     @Override
@@ -174,6 +158,6 @@ public class ReefAlign extends Command {
 
     @Override
     public boolean isFinished() {
-        return targetPose.equals(null) || Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance();
+        return targetPose.equals(null) || (Math.abs(driveErrorAbs) < driveController.getPositionTolerance() && Math.abs(thetaErrorAbs) < thetaController.getPositionTolerance());
     }
 }

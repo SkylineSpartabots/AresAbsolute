@@ -1,4 +1,4 @@
-package frc.robot.Subsystems.Vision;
+package frc.robot.RobotState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -11,7 +11,6 @@ import frc.lib.VisionOutput;
 import frc.robot.Constants;
 import static frc.robot.Constants.LimelightConstants.*;
 
-import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
