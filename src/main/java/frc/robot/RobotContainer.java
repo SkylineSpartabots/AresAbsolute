@@ -264,7 +264,7 @@ public class RobotContainer {
     operator.start().whileTrue(new ZeroElevator());
     // operator.back().onTrue(new ZeroSlapdown());
     // operator.y().onTrue(CommandFactory.ScoringPath( drivetrain.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver));
-
+    operator.x().onTrue(new InstantCommand(()->robotstate.toggleSource()));
     // operator.back().onTrue(new InstantCommand(() -> Vision.getInstance().useFrontCameras()));
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));

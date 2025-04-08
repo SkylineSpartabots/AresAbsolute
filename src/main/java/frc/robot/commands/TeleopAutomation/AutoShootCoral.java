@@ -2,8 +2,10 @@ package frc.robot.commands.TeleopAutomation;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotState.RobotState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
+import frc.robot.commands.CommandFactory;
 
 public class AutoShootCoral extends Command {
     private EndEffector s_EndEffector;
@@ -21,7 +23,8 @@ public class AutoShootCoral extends Command {
     }
 
     public void end() {
-        s_EndEffector.setAlgaeSpeed(0);
+        s_EndEffector.setOuttakeSpeed(0);
+        CommandFactory.IntakePath(() -> RobotState.getInstance().getSourceValue()).schedule();
     }
 
     public boolean isFinished() {

@@ -43,6 +43,7 @@ import frc.robot.commands.TeleopAutomation.DriveToPose;
 import frc.robot.commands.TeleopAutomation.DriveToPoseChill;
 import frc.robot.commands.TeleopAutomation.TeleopPathing;
 import frc.robot.commands.TeleopAutomation.AlgaeAlign;
+import frc.robot.commands.TeleopAutomation.AutoCoralIntake;
 import frc.robot.commands.TeleopAutomation.AutoShootCoral;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
 import frc.robot.commands.TeleopAutomation.ReefAlign;
@@ -158,10 +159,20 @@ public class CommandFactory {
         );
     }    
 
+    public static Command TeleopAutoCoralIntake(){
+        return new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                Commands.waitSeconds(0.7),
+                new AutoCoralIntake()
+            ),
+            new SetElevator(()->ElevatorState.SOURCE)
+        );
+    }
+
     public static Command FullCoralIntake(){
         return new ParallelCommandGroup(
             new SequentialCommandGroup(
-                Commands.waitSeconds(1), 
+                Commands.waitSeconds(0.7), 
                 new SmartCoralIntake()
             ),
             new SetElevator(()->ElevatorState.SOURCE)
@@ -230,6 +241,7 @@ public class CommandFactory {
     
     public static Command ScoringPath(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         Supplier<String> path = dt.loadTraj(level, pole);
+        
         return new SequentialCommandGroup(
             // new DriveToPoseChill(path, true),
             new ParallelCommandGroup(
@@ -241,12 +253,22 @@ public class CommandFactory {
                 )
             ),
             new AutoShootCoral()
-            // TODO: ETHAN ADD THE PATH BACK TO SOURCE HERE!!
+            // TODO: ETHAN ADD THE PATH BACK TO SOURCE HERE!! done :)
         ).raceWith(new AdaptableCommand(controller, pole, level));
     }
 
-    // TODO: path to source command here
 
+    // TODO: path to source command here
+    public static Command IntakePath(Supplier<Boolean> source){
+        Supplier<String> path = dt.sourceTraj(source);
+        return new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                Commands.waitSeconds(0.25),
+                TeleopAutoCoralIntake()
+            ),
+            new TeleopPathing(path.get())
+        );
+    }
 
     // other stuff idk
 

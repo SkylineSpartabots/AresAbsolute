@@ -295,9 +295,33 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY()));
     }
 
+    public Supplier<String> sourceTraj(Supplier<Boolean> source){
+        int k = 0;
+        double smallestDistance = Double.POSITIVE_INFINITY;
+        ReefPoleScoringPoses currPole = null;
+        String path = "";
+        if(Constants.alliance == Alliance.Red){
+            k += 12;
+        }
+        for (int i = k; i < (k + 12); i++) {
+            if(getPose().getTranslation().getDistance(ReefPoleScoringPoses.values()[i].getPose().getTranslation()) < smallestDistance){
+                smallestDistance = getPose().getTranslation().getDistance(ReefPoleScoringPoses.values()[i].getPose().getTranslation());
+                currPole = ReefPoleScoringPoses.values()[i];
+            }
+        }
+
+        path += currPole.getName();
+
+        path += source.get() == false ? "S1" : "S2";
+
+        String intermediary = path;
+
+        return () -> intermediary;
+    }
+
     public Supplier<String> loadTraj(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole){
         boolean bottomSource;
-        String path;
+        String path = "";
         ReefPoleScoringPoses poleTarget;
         Trajectory traj;
         if(Constants.alliance == Alliance.Blue){
@@ -308,96 +332,101 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             bottomSource = getPose().getY() > 4 ? true : false;
         }
 
-        if(bottomSource == false){
-            switch (poleTarget) {
-                case POLE_12L:
-                    path = "S1R1";
-                    break;
-                case POLE_11K:
-                    path = "S1R2";
-                    break;
-                case POLE_10J:
-                    path = "S1R3";
-                    break;
-                case POLE_9I:
-                    path = "S1R4";
-                    break;
-                case POLE_8H:
-                    path = "S1R5";
-                    break;
-                case POLE_7G:
-                    path = "S1R6";
-                    break;
-                case POLE_6F:
-                    path = "S1R7";
-                    break;
-                case POLE_5E:
-                    path = "S1R8";
-                    break;
-                case POLE_4D:
-                    path = "S1R9";
-                    break;
-                case POLE_3C:
-                    path = "S1R10";
-                    break;
-                case POLE_2B:
-                    path = "S1R11";
-                    break;
-                case POLE_1A:
-                    path = "S1R12";
-                    break;
+        path += bottomSource == false ? "S1" : "S2";
+
+        path += poleTarget.getName();
+
+        // if(bottomSource == false){
+        //     switch (poleTarget) {
+        //         case POLE_12L:
+        //             path = "S1R1";
+        //             break;
+        //         case POLE_11K:
+        //             path = "S1R2";
+        //             break;
+        //         case POLE_10J:
+        //             path = "S1R3";
+        //             break;
+        //         case POLE_9I:
+        //             path = "S1R4";
+        //             break;
+        //         case POLE_8H:
+        //             path = "S1R5";
+        //             break;
+        //         case POLE_7G:
+        //             path = "S1R6";
+        //             break;
+        //         case POLE_6F:
+        //             path = "S1R7";
+        //             break;
+        //         case POLE_5E:
+        //             path = "S1R8";
+        //             break;
+        //         case POLE_4D:
+        //             path = "S1R9";
+        //             break;
+        //         case POLE_3C:
+        //             path = "S1R10";
+        //             break;
+        //         case POLE_2B:
+        //             path = "S1R11";
+        //             break;
+        //         case POLE_1A:
+        //             path = "S1R12";
+        //             break;
             
-                default:
-                    path = "S1R12";
-                    break;
-            }
-        } else {
-            switch (poleTarget) {
-                case POLE_12L:
-                    path = "S2R1";
-                    break;
-                case POLE_11K:
-                    path = "S2R2";
-                    break;
-                case POLE_10J:
-                    path = "S2R3";
-                    break;
-                case POLE_9I:
-                    path = "S2R4";
-                    break;
-                case POLE_8H:
-                    path = "S2R5";
-                    break;
-                case POLE_7G:
-                    path = "S2R6";
-                    break;
-                case POLE_6F:
-                    path = "S2R7";
-                    break;
-                case POLE_5E:
-                    path = "S2R8";
-                    break;
-                case POLE_4D:
-                    path = "S2R9";
-                    break;
-                case POLE_3C:
-                    path = "S2R10";
-                    break;
-                case POLE_2B:
-                    path = "S2R11";
-                    break;
-                case POLE_1A:
-                    path = "S2R12";
-                    break;
+        //         default:
+        //             path = "S1R12";
+        //             break;
+        //     }
+        // } else {
+        //     switch (poleTarget) {
+        //         case POLE_12L:
+        //             path = "S2R1";
+        //             break;
+        //         case POLE_11K:
+        //             path = "S2R2";
+        //             break;
+        //         case POLE_10J:
+        //             path = "S2R3";
+        //             break;
+        //         case POLE_9I:
+        //             path = "S2R4";
+        //             break;
+        //         case POLE_8H:
+        //             path = "S2R5";
+        //             break;
+        //         case POLE_7G:
+        //             path = "S2R6";
+        //             break;
+        //         case POLE_6F:
+        //             path = "S2R7";
+        //             break;
+        //         case POLE_5E:
+        //             path = "S2R8";
+        //             break;
+        //         case POLE_4D:
+        //             path = "S2R9";
+        //             break;
+        //         case POLE_3C:
+        //             path = "S2R10";
+        //             break;
+        //         case POLE_2B:
+        //             path = "S2R11";
+        //             break;
+        //         case POLE_1A:
+        //             path = "S2R12";
+        //             break;
             
-                default:
-                    path = "S1R12";
-                    break;
-            }
-        }
+        //         default:
+        //             path = "S1R12";
+        //             break;
+        //     }
+        // }
         // traj = Choreo.loadTrajectory(path).get();
         // Optional<Pose2d> initialPose = traj.getInitialPose(Constants.alliance == Alliance.Red);
-        return () -> path;
+        String intermediary = path;
+        return () -> intermediary;
     }
 
     public void applyFieldSpeeds(ChassisSpeeds speeds) {

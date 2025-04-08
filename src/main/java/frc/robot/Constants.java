@@ -436,41 +436,46 @@ public final class Constants {
             public enum ReefPoleScoringPoses {
                 //Now 4.2545 cm offset (to the right)
                 //quarter inch to the right poses
-                POLE_1A(new Pose2d(3.2808, 4.2257, Rotation2d.fromRadians(0.0))), //
-                POLE_2B(new Pose2d(3.2808, 3.89584, Rotation2d.fromRadians(0.0))), //
-                POLE_3C(new Pose2d(3.69869, 3.05849, Rotation2d.fromRadians(1.0472))), //
-                POLE_4D(new Pose2d(3.98269, 2.89349, Rotation2d.fromRadians(1.0472))), //
-                POLE_5E(new Pose2d(4.92909, 2.86057, Rotation2d.fromRadians(2.0944))), //
-                POLE_6F(new Pose2d(5.21309, 3.02457, Rotation2d.fromRadians(2.0944))), //
-                POLE_7G(new Pose2d(5.7232, 3.82435, Rotation2d.fromRadians(3.14159))), //
-                POLE_8H(new Pose2d(5.7232, 4.15335, Rotation2d.fromRadians(3.14159))), //
-                POLE_9I(new Pose2d(5.29194, 4.9965, Rotation2d.fromRadians(-2.0944))), //
-                POLE_10J(new Pose2d(4.96994, 5.182, Rotation2d.fromRadians(-2.0944))), //
-                POLE_11K(new Pose2d(4.03964, 5.19128, Rotation2d.fromRadians(-1.0472))), //
-                POLE_12L(new Pose2d(3.75364, 5.02628, Rotation2d.fromRadians(-1.0472))), //
+                POLE_1A(new Pose2d(3.2808, 4.2257, Rotation2d.fromRadians(0.0)), "R12"), //
+                POLE_2B(new Pose2d(3.2808, 3.89584, Rotation2d.fromRadians(0.0)), "R11"), //
+                POLE_3C(new Pose2d(3.69869, 3.05849, Rotation2d.fromRadians(1.0472)), "R10"), //
+                POLE_4D(new Pose2d(3.98269, 2.89349, Rotation2d.fromRadians(1.0472)), "R9"), //
+                POLE_5E(new Pose2d(4.92909, 2.86057, Rotation2d.fromRadians(2.0944)), "R8"), //
+                POLE_6F(new Pose2d(5.21309, 3.02457, Rotation2d.fromRadians(2.0944)), "R7"), //
+                POLE_7G(new Pose2d(5.7232, 3.82435, Rotation2d.fromRadians(3.14159)), "R6"), //
+                POLE_8H(new Pose2d(5.7232, 4.15335, Rotation2d.fromRadians(3.14159)), "R5"), //
+                POLE_9I(new Pose2d(5.29194, 4.9965, Rotation2d.fromRadians(-2.0944)), "R4"), //
+                POLE_10J(new Pose2d(4.96994, 5.182, Rotation2d.fromRadians(-2.0944)), "R3"), //
+                POLE_11K(new Pose2d(4.03964, 5.19128, Rotation2d.fromRadians(-1.0472)), "R2"), //
+                POLE_12L(new Pose2d(3.75364, 5.02628, Rotation2d.fromRadians(-1.0472)), "R1"), //
 
                 // red
-                POLE_A(new Pose2d(14.2932, 3.82435, Rotation2d.fromRadians(3.14159))), //
-                POLE_B(new Pose2d(14.2932, 4.15335, Rotation2d.fromRadians(3.14159))), //
-                POLE_C(new Pose2d(13.86194, 4.9965, Rotation2d.fromRadians(-2.0944))), //
-                POLE_D(new Pose2d(13.53994, 5.182, Rotation2d.fromRadians(-2.0944))), //
-                POLE_E(new Pose2d(12.60964, 5.19128, Rotation2d.fromRadians(-1.0472))), //
-                POLE_F(new Pose2d(12.32364, 5.02628, Rotation2d.fromRadians(-1.0472))), //
-                POLE_G(new Pose2d(11.8508, 4.2257, Rotation2d.fromRadians(0.0))), //
-                POLE_H(new Pose2d(11.8508, 3.89584, Rotation2d.fromRadians(0.0))), //
-                POLE_I(new Pose2d(12.26869, 3.05849, Rotation2d.fromRadians(1.0472))), //
-                POLE_J(new Pose2d(12.55269, 2.89349, Rotation2d.fromRadians(1.0472))), //
-                POLE_K(new Pose2d(13.49909, 2.86057, Rotation2d.fromRadians(2.0944))), //
-                POLE_L(new Pose2d(13.78309, 3.02457, Rotation2d.fromRadians(2.0944))); //
+                POLE_A(new Pose2d(14.2932, 3.82435, Rotation2d.fromRadians(3.14159)), "R12"), //
+                POLE_B(new Pose2d(14.2932, 4.15335, Rotation2d.fromRadians(3.14159)), "R11"), //
+                POLE_C(new Pose2d(13.86194, 4.9965, Rotation2d.fromRadians(-2.0944)), "R10"), //
+                POLE_D(new Pose2d(13.53994, 5.182, Rotation2d.fromRadians(-2.0944)), "R9"), //
+                POLE_E(new Pose2d(12.60964, 5.19128, Rotation2d.fromRadians(-1.0472)), "R8"), //
+                POLE_F(new Pose2d(12.32364, 5.02628, Rotation2d.fromRadians(-1.0472)), "R7"), //
+                POLE_G(new Pose2d(11.8508, 4.2257, Rotation2d.fromRadians(0.0)), "R6"), //
+                POLE_H(new Pose2d(11.8508, 3.89584, Rotation2d.fromRadians(0.0)), "R5"), //
+                POLE_I(new Pose2d(12.26869, 3.05849, Rotation2d.fromRadians(1.0472)), "R4"), //
+                POLE_J(new Pose2d(12.55269, 2.89349, Rotation2d.fromRadians(1.0472)), "R3"), //
+                POLE_K(new Pose2d(13.49909, 2.86057, Rotation2d.fromRadians(2.0944)), "R2"), //
+                POLE_L(new Pose2d(13.78309, 3.02457, Rotation2d.fromRadians(2.0944)), "R1"); //
                 
                 private final Pose2d waypoints;
-
-                ReefPoleScoringPoses(Pose2d poses) {
+                private final String name;
+                ReefPoleScoringPoses(Pose2d poses, String choreoName) {
                     this.waypoints = poses;
+                    this.name = choreoName;
                 }
 
                 public Pose2d getPose() {
                     return this.waypoints;
+                }
+                
+                public String getName(){
+                    return this.name;
                 }
             }
 

@@ -68,6 +68,7 @@ public class RobotState { //will estimate pose with odometry and correct drift w
     // 0.0, 0.001 );
 
     // private UnscentedKalmanFilter<N2, N2, N2> UKF;
+    private static boolean source = false;
 
     private static final double dt = 0.020;
     private static final int observationSize = 50; //how many poses we keep our tree
@@ -90,6 +91,14 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         drivetrain = CommandSwerveDrivetrain.getInstance();
         pigeon = drivetrain.getPigeon2();  //getting the already constructed pigeon in swerve
         reset(0.02, IPose2d.identity()); //init
+    }
+
+    public boolean getSourceValue(){
+        return source;
+    }
+
+    public void toggleSource(){
+        source = !source;
     }
 
     public void odometryUpdate(SwerveDriveState state, double timestamp) {
