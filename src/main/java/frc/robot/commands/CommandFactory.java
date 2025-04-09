@@ -282,7 +282,7 @@ public class CommandFactory {
     public static Command AutoAlgaeAlign(Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller){
         return new SequentialCommandGroup(
             new ReefAlign(pole),
-            new AlgaeAlign(pole)
+            new AlgaeAlign()
             ).raceWith(new CancelableCommand(controller));
     }
 
@@ -306,7 +306,7 @@ public class CommandFactory {
                 CommandFactory.SmartCoralIntake()
             ), //source and intake
 
-            new AlgaeAlign(() -> pole2),
+            // new AlgaeAlign(() -> pole2),
             new ParallelCommandGroup(
                 new PoleAlign(() -> pole2),
                 new SetElevator(() -> ElevatorState.L4)
