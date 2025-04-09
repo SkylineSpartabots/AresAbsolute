@@ -30,6 +30,7 @@ import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.commands.CommandFactory;
 import frc.robot.commands.Elevator.SetElevator;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Drives to a specified pose.
@@ -55,12 +56,12 @@ public class AlgaeAlign extends Command {
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1, dealgeaDistanceThreshold = 0.75;
 
-    public AlgaeAlign(Supplier<ReefPoleScoringPoses> pole) {
+    public AlgaeAlign() {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
         this.s_EndEffector = EndEffector.getInstance();
         
-        this.targetReefPole = pole;
+        // this.targetReefPole = pole;
 
         thetaController.setTolerance(0.04); //less than 3 degrees
         driveController.setTolerance(0.03, 0.05);
@@ -71,16 +72,28 @@ public class AlgaeAlign extends Command {
 
     @Override
     public void initialize() {
-
-        targetPose = ReefAlgaeRemovalPoses.values()[(int) (targetReefPole.get().ordinal() / 2)].getPose();
-
+        int k = 0;
+        double lowestDistance = Double.POSITIVE_INFINITY;
+        Pose2d currentPose = s_Swerve.getPose();
+        ReefAlgaeRemovalPoses targetSide = ReefAlgaeRemovalPoses.ALG_AB;
+        // targetPose = ReefAlgaeRemovalPoses.values()[(int) (targetReefPole.get().ordinal() / 2)].getPose();
+        if(Constants.alliance == Alliance.Red){
+                k += 6;
+        }
+        for(int i = k; i < k + 6; i++){
+                if(currentPose.getTranslation().getDistance(ReefAlgaeRemovalPoses.values()[i].getPose().getTranslation()) < lowestDistance){
+                        lowestDistance = currentPose.getTranslation().getDistance(ReefAlgaeRemovalPoses.values()[i].getPose().getTranslation());
+                        targetSide = ReefAlgaeRemovalPoses.values()[i];
+                }
+        }
+        targetPose = targetSide.getPose();
         if((int) (targetReefPole.get().ordinal() / 2) % 2 == 0) 
                 elevatorGoalPos = ElevatorState.A1.getEncoderPosition();
         else 
                 elevatorGoalPos = ElevatorState.A2.getEncoderPosition();
         
 
-        Pose2d currentPose = s_Swerve.getPose();
+        
         IChassisSpeeds speeds = robotState.getLatestFilteredVelocity();
         driveController.reset(
                 currentPose.getTranslation().getDistance(targetPose.getTranslation()),

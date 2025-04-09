@@ -223,7 +223,14 @@ public class CommandFactory {
     // }
 
     // -----===== Teleop Automation Routine =====-----
-
+    public static Command AutoDealgae(CommandXboxController controller){
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                new SetAlgae(0.5),
+                new AlgaeAlign()
+            )
+        ).raceWith(new CancelableCommand(controller));
+    }
 
 
     public static Command AutoPoleAlign(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole, CommandXboxController controller) {
