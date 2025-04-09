@@ -1,8 +1,13 @@
 package frc.robot.commands.TeleopAutomation;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
 import frc.robot.RobotState.RobotState;
+import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.EndEffector.OuttakeState;
 import frc.robot.commands.CommandFactory;
@@ -10,9 +15,15 @@ import frc.robot.commands.CommandFactory;
 public class AutoShootCoral extends Command {
     private EndEffector s_EndEffector;
     Timer timer = new Timer();
+    private CommandXboxController controller;
+    private Supplier<ReefPoleScoringPoses> pole;
+    private Supplier<ElevatorState> level;
 
     public AutoShootCoral() {
         s_EndEffector = EndEffector.getInstance();
+        this.controller = controller;
+        this.pole = pole;
+        this.level = level;
 
         addRequirements(s_EndEffector);
     }
@@ -24,7 +35,7 @@ public class AutoShootCoral extends Command {
 
     public void end() {
         s_EndEffector.setOuttakeSpeed(0);
-        CommandFactory.IntakePath(() -> RobotState.getInstance().getSourceValue()).schedule();
+        CommandFactory.IntakePath(RobotState.getInstance().getSourceValue()).schedule();
     }
 
     public boolean isFinished() {

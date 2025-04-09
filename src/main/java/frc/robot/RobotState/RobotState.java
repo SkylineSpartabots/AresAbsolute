@@ -1,6 +1,7 @@
 package frc.robot.RobotState;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -93,8 +94,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         reset(0.02, IPose2d.identity()); //init
     }
 
-    public boolean getSourceValue(){
-        return source;
+    public Supplier<Boolean> getSourceValue(){
+        return () -> source;
     }
 
     public void toggleSource(){

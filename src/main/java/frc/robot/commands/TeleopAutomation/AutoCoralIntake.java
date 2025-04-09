@@ -4,6 +4,8 @@
 
 package frc.robot.commands.TeleopAutomation;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +26,7 @@ public class AutoCoralIntake extends Command {
   Timer timer;
   private CommandSwerveDrivetrain dt;
   private RobotState robotState;
+  
   public AutoCoralIntake() {
     ee = EndEffector.getInstance();
     funnel = Funnel.getInstance();

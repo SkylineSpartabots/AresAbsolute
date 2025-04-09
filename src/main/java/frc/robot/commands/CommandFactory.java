@@ -267,7 +267,7 @@ public class CommandFactory {
                 TeleopAutoCoralIntake()
             ),
             new TeleopPathing(path.get())
-        );
+        ).raceWith(new AdaptableCommand(source));
     }
 
     // other stuff idk
