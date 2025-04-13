@@ -31,7 +31,6 @@ public class AutoShootCoral extends Command {
 
     public void end() {
         s_EndEffector.setOuttakeSpeed(0);
-        CommandFactory.IntakePath(RobotState.getInstance().getSourceValue(), controller).schedule();
     }
 
     public boolean isFinished() {

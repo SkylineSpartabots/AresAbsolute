@@ -222,7 +222,7 @@ public class CommandFactory {
     //     ).raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     // }
 
-    // -----===== Teleop Automation Routine =====-----
+    // ----------===== Teleop Automation Routine =====----------
 
     //entry point for teleop automation
     public static Command BeginAutomationRoutine(CommandXboxController controller) {
@@ -285,10 +285,10 @@ public class CommandFactory {
             ),
             new AutoShootCoral(controller), //shoot
             CommandFactory.IntakePath(controller)
-        ).raceWith(new AdaptableCommand(controller, pole, level)).raceWith(new CancelableCommand(controller));
+        ).raceWith(new AdaptableCommand(controller, false)).raceWith(new CancelableCommand(controller));
     }
 
-    public static Command   IntakePath(CommandXboxController controller){
+    public static Command IntakePath(CommandXboxController controller){
         Supplier<String> path = dt.sourceTraj();
         return new SequentialCommandGroup(
                 new ParallelCommandGroup(
@@ -299,7 +299,7 @@ public class CommandFactory {
                 )
             ),
             CommandFactory.ScoringPath(controller)
-        ).raceWith(new AdaptableCommand(controller, source)).raceWith(new CancelableCommand(controller));
+        ).raceWith(new AdaptableCommand(controller, true)).raceWith(new CancelableCommand(controller));
     }
 
 
@@ -318,10 +318,6 @@ public class CommandFactory {
     //     ).raceWith(new AdaptableCommand(controller, source)).raceWith(new CancelableCommand(controller));
     // }
 
-
-
-
-    // other stuff idk
     public static Command AutoAlgaeAlign(CommandXboxController controller){
         return new SequentialCommandGroup(
             new ReefAlign(),
