@@ -32,8 +32,9 @@ public class AdaptableCommand extends Command {
         intaking = false;
     }
 
-    public AdaptableCommand(Supplier<Boolean> intaking){
+    public AdaptableCommand(CommandXboxController controller, Supplier<Boolean> source){
       this.intaking = true;
+      this.controller = controller;
       this.source = source;
 
     }
@@ -50,10 +51,10 @@ public class AdaptableCommand extends Command {
           goalPose.rotateAround(new Translation2d(8.790802, 4.03224), Rotation2d.fromDegrees(180));
         }
 
-        new DriveToPose(() -> goalPose).schedule();
+        new PausableCommand(controller, new DriveToPose(() -> goalPose)).schedule();
 
       } else{
-        CommandFactory.AutoPoleAlign(level, pole, controller).schedule();
+        new PausableCommand(controller, CommandFactory.AutoPoleAlign(level, pole, controller)).schedule();
       }
 
       

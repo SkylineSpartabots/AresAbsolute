@@ -16,14 +16,10 @@ public class AutoShootCoral extends Command {
     private EndEffector s_EndEffector;
     Timer timer = new Timer();
     private CommandXboxController controller;
-    private Supplier<ReefPoleScoringPoses> pole;
-    private Supplier<ElevatorState> level;
 
-    public AutoShootCoral() {
+    public AutoShootCoral(CommandXboxController controller) {
         s_EndEffector = EndEffector.getInstance();
         this.controller = controller;
-        this.pole = pole;
-        this.level = level;
 
         addRequirements(s_EndEffector);
     }
@@ -35,7 +31,7 @@ public class AutoShootCoral extends Command {
 
     public void end() {
         s_EndEffector.setOuttakeSpeed(0);
-        CommandFactory.IntakePath(RobotState.getInstance().getSourceValue()).schedule();
+        CommandFactory.IntakePath(RobotState.getInstance().getSourceValue(), controller).schedule();
     }
 
     public boolean isFinished() {

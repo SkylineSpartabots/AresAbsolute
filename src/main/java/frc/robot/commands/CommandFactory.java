@@ -240,7 +240,7 @@ public class CommandFactory {
                 new PoleAlign(level, pole),
                 new SetElevator(level)
             ),
-            new AutoShootCoral()
+            new AutoShootCoral(controller)
             // TODO: ETHAN ADD THE PATH BACK TO SOURCE HERE!!
         ).raceWith(new PausableCommand(controller, AutoPoleAlign(level, pole, controller)))
         .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
@@ -259,14 +259,14 @@ public class CommandFactory {
                     new SetElevator(level)
                 )
             ),
-            new AutoShootCoral()
+            new AutoShootCoral(controller)
             // TODO: ETHAN ADD THE PATH BACK TO SOURCE HERE!! done :)
-        ).raceWith(new AdaptableCommand(controller, pole, level));
+        ).raceWith(new AdaptableCommand(controller, pole, level)).raceWith(new CancelableCommand(controller));
     }
 
 
     // TODO: path to source command here
-    public static Command IntakePath(Supplier<Boolean> source){
+    public static Command IntakePath(Supplier<Boolean> source, CommandXboxController controller){
         Supplier<String> path = dt.sourceTraj(source);
         return new ParallelCommandGroup(
             new SequentialCommandGroup(
@@ -274,7 +274,7 @@ public class CommandFactory {
                 TeleopAutoCoralIntake()
             ),
             new TeleopPathing(path.get())
-        ).raceWith(new AdaptableCommand(source));
+        ).raceWith(new AdaptableCommand(controller, source)).raceWith(new CancelableCommand(controller));
     }
 
     // other stuff idk
