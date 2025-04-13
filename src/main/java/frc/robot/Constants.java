@@ -33,6 +33,12 @@ public final class Constants {
     public static double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
     public static double MaxAngularVelocity = 2 * Math.PI;
 
+    public static Pose2d blueSource1 = new Pose2d(1.191, 7.0298, Rotation2d.fromRadians(-0.939839628289));
+    public static Pose2d blueSource2 = new Pose2d(1.1702, 0.9921, Rotation2d.fromRadians(0.9404398081));
+    public static Pose2d redSource1 = blueSource1.rotateAround(new Translation2d(8.790802, 4.03224), Rotation2d.fromDegrees(180));
+    public static Pose2d redSource2 = blueSource2.rotateAround(new Translation2d(8.790802, 4.03224), Rotation2d.fromDegrees(180));
+
+
     //all these are outdated but we are not using them anymore so its fine tbh
     public static double robotMass = 25; //kg
     public static double MOI = 2; //sum of kg * m^2 to center of rotation

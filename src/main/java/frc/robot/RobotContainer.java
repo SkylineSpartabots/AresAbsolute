@@ -118,7 +118,7 @@ public class RobotContainer {
 
 
     drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY(), -driver.getLeftX(), -driver.getRightX()) // Drive counterclockwise with negative X (left)
+        drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY() + operator.getLeftX(), -driver.getLeftX() + operator.getLeftY(), -driver.getRightX() + operator.getRightX()) // Drive counterclockwise with negative X (left)
     ));
 
     //SysID

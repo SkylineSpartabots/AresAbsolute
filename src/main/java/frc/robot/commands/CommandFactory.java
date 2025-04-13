@@ -241,6 +241,8 @@ public class CommandFactory {
         ).raceWith(new CancelableCommand(controller));
     }
 
+
+
     public static Command AutoPoleAlign(CommandXboxController controller) {
         return new SequentialCommandGroup(
             new ReefAlign(),
@@ -249,20 +251,14 @@ public class CommandFactory {
                 new SetElevator()
             ),
             new AutoShootCoral(controller)
-        ).raceWith(new PausableCommand(controller, AutoPoleAlign(controller)))
+        ).raceWith(new PausablePoleAlignCommand(controller)) //254
         .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
 
     public static Command AutoSourceAlign(CommandXboxController controller) {
         return new SequentialCommandGroup( //dw about this rn
-            // new ReefAlign(),
-            // new ParallelCommandGroup(
-            //     new PoleAlign(),
-            //     new SetElevator()
-            // ),
-            // new AutoShootCoral(controller),
-            // CommandFactory.ScoringPath(controller)
-        ).raceWith(new PausableCommand(controller, AutoPoleAlign(controller)))
+            new DriveToPose(RobotState.getInstance().getSourcePose())
+        ).raceWith(new PausableSourceAlignCommand(controller))
         .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
 
@@ -275,7 +271,7 @@ public class CommandFactory {
             new ParallelCommandGroup(
                 new TeleopPathing(path.get()),
                 new SequentialCommandGroup(
-                    Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 1.1), //TODO whats with the 1.1
+                    Commands.waitSeconds(Choreo.loadTrajectory(path.get()).get().getTotalTime() - 1.1),
                     new SetElevator()
                 )
             ),

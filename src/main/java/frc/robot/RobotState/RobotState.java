@@ -98,6 +98,23 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         return () -> source;
     }
 
+    public Supplier<Pose2d> getSourcePose(){
+        if(Constants.alliance == Alliance.Blue){
+            if(!source){
+                return () -> Constants.blueSource1;
+            } else{
+                return () -> Constants.blueSource2;
+            }
+        } else{
+            if(!source){
+                return ()-> Constants.redSource1;
+            } else{
+                return ()-> Constants.redSource2;
+            }
+        }
+        
+    }
+
     public void toggleSource(){
         source = !source;
     }
