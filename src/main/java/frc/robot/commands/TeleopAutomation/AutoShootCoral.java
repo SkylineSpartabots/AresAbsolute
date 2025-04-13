@@ -17,7 +17,7 @@ public class AutoShootCoral extends Command {
     Timer timer = new Timer();
     private CommandXboxController controller;
 
-    public AutoShootCoral(CommandXboxController controller) {
+    public  AutoShootCoral(CommandXboxController controller) {
         s_EndEffector = EndEffector.getInstance();
         this.controller = controller;
 
@@ -31,6 +31,8 @@ public class AutoShootCoral extends Command {
 
     public void end() {
         s_EndEffector.setOuttakeSpeed(0);
+        CommandFactory.IntakePath(controller).schedule();
+
     }
 
     public boolean isFinished() {

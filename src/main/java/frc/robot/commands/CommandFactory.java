@@ -30,7 +30,6 @@ import frc.robot.Subsystems.Funnel;
 import frc.robot.Subsystems.Funnel.FunnelState;
 import frc.robot.Subsystems.Slapdown.RollerState;
 import frc.robot.commands.Autos.Autos;
-import frc.robot.commands.Autos.AutoCoralIntake;
 import frc.robot.commands.Autos.FollowChoreoTrajectory;
 import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.EndEffector.SetAlgae;
@@ -47,6 +46,7 @@ import frc.robot.commands.TeleopAutomation.AlgaeAlign;
 import frc.robot.commands.TeleopAutomation.AutoShootCoral;
 import frc.robot.commands.TeleopAutomation.PoleAlign;
 import frc.robot.commands.TeleopAutomation.ReefAlign;
+import frc.robot.commands.TeleopAutomation.AutoCoralIntake;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.FieldConstants.ReefConstants.ReefPoleScoringPoses;
@@ -176,9 +176,6 @@ public class CommandFactory {
                 new SmartCoralIntake()
             ),
             new SetElevator(()->ElevatorState.SOURCE)
-            
-            
-            // ScoringPath(dt.loadTraj(()->robotstate.getSelectedElevatorLevel(),()-> robotstate.getSelectedReefPole()), ()->robotstate.getSelectedElevatorLevel(), driver)
         );
     }
 
@@ -251,21 +248,20 @@ public class CommandFactory {
                 new PoleAlign(),
                 new SetElevator()
             ),
-            new AutoShootCoral(controller),
-            CommandFactory.IntakePath(controller)
+            new AutoShootCoral(controller)
         ).raceWith(new PausableCommand(controller, AutoPoleAlign(controller)))
         .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
 
     public static Command AutoSourceAlign(CommandXboxController controller) {
-        return new SequentialCommandGroup(
-            new ReefAlign(),
-            new ParallelCommandGroup(
-                new PoleAlign(),
-                new SetElevator()
-            ),
-            new AutoShootCoral(controller),
-            CommandFactory.ScoringPath(controller)
+        return new SequentialCommandGroup( //dw about this rn
+            // new ReefAlign(),
+            // new ParallelCommandGroup(
+            //     new PoleAlign(),
+            //     new SetElevator()
+            // ),
+            // new AutoShootCoral(controller),
+            // CommandFactory.ScoringPath(controller)
         ).raceWith(new PausableCommand(controller, AutoPoleAlign(controller)))
         .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
@@ -283,22 +279,18 @@ public class CommandFactory {
                     new SetElevator()
                 )
             ),
-            new AutoShootCoral(controller), //shoot
-            CommandFactory.IntakePath(controller)
+            new AutoShootCoral(controller) //shoot
         ).raceWith(new AdaptableCommand(controller, false)).raceWith(new CancelableCommand(controller));
     }
 
     public static Command IntakePath(CommandXboxController controller){
         Supplier<String> path = dt.sourceTraj();
-        return new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                new TeleopPathing(path.get()),
-                new SequentialCommandGroup(
-                    Commands.waitSeconds(0.25),
-                    TeleopAutoCoralIntake()
-                )
-            ),
-            CommandFactory.ScoringPath(controller)
+            return new ParallelCommandGroup(
+            new TeleopPathing(path.get()),
+            new SequentialCommandGroup(
+                Commands.waitSeconds(0.25),
+                TeleopAutoCoralIntake()
+            )
         ).raceWith(new AdaptableCommand(controller, true)).raceWith(new CancelableCommand(controller));
     }
 
