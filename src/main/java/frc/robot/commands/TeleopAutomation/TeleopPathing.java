@@ -34,6 +34,7 @@ public class TeleopPathing extends Command {
   private Timer timer;
   private DriveControlSystems controlSystems;
   private RobotState robotState;
+  
   private PIDController xController = new PIDController(3.6, 0, 0.02);
   private PIDController yController = new PIDController(3.6, 0, 0.02);
   private PIDController thetaController = new PIDController(1.4, 0, 0.02);
@@ -57,8 +58,7 @@ public class TeleopPathing extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timer.reset();
-    timer.start();
+    timer.restart();
     // toggled = false;
     // if (trajectory != null){
     //   startPose = trajectory.getInitialPose(alliance.get() == DriverStation.Alliance.Red);
@@ -74,8 +74,8 @@ public class TeleopPathing extends Command {
   public void execute() {
     if(trajectory != null){
       Optional<SwerveSample> sample = trajectory.sampleAt(timer.get(), alliance.get() == DriverStation.Alliance.Red);
+      
       followAutoTrajectory(sample.get());
-
       // if(!toggled && timer.hasElapsed(trajectory.getTotalTime() - 0.7)){
       //   Vision.getInstance().useFrontCameras();
       //   toggled = true;
@@ -101,7 +101,7 @@ public class TeleopPathing extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return trajectory != null ? timer.hasElapsed(trajectory.getTotalTime()+ 0.2) : true;
+    return trajectory == null || timer.hasElapsed(trajectory.getTotalTime()+ 0.2); //TODO whats with the 0.2
   }
 
   private void followAutoTrajectory(SwerveSample sample){
@@ -109,17 +109,6 @@ public class TeleopPathing extends Command {
 
         System.out.println("forward velocity: " + sample.vx);
         
-
-      // s_Swerve.applyFieldSpeeds((ChassisSpeeds.fromFieldRelativeSpeeds(sample.vx + xController.calculate(currPose.getX(), sample.x), sample.vy + yController.calculate(currPose.getY(), sample.y), sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading),  currPose.getRotation())));
-    
-    // s_Swerve.applyFieldSpeeds(
-    //   new ChassisSpeeds(
-    //     sample.vx + xController.calculate(currPose.getX(), sample.x),
-    //     sample.vy + yController.calculate(currPose.getY(), sample.y),
-    //     sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
-    //   )
-    // );
-
        s_Swerve.setControl(
         controlSystems.autoDrive(
           sample.vx + xController.calculate(currPose.getX(), sample.x),
@@ -130,6 +119,19 @@ public class TeleopPathing extends Command {
        System.out.println("x error: " + (currPose.getX() - sample.x));
        System.out.println("y error: " + (currPose.getY() - sample.y));
        System.out.println("rot error: " + Units.radiansToDegrees((currPose.getRotation().getRadians() - sample.heading)));
+
+
+
+
+             // s_Swerve.applyFieldSpeeds((ChassisSpeeds.fromFieldRelativeSpeeds(sample.vx + xController.calculate(currPose.getX(), sample.x), sample.vy + yController.calculate(currPose.getY(), sample.y), sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading),  currPose.getRotation())));
+    
+    // s_Swerve.applyFieldSpeeds(
+    //   new ChassisSpeeds(
+    //     sample.vx + xController.calculate(currPose.getX(), sample.x),
+    //     sample.vy + yController.calculate(currPose.getY(), sample.y),
+    //     sample.omega + thetaController.calculate(currPose.getRotation().getRadians(), sample.heading)
+    //   )
+    // );
     
         // .withVelocityX(sample.vx + xController.calculate(currPose.getX(), sample.x))
         // .withVelocityY(sample.vy + yController.calculate(currPose.getY(), sample.y))

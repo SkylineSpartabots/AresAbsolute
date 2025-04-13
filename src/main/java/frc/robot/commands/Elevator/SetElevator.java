@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,9 +40,17 @@ public class SetElevator extends Command {
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
   private PIDController controller = new PIDController(1.3, 0.7, 0.06);
 
-  // pls dont add more constructors
+  // pls dont add more constructors (BAD NEWS)
   public SetElevator(Supplier<ElevatorState> state){
     this.state = state;
+
+    ee = EndEffector.getInstance();
+    s_Elevator = Elevator.getInstance();
+    addRequirements(s_Elevator);
+  }
+
+  public SetElevator(){
+    this.state = frc.robot.RobotState.RobotState.getInstance()::getSelectedElevatorLevel;
 
     ee = EndEffector.getInstance();
     s_Elevator = Elevator.getInstance();

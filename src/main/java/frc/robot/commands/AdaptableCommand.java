@@ -25,19 +25,19 @@ public class AdaptableCommand extends Command {
     private boolean intaking;
 
     
-    public AdaptableCommand(CommandXboxController controller, Supplier<ReefPoleScoringPoses> pole, Supplier<ElevatorState> level) {
+    public AdaptableCommand(CommandXboxController controller, boolean source) {
         this.controller = controller;
         this.pole = pole;
         this.level = level;
         intaking = false;
     }
 
-    public AdaptableCommand(CommandXboxController controller, Supplier<Boolean> source){
-      this.intaking = true;
-      this.controller = controller;
-      this.source = source;
+    // public AdaptableCommand(CommandXboxController controller, Supplier<Boolean> source){
+    //   this.intaking = true;
+    //   this.controller = controller;
+    //   this.source = source;
 
-    }
+    // }
 
     public void end() {
       
@@ -52,7 +52,6 @@ public class AdaptableCommand extends Command {
         }
 
         new PausableCommand(controller, new DriveToPose(() -> goalPose)).schedule();
-
       } else{
         new PausableCommand(controller, CommandFactory.AutoPoleAlign(level, pole, controller)).schedule();
       }

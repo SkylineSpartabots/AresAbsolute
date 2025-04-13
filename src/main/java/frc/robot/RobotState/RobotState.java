@@ -204,8 +204,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
         }
     }
 
-    public ReefPoleScoringPoses getSelectedReefPole() {
-        return reefPole;
+    public Supplier<ReefPoleScoringPoses> getSelectedReefPole() {
+        return () -> reefPole;
     }
 
     public void raisePoleLevel() {

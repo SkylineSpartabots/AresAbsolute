@@ -61,14 +61,14 @@ public class ReefAlign extends Command {
 
     private Alliance alliance;
 
-    public ReefAlign(Supplier<ReefPoleScoringPoses> pole) {
+    public ReefAlign() {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
         this.s_EndEffector = EndEffector.getInstance();
 
         alliance = DriverStation.getAlliance().get();
         
-        this.targetReefPole = pole;
+        this.targetReefPole = robotState.getSelectedReefPole();
 
         thetaController.setTolerance(0.3); //less than 3 degrees
         driveController.setTolerance(0.125, 0.05);

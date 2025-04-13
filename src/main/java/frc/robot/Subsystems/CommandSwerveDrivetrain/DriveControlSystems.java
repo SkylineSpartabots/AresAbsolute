@@ -124,15 +124,10 @@ public class DriveControlSystems {
         return new SwerveRequest.RobotCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(rot);
     }
     public SwerveRequest autoDrive(double xVel, double yVel, double rot){
-        
-
+        return new SwerveRequest.FieldCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(rot);
 
         // SmartDashboard.putNumber("requested velocity x", xVel);
         // SmartDashboard.putNumber("requested velocity y", yVel);
-
-        
-
-        return new SwerveRequest.FieldCentric().withVelocityX(xVel).withVelocityY(yVel).withRotationalRate(rot);
         // return new SwerveRequest.FieldCentricFacingAngle()
         // .withVelocityX(driverLY)
         // .withVelocityY(-driverLX)

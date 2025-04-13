@@ -56,13 +56,12 @@ public class PoleAlign extends Command {
     private double thetaErrorAbs;
     private double ffMinRadius = 0.2, ffMaxRadius = 1.2, elevatorDistanceThreshold = 1;
 
-    public PoleAlign(Supplier<ElevatorState> elevatorLevel, Supplier<ReefPoleScoringPoses> pole) {
+    public PoleAlign() {
         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
         this.robotState = RobotState.getInstance();
         this.s_EndEffector = EndEffector.getInstance();
         
-        this.targetReefPole = pole;
-        // this.elevatorLevel = elevatorLevel;
+        this.targetReefPole = robotState.getSelectedReefPole();
 
         thetaController.setTolerance(0.04); //less than 3 degrees
         driveController.setTolerance(0.03, 0.05);
@@ -71,20 +70,20 @@ public class PoleAlign extends Command {
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
     }
 
-    public PoleAlign(Supplier<ReefPoleScoringPoses> pole) {
-        this.s_Swerve = CommandSwerveDrivetrain.getInstance();
-        this.robotState = RobotState.getInstance();
-        this.s_EndEffector = EndEffector.getInstance();
+//     public PoleAlign(Supplier<ReefPoleScoringPoses> pole) {
+//         this.s_Swerve = CommandSwerveDrivetrain.getInstance();
+//         this.robotState = RobotState.getInstance();
+//         this.s_EndEffector = EndEffector.getInstance();
         
-        this.targetReefPole = pole;
-        // this.elevatorLevel = elevatorLevel;
+//         this.targetReefPole = pole;
+//         // this.elevatorLevel = elevatorLevel;
 
-        thetaController.setTolerance(0.04); //less than 3 degrees
-        driveController.setTolerance(0.03, 0.05);
+//         thetaController.setTolerance(0.04); //less than 3 degrees
+//         driveController.setTolerance(0.03, 0.05);
 
-        addRequirements(s_Swerve);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);       
-    }
+//         addRequirements(s_Swerve);
+//         thetaController.enableContinuousInput(-Math.PI, Math.PI);       
+//     }
 
     @Override
     public void initialize() {

@@ -295,7 +295,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesY()));
     }
 
-    public Supplier<String> sourceTraj(Supplier<Boolean> source){
+    public Supplier<String> sourceTrajFromPole(Supplier<Boolean> source){
         int k = 0;
         double smallestDistance = Double.POSITIVE_INFINITY;
         ReefPoleScoringPoses currPole = null;
@@ -319,16 +319,51 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return () -> intermediary;
     }
 
-    public Supplier<String> loadTraj(Supplier<ElevatorState> level, Supplier<ReefPoleScoringPoses> pole){
+    public Supplier<String> sourceTraj(){
+        int k = 0;
+        double smallestDistance = Double.POSITIVE_INFINITY;
+        ReefPoleScoringPoses currPole = null;
+        String path = "";
+        if(Constants.alliance == Alliance.Red){
+            k += 12;
+        }
+        for (int i = k; i < (k + 12); i++) {
+            if(getPose().getTranslation().getDistance(ReefPoleScoringPoses.values()[i].getPose().getTranslation()) < smallestDistance){
+                smallestDistance = getPose().getTranslation().getDistance(ReefPoleScoringPoses.values()[i].getPose().getTranslation());
+                currPole = ReefPoleScoringPoses.values()[i];
+            }
+        }
+
+        path += currPole.getName();
+
+        path += robotState.getSourceValue().get() == false ? "S1" : "S2";
+
+        String intermediary = path; //TODO who is intermediary bruh
+
+        return () -> intermediary;
+    }
+
+    public Supplier<String> sourceTraj(Supplier<Boolean> source, ReefPoleScoringPoses pole){
+        String path = pole.getName();
+
+        path += source.get() == false ? "S1" : "S2";
+
+        String intermediary = path;
+
+        return () -> intermediary;
+    }
+
+    public Supplier<String> loadTraj(){
+        ReefPoleScoringPoses pole = RobotState.getInstance().getSelectedReefPole().get();
         boolean bottomSource;
         String path = "";
         ReefPoleScoringPoses poleTarget;
         Trajectory traj;
         if(Constants.alliance == Alliance.Blue){
-            poleTarget = pole.get();
+            poleTarget = pole;
             bottomSource = getPose().getY() > 4 ? false : true;
         } else{
-            poleTarget = ReefPoleScoringPoses.values()[pole.get().ordinal()-12];
+            poleTarget = ReefPoleScoringPoses.values()[pole.ordinal()-12];
             bottomSource = getPose().getY() > 4 ? true : false;
         }
 
