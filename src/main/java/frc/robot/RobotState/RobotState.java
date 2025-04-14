@@ -71,6 +71,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
     // private UnscentedKalmanFilter<N2, N2, N2> UKF;
     private static boolean source = false;
 
+    private static boolean autoOnIntake = false;
+
     private static final double dt = 0.020;
     private static final int observationSize = 50; //how many poses we keep our tree
 
@@ -117,6 +119,22 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
     public void toggleSource(){
         source = !source;
+    }
+
+    public void setSourceValue(boolean reqValue){
+        source = reqValue;
+    }
+
+    public boolean autoOnIntake(){
+        return autoOnIntake;
+    }
+
+    public void toggleAutoOnIntake(){
+        autoOnIntake = !autoOnIntake;
+    }
+
+    public void setAutoOnIntake(boolean value){
+        autoOnIntake = value;
     }
 
     public void odometryUpdate(SwerveDriveState state, double timestamp) {

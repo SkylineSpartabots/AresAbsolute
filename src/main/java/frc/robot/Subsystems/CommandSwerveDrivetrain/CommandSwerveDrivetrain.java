@@ -336,7 +336,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         path += currPole.getName();
 
-        path += robotState.getSourceValue().get() == false ? "S1" : "S2";
+        path += RobotState.getInstance().getSourceValue().get() == false ? "S1" : "S2";
 
         String intermediary = path; //TODO who is intermediary bruh
 

@@ -169,6 +169,14 @@ public class CommandFactory {
         );
     }
 
+    public static Command FlexibleIntake(){
+        return Commands.either(
+            TeleopAutoCoralIntake(),
+            FullCoralIntake(),
+            RobotState.getInstance()::autoOnIntake
+        );
+    }
+
     public static Command FullCoralIntake(){
         return new ParallelCommandGroup(
             new SequentialCommandGroup(
