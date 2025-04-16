@@ -59,6 +59,7 @@ public class TeleopPathing extends Command {
   @Override
   public void initialize() {
     timer.restart();
+    robotState.autoAligning = true;
     // toggled = false;
     // if (trajectory != null){
     //   startPose = trajectory.getInitialPose(alliance.get() == DriverStation.Alliance.Red);
@@ -91,6 +92,7 @@ public class TeleopPathing extends Command {
     s_Swerve.setControl(controlSystems.autoDrive(0, 0, 0));
     // if(toggled) Vision.getInstance().useFrontCameras();
     timer.stop();
+    robotState.autoAligning = false;
     // Pose2d pose = s_Swerve.getPose();
     // Optional<Pose2d> goal = trajectory.getFinalPose(alliance.get() == DriverStation.Alliance.Red);
     // System.out.println("x error: " + (pose.getX() - goal.get().getX()));

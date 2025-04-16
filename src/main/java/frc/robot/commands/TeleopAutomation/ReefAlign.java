@@ -79,6 +79,7 @@ public class ReefAlign extends Command {
     
     @Override
     public void initialize() {
+        RobotState.getInstance().autoAligning = true;
         Pose2d currentPose = s_Swerve.getPose();
 
         if(alliance == Alliance.Blue) {
@@ -204,6 +205,7 @@ public class ReefAlign extends Command {
     @Override
     public void end(boolean interrupted) {
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
+        RobotState.getInstance().autoAligning = false;
     }
 
     @Override

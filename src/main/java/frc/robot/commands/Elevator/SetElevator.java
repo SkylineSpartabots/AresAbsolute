@@ -47,6 +47,7 @@ public class SetElevator extends Command {
     ee = EndEffector.getInstance();
     s_Elevator = Elevator.getInstance();
     addRequirements(s_Elevator);
+
   }
 
   public SetElevator(){
@@ -66,6 +67,7 @@ public class SetElevator extends Command {
 
   @Override
   public void initialize() {
+    s_Elevator.setState(state.get());
     if(state != null)
       this.goalPosition = state.get().getEncoderPosition();
     

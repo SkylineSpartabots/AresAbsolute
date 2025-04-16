@@ -88,7 +88,7 @@ public class DriveToPose extends Command {
                 robotState.getLatestFilteredVelocity().getOmega());
                 
         lastSetpointTranslation = s_Swerve.getPose().getTranslation();
-
+        RobotState.getInstance().autoAligning = true;
         // Vision.getInstance().useFrontCameras();
     }
 
@@ -154,6 +154,7 @@ public class DriveToPose extends Command {
     @Override
     public void end(boolean interrupted) {
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
+        RobotState.getInstance().autoAligning = false;
     }
 
     @Override

@@ -73,6 +73,8 @@ public class RobotState { //will estimate pose with odometry and correct drift w
 
     private static boolean autoOnIntake = false;
 
+    public boolean autoAligning = false;
+
     private static final double dt = 0.020;
     private static final int observationSize = 50; //how many poses we keep our tree
 

@@ -39,6 +39,7 @@ public class EndEffector extends SubsystemBase {
   private TalonFX algae;
   private LaserCan leftLaser;
   private LaserCan rightLaser;
+  public boolean aligned = false;
 
   public static EndEffector getInstance(){
     if(instance == null) instance = new EndEffector();
@@ -168,15 +169,19 @@ public class EndEffector extends SubsystemBase {
       if(getRightLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && getLeftLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
         if(getLeftLaserMeasurement().distance_mm < 300 && getRightLaserMeasurement().distance_mm < 300){
           SmartDashboard.putBoolean("aligned", true);
+          aligned = true;
         } else{
           SmartDashboard.putBoolean("aligned", false);
+          aligned = false;
         }
         
       }else{
         SmartDashboard.putBoolean("aligned", false);
+        aligned = false;
       }
     }else{
       SmartDashboard.putBoolean("aligned", false);
+      aligned = false;
     }
    SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
   }

@@ -40,6 +40,7 @@ import frc.robot.Subsystems.Climb;
 import frc.robot.Subsystems.Elevator;
 import frc.robot.Subsystems.EndEffector;
 import frc.robot.Subsystems.Funnel;
+import frc.robot.Subsystems.LEDs;
 import frc.robot.Subsystems.Elevator.ElevatorState;
 import frc.robot.Subsystems.Slapdown.PivotState;
 import frc.robot.Subsystems.Slapdown;
@@ -55,6 +56,7 @@ import frc.robot.commands.Elevator.SetElevator;
 import frc.robot.commands.Elevator.ZeroElevator;
 import frc.robot.commands.Slapdown.SetPivot;
 import frc.robot.commands.Slapdown.ZeroSlapdown;
+import frc.robot.commands.SwerveCommands.ForwardLog;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -72,6 +74,8 @@ public class Robot extends LoggedRobot {
   private AutoCommand thirdSavedChoice;
   private AutoCommand fourthSavedChoice;
   private AutoCommand fifthSavedChoice;
+
+  private LEDs led;
 
  
     public Robot() { 
@@ -148,7 +152,8 @@ public class Robot extends LoggedRobot {
       RobotContainer.getInstance();
       CANCoders.getInstance();
       Climb.getInstance();
-      
+      // LEDs.getInstance();
+      // led = LEDs.getInstance();
       CanBridge.runTCP();
     }
 
@@ -195,7 +200,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    
+  }
 
   @Override
   public void disabledPeriodic() {
@@ -214,7 +221,7 @@ public class Robot extends LoggedRobot {
     //   // m_autonomousCommand.addCommands(thirdSavedChoice.getCommand());
     // }
     // CANCoders.getInstance().getOffsets();
-
+    // led.updateDisabled();
   }
 
   @Override
@@ -265,10 +272,15 @@ public class Robot extends LoggedRobot {
     }
     new ZeroSlapdown().schedule();
     Constants.alliance = DriverStation.getAlliance().get();
+
+    new ForwardLog().schedule();
+    
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    // led.updateTeleop();
+  }
 
   @Override
   public void teleopExit() {}

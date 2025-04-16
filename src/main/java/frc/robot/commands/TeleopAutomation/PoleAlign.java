@@ -87,6 +87,7 @@ public class PoleAlign extends Command {
 
     @Override
     public void initialize() {
+        RobotState.getInstance().autoAligning = true;
         // elevatorGoalPos = elevatorLevel.get().getEncoderPosition();
         targetPose = targetReefPole.get().getPose();
 
@@ -175,7 +176,7 @@ public class PoleAlign extends Command {
     @Override
     public void end(boolean interrupted) {
         Vision.getInstance().useFrontCameras();
-        
+        RobotState.getInstance().autoAligning = false;
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
     }
 

@@ -72,6 +72,7 @@ public class AlgaeAlign extends Command {
 
     @Override
     public void initialize() {
+        RobotState.getInstance().autoAligning = true;
         int k = 0;
         double lowestDistance = Double.POSITIVE_INFINITY;
         Pose2d currentPose = s_Swerve.getPose();
@@ -178,6 +179,7 @@ public class AlgaeAlign extends Command {
     public void end(boolean interrupted) {
         System.out.println("Algaga align done ngl");
         s_Swerve.applyFieldSpeeds(new ChassisSpeeds());
+        RobotState.getInstance().autoAligning = false;
     }
 
     @Override

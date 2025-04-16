@@ -49,6 +49,7 @@ public class Elevator extends SubsystemBase {
   private TalonFX leader;
   private VoltageOut voltOutput;
   private TorqueCurrentFOC torqueOutput;
+  private ElevatorState state;
 
   private boolean holdPosition = false;
 
@@ -130,6 +131,8 @@ public class Elevator extends SubsystemBase {
     configMotor(leader, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);
     configMotor(follower, InvertedValue.CounterClockwise_Positive, NeutralModeValue.Brake);
 
+
+    state = ElevatorState.GROUND;
     // follower.setControl(new Follower(Constants.HardwarePorts.elevatorLeaderId, false));
 
     voltOutput = new VoltageOut(0).withEnableFOC(true);
@@ -172,6 +175,14 @@ public class Elevator extends SubsystemBase {
 
   public double getPosition(){
     return leader.getPosition().getValueAsDouble();
+  }
+  
+  public void setState(ElevatorState request){
+    state = request;
+  }
+
+  public ElevatorState getState(){
+    return state;
   }
 
   public void setTorqueOutput(double output){
