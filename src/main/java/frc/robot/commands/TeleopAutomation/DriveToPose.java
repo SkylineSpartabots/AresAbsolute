@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class DriveToPose extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            3, 0.45, 0.005, new TrapezoidProfile.Constraints(Constants.MaxSpeed, Constants.MaxAcceleration + 1), 0.02);
+        2.9, 0.3, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 0.5, Constants.MaxAcceleration + 3), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             2.2, 1.2, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
@@ -58,8 +58,8 @@ public class DriveToPose extends Command {
 
         targetPoseSupplier = pose;
         
-        thetaController.setTolerance(0.04); //less than 3 degrees
-        driveController.setTolerance(0.03, 0.05);
+        thetaController.setTolerance(0.065); //less than 3 degrees
+        driveController.setTolerance(0.05, 0.05);
 
         addRequirements(s_Swerve);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);       

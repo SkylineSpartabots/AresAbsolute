@@ -145,7 +145,7 @@ public class RobotContainer {
     driver.leftBumper().onTrue(new InstantCommand(() -> robotstate.lowerPoleLevel()));
     driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
 
-    driverLeftTrigger.whileTrue(new SlowDrive());
+    driverLeftTrigger.whileTrue(new SlowDrive()); // :(
     
     driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2769))); //scoring on L2-L4
     driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
@@ -154,9 +154,9 @@ public class RobotContainer {
 
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
     driver.b().onTrue(CommandFactory.EjectFunnel());
-    // driver.x().onTrue(CommandFactory.FlexibleIntake());
+    driver.x().onTrue(CommandFactory.FlexibleIntake());
 
-    driver.x().onTrue(CommandFactory.FullCoralIntake());
+    // driver.x().onTrue(CommandFactory.FullCoralIntake());
     driver.y().onTrue(CommandFactory.BeginAutomationRoutine(driver));
 
     // ----------====# Operator bindings #====----------
