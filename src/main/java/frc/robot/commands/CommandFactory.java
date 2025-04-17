@@ -266,8 +266,7 @@ public class CommandFactory {
     public static Command AutoSourceAlign(CommandXboxController controller) {
         return new SequentialCommandGroup( //dw about this rn
             new DriveToPose(RobotState.getInstance().getSourcePose())
-        ).raceWith(new PausableSourceAlignCommand(controller))
-        .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
+        ).raceWith(new CancelableCommandJoystick    (controller)); // If cancelable command ends, the whole thing stops
     }
 
     //choreo pathing --------------------------------
@@ -295,7 +294,7 @@ public class CommandFactory {
                 Commands.waitSeconds(0.25),
                 TeleopAutoCoralIntake()
             )
-        ).raceWith(new AdaptableCommand(controller, true)).raceWith(new CancelableCommand(controller));
+        ).raceWith(new CancelableCommandJoystick(controller));
     }
 
 

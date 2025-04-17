@@ -156,7 +156,7 @@ public class RobotContainer {
 
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
     driver.x().onTrue(CommandFactory.FlexibleIntake());
-    driver.y().onTrue(CommandFactory.BeginAutomationRoutine(driver));
+    driver.y().onTrue(CommandFactory.AutoPoleAlign(driver));
 
     // ----------====# Operator bindings #====----------
     operator.start().onTrue(new ZeroElevator());

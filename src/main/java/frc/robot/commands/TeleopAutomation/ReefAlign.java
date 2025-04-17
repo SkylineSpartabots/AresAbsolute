@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class ReefAlign extends Command {
         
     private final ProfiledPIDController driveController = new ProfiledPIDController(
-            2.9, 0.3, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 0.5, Constants.MaxAcceleration + 3.8), 0.02);
+            2.9, 0.3, 0.01, new TrapezoidProfile.Constraints(Constants.MaxSpeed + 1, Constants.MaxAcceleration + 4.254), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(
             2.3, 0.8, 0, new TrapezoidProfile.Constraints(Constants.MaxAngularVelocity, Constants.MaxAngularRate), 0.02);
 
