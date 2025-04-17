@@ -14,6 +14,6 @@ public class CancelableCommand extends Command {
     }
   
     public boolean isFinished() {
-      return controller.start().getAsBoolean();
+      return controller.b().getAsBoolean();
     }
 }

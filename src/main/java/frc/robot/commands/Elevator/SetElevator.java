@@ -38,7 +38,7 @@ public class SetElevator extends Command {
   private Timer timer = new Timer();
 
   private TrapezoidProfile profile = new TrapezoidProfile(constraints);
-  private PIDController controller = new PIDController(1.3, 0.7, 0.06);
+  private PIDController controller = new PIDController(1.3, 0.7, 0.05);
 
   // pls dont add more constructors (BAD NEWS)
   public SetElevator(Supplier<ElevatorState> state){

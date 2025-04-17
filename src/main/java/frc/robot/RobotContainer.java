@@ -137,7 +137,7 @@ public class RobotContainer {
               
     // ----------====# Active binding ====----------
 
-    driverDpadLeft.onTrue(CommandFactory.AutoDealgae(driver));
+    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
     driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
     driverDpadUp.whileTrue(new RunClimb(-0.95));
     driverDpadDown.whileTrue(new RunClimb(0.95));
@@ -146,17 +146,16 @@ public class RobotContainer {
     driver.rightBumper().onTrue(new InstantCommand(() -> robotstate.raisePoleLevel()));
 
     driverLeftTrigger.whileTrue(new SlowDrive()); // :(
-    
+
     driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2769))); //scoring on L2-L4
     driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
     driver.start().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.56))); //theoretical outtake speed for scoring L1
     driver.start().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
-    driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
-    driver.b().onTrue(CommandFactory.EjectFunnel());
-    driver.x().onTrue(CommandFactory.FlexibleIntake());
+    driver.back().onTrue(CommandFactory.EjectFunnel());
 
-    // driver.x().onTrue(CommandFactory.FullCoralIntake());
+    driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
+    driver.x().onTrue(CommandFactory.FlexibleIntake());
     driver.y().onTrue(CommandFactory.BeginAutomationRoutine(driver));
 
     // ----------====# Operator bindings #====----------

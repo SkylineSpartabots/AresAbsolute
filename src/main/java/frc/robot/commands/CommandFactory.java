@@ -232,8 +232,8 @@ public class CommandFactory {
     //entry point for teleop automation
     public static Command BeginAutomationRoutine(CommandXboxController controller) {
         return Commands.either(
+            CommandFactory.AutoSourceAlign(controller),    
             CommandFactory.AutoPoleAlign(controller),
-            CommandFactory.AutoSourceAlign(controller),
             EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
         );
     }

@@ -114,7 +114,7 @@ public class Autos {
           new SetElevator(()->ElevatorState.A1)
         )
       ),
-      Commands.waitSeconds(1.5),
+      Commands.waitSeconds(2),
       new ParallelCommandGroup(
         new FollowChoreoTrajectory("A4A3"),
         new SequentialCommandGroup(
@@ -174,15 +174,18 @@ public class Autos {
 
   public static Command threeCoralLeft(){
     return new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        new FollowChoreoTrajectory("B1R3"),
         new SequentialCommandGroup(
-          Commands.waitSeconds(0.6),
-          new SetElevator(()->ElevatorState.L4),
           Commands.waitSeconds(0.5),
+          new SetElevator(()->ElevatorState.L4),
+          Commands.waitSeconds(5)
+        ).withDeadline(
+          new SequentialCommandGroup(
+          new FollowChoreoTrajectory("B1R3"),
+          Commands.waitSeconds(0.1),
           new SetOuttake(OuttakeState.SCORE)
-        )
-      ),
+          )
+        ),
+      
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -192,13 +195,13 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.15),
-          new SetElevator(()->ElevatorState.L4),
-          Commands.waitSeconds(0.7),
-          new SetOuttake(OuttakeState.SCORE)
+          Commands.waitSeconds(0.8),
+          new SetElevator(()->ElevatorState.L4)
+          
         ),
         new FollowChoreoTrajectory("S1R1")
       ),
+      new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -208,27 +211,44 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.15),
-          new SetElevator(()->ElevatorState.L4),
-          Commands.waitSeconds(0.3),
-          new SetOuttake(OuttakeState.SCORE)
+          Commands.waitSeconds(0.8),
+          new SetElevator(()->ElevatorState.L4)
+          
         ),
         new FollowChoreoTrajectory("S1R2")
-      )
+      ),
+      new SetOuttake(OuttakeState.SCORE),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.1),
+          CommandFactory.FullCoralIntake()
+        ),
+        new FollowChoreoTrajectory("R2S1")
+      ),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(1),
+          new SetElevator(()->ElevatorState.L3)
+        ),
+        new FollowChoreoTrajectory("S1R1")
+      ),
+      new SetOuttake(OuttakeState.SCORE)
     );
   }
 
   public static Command threeCoralRight(){
     return new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        new FollowChoreoTrajectory("B2R8"),
-        new SequentialCommandGroup(
-          Commands.waitSeconds(0.6),
+      new SequentialCommandGroup(
+          Commands.waitSeconds(0.5),
           new SetElevator(()->ElevatorState.L4),
-          Commands.waitSeconds(0.2),
+          Commands.waitSeconds(5)
+        ).withDeadline(
+          new SequentialCommandGroup(
+          new FollowChoreoTrajectory("B1R3"),
+          Commands.waitSeconds(0.1),
           new SetOuttake(OuttakeState.SCORE)
-        )
-      ),
+          )
+        ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -238,13 +258,12 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.15),
-          new SetElevator(()->ElevatorState.L4),
-          Commands.waitSeconds(0.2),
-          new SetOuttake(OuttakeState.SCORE)
+          Commands.waitSeconds(0.9),
+          new SetElevator(()->ElevatorState.L4)
         ),
         new FollowChoreoTrajectory("S2R9")
       ),
+      new SetOuttake(OuttakeState.SCORE),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
           Commands.waitSeconds(0.1),
@@ -254,13 +273,27 @@ public class Autos {
       ),
       new ParallelCommandGroup(
         new SequentialCommandGroup(
-          Commands.waitSeconds(1.15),
-          new SetElevator(()->ElevatorState.L4),
-          Commands.waitSeconds(0.2),
-          new SetOuttake(OuttakeState.SCORE)
+          Commands.waitSeconds(0.9),
+          new SetElevator(()->ElevatorState.L4)
         ),
         new FollowChoreoTrajectory("S2R10")
-      )
+      ),
+      new SetOuttake(OuttakeState.SCORE),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.1),
+          CommandFactory.FullCoralIntake()
+        ),
+        new FollowChoreoTrajectory("R10S2")
+      ),
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          Commands.waitSeconds(0.9),
+          new SetElevator(()->ElevatorState.L3)
+        ),
+        new FollowChoreoTrajectory("S2R10")
+      ),
+      new SetOuttake(OuttakeState.SCORE)
     );
   }
 

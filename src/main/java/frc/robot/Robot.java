@@ -69,6 +69,8 @@ public class Robot extends LoggedRobot {
   SendableChooser<AutoCommand> fourthAuto = new SendableChooser<AutoCommand>();
   SendableChooser<AutoCommand> fifthAuto = new SendableChooser<AutoCommand>();
 
+  SendableChooser<Boolean> sourceSide = new SendableChooser<Boolean>();
+
   private AutoCommand firstSavedChoice;
   private AutoCommand secondSavedChoice;
   private AutoCommand thirdSavedChoice;
@@ -168,6 +170,10 @@ public class Robot extends LoggedRobot {
     firstAuto.addOption(AutoCommand.B1R3().name, AutoCommand.B1R3());
     firstAuto.addOption(AutoCommand.B2R8().name, AutoCommand.B2R8());
 
+    sourceSide.setDefaultOption("left source", false);
+    sourceSide.addOption("right source", true);
+    
+
     chosenAuto.addOption("forward + dealgae back", Autos.forwardDealgaeBack());
     chosenAuto.addOption("forward + dealgae left", Autos.forwardDealgaeLeft());
     chosenAuto.addOption("forward + dealgae right", Autos.forwardDealgaeRight());
@@ -177,6 +183,7 @@ public class Robot extends LoggedRobot {
     chosenAuto.addOption("1 + 2 right", Autos.threeCoralRight());
     // firstAuto.addOption(AutoCommand.halfmeter().name, AutoCommand.halfmeter());
     // AutoCommand.loadAutos(); 
+    SmartDashboard.putData("source side", sourceSide);
     SmartDashboard.putData("first auto", firstAuto);
     SmartDashboard.putData("autochoices", chosenAuto);
 
@@ -238,7 +245,7 @@ public class Robot extends LoggedRobot {
     // ).schedule();
     Constants.alliance = DriverStation.getAlliance().get();
     m_autonomousCommand = chosenAuto.getSelected();
-
+    RobotState.getInstance().setSourceValue(sourceSide.getSelected());
     new SequentialCommandGroup(
       // new ZeroSlapdown(),
       new ZeroElevator(),
