@@ -5,6 +5,7 @@
 package frc.robot.commands.SwerveCommands;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.CommandSwerveDrivetrain.DriveControlSystems;
@@ -26,13 +27,15 @@ public class ForwardLog extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    dt.setControl(controlSystems.autoDrive(1, 0, 0));
+    dt.setControl(controlSystems.autoDrive(0.4, 0, 0));
     timer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    SmartDashboard.putNumber("speed m/s", dt.getAbsoluteWheelVelocity());
+  }
 
   // Called once the command ends or is interrupted.
   @Override

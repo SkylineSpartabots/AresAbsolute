@@ -270,10 +270,10 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    new ZeroSlapdown().schedule();
+    // new ZeroSlapdown().schedule();
     Constants.alliance = DriverStation.getAlliance().get();
 
-    new ForwardLog().schedule();
+    // new ForwardLog().schedule();
     
   }
 

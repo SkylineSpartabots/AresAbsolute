@@ -55,7 +55,7 @@ public class SmartCoralIntake extends Command {
     ee.setOuttakeSpeed(OuttakeState.HOLD);
     timer.stop();
     timer.reset();
-    CommandFactory.ScoringPath(driver).schedule();
+    // CommandFactory.ScoringPath(driver).schedule();
     // if(ee.getBeamResult() == false) CommandFactory.ScoringPath( dt.loadTraj(()->robotState.getSelectedElevatorLevel(),()-> robotState.getSelectedReefPole()), ()->robotState.getSelectedElevatorLevel(), driver).schedule();
   }
 

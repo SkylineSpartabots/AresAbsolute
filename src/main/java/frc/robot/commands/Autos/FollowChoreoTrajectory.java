@@ -32,9 +32,9 @@ public class FollowChoreoTrajectory extends Command {
   private Timer timer;
   private DriveControlSystems controlSystems;
   private RobotState robotState;
-  private PIDController xController = new PIDController(3.6, 0, 0.02);
-  private PIDController yController = new PIDController(3.6, 0, 0.02);
-  private PIDController thetaController = new PIDController(1.4, 0, 0.02);
+  private PIDController xController = new PIDController(0.7, 0, 0);
+  private PIDController yController = new PIDController(0.7, 0, 0);
+  private PIDController thetaController = new PIDController(0.7, 0, 0);
 
   public FollowChoreoTrajectory(String name) {
     if (Choreo.loadTrajectory(name).isPresent()) {

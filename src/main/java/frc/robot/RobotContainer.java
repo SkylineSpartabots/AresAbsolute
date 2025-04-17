@@ -117,9 +117,9 @@ public class RobotContainer {
   private void configureBindings() {
 
 
-    // drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-    //     drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY() + operator.getLeftX(), -driver.getLeftX() + operator.getLeftY(), -driver.getRightX() + operator.getRightX()) // Drive counterclockwise with negative X (left)
-    // ));
+    drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+        drivetrain.applyRequest(() -> controlSystem.drive(-driver.getLeftY(), -driver.getLeftX(), -driver.getRightX()) // Drive counterclockwise with negative X (left)
+    ));
 
     //SysID
         // driver.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
@@ -137,7 +137,7 @@ public class RobotContainer {
               
     // ----------====# Active binding ====----------
 
-    driverDpadLeft.onTrue(CommandFactory.Dealgaeify(ElevatorState.A1));
+    driverDpadLeft.onTrue(CommandFactory.AutoDealgae(driver));
     driverDpadRight.onTrue(CommandFactory.Dealgaeify(ElevatorState.A2));
     driverDpadUp.whileTrue(new RunClimb(-0.95));
     driverDpadDown.whileTrue(new RunClimb(0.95));
@@ -149,12 +149,14 @@ public class RobotContainer {
     
     driverRightTrigger.onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.2769))); //scoring on L2-L4
     driverRightTrigger.onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
-    driver.start().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.35))); //theoretical outtake speed for scoring L1
+    driver.start().onTrue(new InstantCommand(()->endEffector.setOuttakeSpeed(-0.56))); //theoretical outtake speed for scoring L1
     driver.start().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));
 
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
     driver.b().onTrue(CommandFactory.EjectFunnel());
-    driver.x().onTrue(CommandFactory.FlexibleIntake());
+    // driver.x().onTrue(CommandFactory.FlexibleIntake());
+
+    driver.x().onTrue(CommandFactory.FullCoralIntake());
     driver.y().onTrue(CommandFactory.BeginAutomationRoutine(driver));
 
     // ----------====# Operator bindings #====----------

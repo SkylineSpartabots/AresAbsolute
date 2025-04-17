@@ -239,12 +239,12 @@ public final class Constants {
             // We are moving from the camera to the center of the robot using WPI coordinates
             
             public static final Transform3d FLcameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(-10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0))); //so this guy is negative not pos (cause ccw)
+                    new Translation3d(Units.inchesToMeters(-11.323), Units.inchesToMeters(-8.563), Units.inchesToMeters(-7.372)),
+                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-15),Units.degreesToRadians(0))); //so this guy is negative not pos (cause ccw)
 
             public static final Transform3d FRcameraToRobot = new Transform3d(
-                    new Translation3d(Units.inchesToMeters(-11.559), Units.inchesToMeters(10.801), Units.inchesToMeters(-9.841)),
-                    new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(-5),Units.degreesToRadians(0)));
+                    new Translation3d(Units.inchesToMeters(-11.323), Units.inchesToMeters(8.563), Units.inchesToMeters(-7.372)),
+                    new Rotation3d(Units.degreesToRadians(5),Units.degreesToRadians(-15),Units.degreesToRadians(0)));
 
             public static final Transform3d FCcameraToRobot = new Transform3d(
                     new Translation3d(Units.inchesToMeters(-11.882), Units.inchesToMeters(0.500), Units.inchesToMeters(-6.898)), 

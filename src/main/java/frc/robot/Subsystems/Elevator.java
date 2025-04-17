@@ -103,14 +103,14 @@ public class Elevator extends SubsystemBase {
   }
 
   public enum ElevatorState {
-    L1(14), //bad
-    L2(21.7),
-    L3(36.3),
-    L4(61.7),
-    GROUND(0.11), //bad
-    A1(10.5), //bad
-    A2(26), //bad
-    SOURCE(2.35);
+    L1(15), //bad
+    L2(22.7),
+    L3(37.3),
+    L4(62.7),
+    GROUND(0.31), //bad
+    A1(11.5), //bad
+    A2(27), //bad
+    SOURCE(3.35);
     //48.1 should be max
     private double encoderPosition;
 

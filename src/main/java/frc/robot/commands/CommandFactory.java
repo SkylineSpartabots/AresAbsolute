@@ -180,7 +180,7 @@ public class CommandFactory {
     public static Command FullCoralIntake(){
         return new ParallelCommandGroup(
             new SequentialCommandGroup(
-                Commands.waitSeconds(0.7), 
+                Commands.waitSeconds(0.85), 
                 new SmartCoralIntake()
             ),
             new SetElevator(()->ElevatorState.SOURCE)
