@@ -231,7 +231,7 @@ public class Vision extends SubsystemBase {
                             photonPipelineResult.getBestTarget(),
                             robotState.getOdomRobotVelocity(Utils.fpgaToCurrentTime(photonPipelineResult.getTimestampSeconds())), false);
 
-                    System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
+                    // System.out.println(camera.getName() + " pose: " + newPose.estimatedPose.toString());
 
                     s_Swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(newPose.timestampSeconds), stddev.getStandardDev(false));
                     Logger.recordOutput("odo", s_Swerve.getPose());

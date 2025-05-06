@@ -141,48 +141,48 @@ public class EndEffector extends SubsystemBase {
   @Override
   public void periodic() {
     // SmartDashboard.putBoolean("Can score L1", outtakeProfiler.coralTrajAligned());
-    if(getLeftLaserMeasurement() != null){
-      if(getLeftLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-        SmartDashboard.putNumber("leftlasercan measurement", getLeftLaserMeasurement().distance_mm);
-        SmartDashboard.putBoolean("leftlasercan working", true);
-      }else{
-        SmartDashboard.putNumber("leftlasercan measurement", -1);
-        SmartDashboard.putBoolean("leftlasercan working", false );
-        SmartDashboard.putNumber("leftlasercan status", getLeftLaserMeasurement().status);
-      }
-    } else{
-      SmartDashboard.putNumber("lasercan measurement", -1);
-      SmartDashboard.putBoolean("lasercan working", false );
-    }
-    if(getRightLaserMeasurement() != null){
-      if(getRightLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-        SmartDashboard.putNumber("rightlasercan measurement", getRightLaserMeasurement().distance_mm);
-        SmartDashboard.putBoolean("rightlasercan working", true);
-      }else{
-        SmartDashboard.putNumber("rightlasercan measurement", -1);
-        SmartDashboard.putBoolean("rightlasercan working", false );
-        SmartDashboard.putNumber("rightlasercan status", getRightLaserMeasurement().status);
-      }
-    }
+    // if(getLeftLaserMeasurement() != null){
+    //   if(getLeftLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+    //     SmartDashboard.putNumber("leftlasercan measurement", getLeftLaserMeasurement().distance_mm);
+    //     SmartDashboard.putBoolean("leftlasercan working", true);
+    //   }else{
+    //     SmartDashboard.putNumber("leftlasercan measurement", -1);
+    //     SmartDashboard.putBoolean("leftlasercan working", false );
+    //     SmartDashboard.putNumber("leftlasercan status", getLeftLaserMeasurement().status);
+    //   }
+    // } else{
+    //   SmartDashboard.putNumber("lasercan measurement", -1);
+    //   SmartDashboard.putBoolean("lasercan working", false );
+    // }
+    // if(getRightLaserMeasurement() != null){
+    //   if(getRightLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+    //     SmartDashboard.putNumber("rightlasercan measurement", getRightLaserMeasurement().distance_mm);
+    //     SmartDashboard.putBoolean("rightlasercan working", true);
+    //   }else{
+    //     SmartDashboard.putNumber("rightlasercan measurement", -1);
+    //     SmartDashboard.putBoolean("rightlasercan working", false );
+    //     SmartDashboard.putNumber("rightlasercan status", getRightLaserMeasurement().status);
+    //   }
+    // }
 
-    if(getLeftLaserMeasurement()!= null && getRightLaserMeasurement() != null){
-      if(getRightLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && getLeftLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-        if(getLeftLaserMeasurement().distance_mm < 300 && getRightLaserMeasurement().distance_mm < 300){
-          SmartDashboard.putBoolean("aligned", true);
-          aligned = true;
-        } else{
-          SmartDashboard.putBoolean("aligned", false);
-          aligned = false;
-        }
+    // if(getLeftLaserMeasurement()!= null && getRightLaserMeasurement() != null){
+    //   if(getRightLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && getLeftLaserMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+    //     if(getLeftLaserMeasurement().distance_mm < 300 && getRightLaserMeasurement().distance_mm < 300){
+    //       SmartDashboard.putBoolean("aligned", true);
+    //       aligned = true;
+    //     } else{
+    //       SmartDashboard.putBoolean("aligned", false);
+    //       aligned = false;
+    //     }
         
-      }else{
-        SmartDashboard.putBoolean("aligned", false);
-        aligned = false;
-      }
-    }else{
-      SmartDashboard.putBoolean("aligned", false);
-      aligned = false;
-    }
+    //   }else{
+    //     SmartDashboard.putBoolean("aligned", false);
+    //     aligned = false;
+    //   }
+    // }else{
+    //   SmartDashboard.putBoolean("aligned", false);
+    //   aligned = false;
+    // }
    SmartDashboard.putBoolean("beam break unbroken", getBeamResult());
   }
 }

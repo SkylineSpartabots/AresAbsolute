@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -35,9 +36,9 @@ public class TeleopPathing extends Command {
   private DriveControlSystems controlSystems;
   private RobotState robotState;
   
-  private PIDController xController = new PIDController(0.7, 0, 0);
-  private PIDController yController = new PIDController(0.7, 0, 0);
-  private PIDController thetaController = new PIDController(0.7, 0, 0);
+  private PIDController xController = new PIDController(2.3, 0, 0.01);
+  private PIDController yController = new PIDController(2.3, 0, 0.01);
+  private PIDController thetaController = new PIDController(2.3, 0, 0.01);
   // private boolean toggled = false;
 
   public TeleopPathing(String name) {
@@ -60,6 +61,7 @@ public class TeleopPathing extends Command {
   public void initialize() {
     timer.restart();
     robotState.autoAligning = true;
+    SmartDashboard.putString("current path", trajectory.name());
     // toggled = false;
     // if (trajectory != null){
     //   startPose = trajectory.getInitialPose(alliance.get() == DriverStation.Alliance.Red);

@@ -155,11 +155,12 @@ public class RobotContainer {
     driver.back().onTrue(CommandFactory.EjectFunnel());
 
     driver.a().onTrue(new SetElevator(() -> robotstate.getSelectedElevatorLevel()));
-    driver.x().onTrue(CommandFactory.FlexibleIntake());
+    driver.x().onTrue(CommandFactory.FullCoralIntake());
     driver.y().onTrue(CommandFactory.AutoPoleAlign(driver));
 
     // ----------====# Operator bindings #====----------
-    operator.start().onTrue(new ZeroElevator());
+    operator.back().onTrue(new ZeroElevator());
+    operator.start().onTrue(CommandFactory.BeginAutomationRoutine(driver));
     
     operator.povLeft().onTrue(new InstantCommand(() -> robotstate.setSourceValue(false)));
     operator.povRight().onTrue(new InstantCommand(() -> robotstate.setSourceValue(true)));
@@ -172,8 +173,8 @@ public class RobotContainer {
     operator.rightBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleUp()));
     operator.leftBumper().onTrue(new InstantCommand(() -> robotstate.navigateReefPoleDown()));
     
-    operatorDpadUp.whileTrue(new AdjustElevator(0.2));
-    operatorDpadDown.whileTrue(new AdjustElevator(-0.2));
+    operatorDpadUp.whileTrue(new AdjustElevator(0.1));
+    operatorDpadDown.whileTrue(new AdjustElevator(-0.1));
 
     operator.leftTrigger().onTrue(new InstantCommand(()-> endEffector.setOuttakeSpeed(0.4)));
     operator.leftTrigger().onFalse(new InstantCommand(()->endEffector.setOuttakeSpeed(0)));

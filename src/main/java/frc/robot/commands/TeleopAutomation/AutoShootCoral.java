@@ -14,24 +14,27 @@ import frc.robot.commands.CommandFactory;
 
 public class AutoShootCoral extends Command {
     private EndEffector s_EndEffector;
-    Timer timer = new Timer();
+    Timer timer;
     private CommandXboxController controller;
 
     public  AutoShootCoral(CommandXboxController controller) {
         s_EndEffector = EndEffector.getInstance();
         this.controller = controller;
-
+        timer = new Timer();
         addRequirements(s_EndEffector);
     }
 
+    @Override
     public void initialize() {
         timer.restart();
         s_EndEffector.setOuttakeSpeed(OuttakeState.SCORE);
     }
 
-    public void end() {
+    @Override
+    public void end(boolean interrupted) {
         s_EndEffector.setOuttakeSpeed(0);
         CommandFactory.IntakePath(controller).schedule();
+
     }
 
     public boolean isFinished() {

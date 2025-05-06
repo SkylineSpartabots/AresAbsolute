@@ -173,7 +173,7 @@ public class Robot extends LoggedRobot {
     sourceSide.setDefaultOption("left source", false);
     sourceSide.addOption("right source", true);
     
-
+    SmartDashboard.putString("current path", "none");
     chosenAuto.addOption("forward + dealgae back", Autos.forwardDealgaeBack());
     chosenAuto.addOption("forward + dealgae left", Autos.forwardDealgaeLeft());
     chosenAuto.addOption("forward + dealgae right", Autos.forwardDealgaeRight());
@@ -277,6 +277,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    RobotState.getInstance().setSourceValue(sourceSide.getSelected());
     // new ZeroSlapdown().schedule();
     Constants.alliance = DriverStation.getAlliance().get();
 

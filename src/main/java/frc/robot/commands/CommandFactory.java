@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import java.util.Optional;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Supplier;
 
 import choreo.Choreo;
@@ -232,8 +233,8 @@ public class CommandFactory {
     //entry point for teleop automation
     public static Command BeginAutomationRoutine(CommandXboxController controller) {
         return Commands.either(
-            CommandFactory.AutoSourceAlign(controller),    
-            CommandFactory.AutoPoleAlign(controller),
+            Commands.none(),    
+            CommandFactory.ScoringPath(controller),
             EndEffector.getInstance()::getBeamResult // Run FullCoralIntake() only if true
         );
     }
@@ -249,16 +250,14 @@ public class CommandFactory {
         ).raceWith(new CancelableCommand(controller));
     }
 
-
-
     public static Command AutoPoleAlign(CommandXboxController controller) {
         return new SequentialCommandGroup(
             new ReefAlign(),
             new ParallelCommandGroup(
                 new PoleAlign(),
                 new SetElevator()
-            ),
-            new AutoShootCoral(controller)
+            )
+            // new AutoShootCoral(controller)
         ).raceWith(new PausablePoleAlignCommand(controller)) //254
         .raceWith(new CancelableCommand(controller)); // If cancelable command ends, the whole thing stops
     }
@@ -266,7 +265,7 @@ public class CommandFactory {
     public static Command AutoSourceAlign(CommandXboxController controller) {
         return new SequentialCommandGroup( //dw about this rn
             new DriveToPose(RobotState.getInstance().getSourcePose())
-        ).raceWith(new CancelableCommandJoystick    (controller)); // If cancelable command ends, the whole thing stops
+        ).raceWith(new CancelableCommandJoystick(controller)); // If cancelable command ends, the whole thing stops
     }
 
     //choreo pathing --------------------------------
@@ -315,7 +314,7 @@ public class CommandFactory {
 
     public static Command AutoAlgaeAlign(CommandXboxController controller){
         return new SequentialCommandGroup(
-            new ReefAlign(),
+            // new ReefAlign(),
             new AlgaeAlign()
             ).raceWith(new CancelableCommand(controller));
     }
